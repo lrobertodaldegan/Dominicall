@@ -3,15 +3,24 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import { Colors } from '../utils/Colors';
 import Icon from './Icon';
 import Label from './Label';
 
-const Button = ({label, style={}, labelStyle={}, icon=null, iconStyle={}, iconPosition='r', 
-                  onPress=()=>null}) => {
+const Button = ({label, 
+                  style={}, 
+                  labelStyle={}, 
+                  icon=null, 
+                  iconStyle={}, 
+                  iconPosition='r', 
+                  onPress=()=>null
+                }) => {
   
   const getIcon = () => {
-    return icon === null ? <></>
-                         : <Icon icon={icon} size={18} style={[styles.icon, iconStyle]}/>;
+    return icon === null 
+                  ? <></>
+                  : <Icon icon={icon} size={18} 
+                        style={[styles.icon, iconStyle]}/>;
   }
   
   return (
@@ -29,23 +38,26 @@ const Button = ({label, style={}, labelStyle={}, icon=null, iconStyle={}, iconPo
   );
 }
 
+const screen = Dimensions.get('screen');
+
 const styles = StyleSheet.create({
   btn:{
     flexDirection:'row',
-    backgroundColor:'#8A4A20',
-    width:Dimensions.get('screen').width - 40,
+    backgroundColor:Colors.black,
+    width:screen.width - 20,
     alignItems:'center',
     justifyContent:'center',
-    height:50,
+    height:screen.height * 0.06,
     borderRadius:10,
     marginVertical:5
   },
-  lbl:{
-    color: '#fafafa'
-  },
   icon:{
-    color: '#fafafa'
-  }
+    color: Colors.white
+  },
+  lbl:{
+    fontSize:20,
+    fontFamily:'MartelSans-Bold'
+  },
 });
 
 export default Button;

@@ -1,8 +1,8 @@
 import {
   TouchableHighlight,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
+import { Colors } from '../utils/Colors';
 import Label from './Label';
 
 const Link = ({label, style={}, onPress=()=>null}) => {
@@ -18,7 +18,7 @@ const Link = ({label, style={}, onPress=()=>null}) => {
 
 const styles = StyleSheet.create({
   lbl:{
-    color: '#8A4A20',
+    color: Colors.black,
     fontSize: 14,
     marginTop:10
   }

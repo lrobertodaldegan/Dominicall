@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
   lbl:{
     color:'red',
     fontSize:16,
-    fontFamily:'Montserrat-Regular',
+    fontFamily:'MartelSans-Regular',
     marginBottom:10,
     marginTop:10
   }

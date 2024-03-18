@@ -2,6 +2,8 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
+import { Colors } from "../utils/Colors";
+
 
 
 const Label = ({value, style={}}) => {
@@ -12,9 +14,9 @@ const Label = ({value, style={}}) => {
 
 const styles = StyleSheet.create({
   lbl:{
-    color:'#8A4A20',
+    color:Colors.white,
     fontSize:16,
-    fontFamily:'Montserrat-Regular'
+    fontFamily:'MartelSans-Regular'
   }
 });
 
