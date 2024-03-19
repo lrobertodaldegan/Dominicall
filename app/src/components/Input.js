@@ -17,6 +17,7 @@ export default function Input({
                         inputStyle={},
                         placeholder='',
                         value=null,
+                        keyboardType='default',
                         onChange=(v)=>null,
                         onEnter=(v)=>null
                       }) {
@@ -35,6 +36,7 @@ export default function Input({
           placeholderTextColor={Colors.darkerGray}
           placeholder={placeholder}
           value={value} 
+          keyboardType={keyboardType}
           onSubmitEditing={onEnter}
           onChangeText={onChange}
       />

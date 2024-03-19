@@ -5,21 +5,19 @@ import {
   Dimensions,
   TouchableHighlight,
 } from 'react-native';
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Colors } from "../utils/Colors";
-import Icon from "./Icon";
 import Label from "./Label";
 import Link from "./Link";
+import Icon from "./Icon";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function ListItem({
-                                title=' ',
-                                leftComponent=<></>,
-                                midleComponent=<></>,
-                                rightComponent=<></>,
-                                showRemove=true,
+export default function NumberListItem({
+                                title='',
+                                number=0,
                                 onPress=()=>null,
                                 onRemove=()=>null,
                               }) {
+  
   const [showConfirm, setShowConfirm] = useState(false);
 
   const renderConfirmation = () => {
@@ -42,20 +40,6 @@ export default function ListItem({
       );
     }
   }
-
-  const renderTrash = () => {
-    if(showRemove === true){
-      return (
-        <TouchableHighlight style={styles.rmBtn}
-            underlayColor={Colors.white}
-            onPress={() => setShowConfirm(true)}>
-          <Icon icon={faTrash} style={{color:Colors.black}}/>
-        </TouchableHighlight>
-      );
-    }
-
-    return <></>
-  }
                               
   return (
     <TouchableHighlight style={styles.wrap}
@@ -63,30 +47,19 @@ export default function ListItem({
         onPress={onPress}>
       <>
         {renderConfirmation()}
-        
+
         <View style={styles.left}>
-          <Label value={title[0]} style={styles.titleLeft}/>
+          <Label value={'R$'} style={styles.titleLeft}/>
         </View>
+
         <View style={styles.componentsWrap}>
-          <View style={styles.titleWrap}>
-            <Label value={title} style={styles.title}/>
+          <Label value={`${title}${number}`} style={styles.title}/>
 
-            {renderTrash()}
-          </View>
-
-          <View style={styles.components}>
-            <View style={styles.compsItem}>
-              {leftComponent}
-            </View>
-
-            <View style={styles.compsItem}>
-              {midleComponent}
-            </View>
-            
-            <View style={styles.compsItem}>
-              {rightComponent}
-            </View>
-          </View>
+          <TouchableHighlight style={styles.rmBtn}
+                underlayColor={Colors.white}
+                onPress={() => setShowConfirm(true)}>
+              <Icon icon={faTrash} style={{color:Colors.black}}/>
+            </TouchableHighlight>
         </View>
       </>
     </TouchableHighlight>
@@ -120,25 +93,16 @@ const styles = StyleSheet.create({
     backgroundColor:Colors.black,
     marginRight:20
   },
+  componentsWrap:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width:screen.width * 0.65,
+  },
   title:{
     color:Colors.black,
     fontSize:22,
-    fontFamily:'MartelSans-Bold',
-  },
-  titleWrap:{
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'center',
-    width:screen.width * 0.66
-  },
-  components:{
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'center',
-    marginTop:5,
-  },
-  compsItem:{
-    width: widthComps
+    fontFamily:'MartelSans-Bold'
   },
   confirmation:{
     position:'absolute',

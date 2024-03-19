@@ -5,19 +5,17 @@ import {
   Dimensions,
   TouchableHighlight,
 } from 'react-native';
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faArrowUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Colors } from "../utils/Colors";
 import Icon from "./Icon";
 import Label from "./Label";
 import Link from "./Link";
 
-export default function ListItem({
+export default function PositionListItem({
                                 title=' ',
-                                leftComponent=<></>,
-                                midleComponent=<></>,
-                                rightComponent=<></>,
-                                showRemove=true,
-                                onPress=()=>null,
+                                subtitle='',
+                                onUp=()=>null,
+                                onDown=()=>null,
                                 onRemove=()=>null,
                               }) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -26,7 +24,8 @@ export default function ListItem({
     if(showConfirm === true){
       return (
         <View style={styles.confirmation}>
-          <Label value={'Isso não pode ser desfeito!'} style={styles.dltTitle}/>
+          <Label value={'Isso não pode ser desfeito!'} 
+              style={styles.dltTitle}/>
 
           <View style={styles.confActions}>
             <Link label={'Quero remover mesmo'} 
@@ -43,59 +42,50 @@ export default function ListItem({
     }
   }
 
-  const renderTrash = () => {
-    if(showRemove === true){
-      return (
-        <TouchableHighlight style={styles.rmBtn}
-            underlayColor={Colors.white}
-            onPress={() => setShowConfirm(true)}>
-          <Icon icon={faTrash} style={{color:Colors.black}}/>
-        </TouchableHighlight>
-      );
-    }
-
-    return <></>
-  }
-                              
   return (
-    <TouchableHighlight style={styles.wrap}
-        underlayColor={Colors.white}
-        onPress={onPress}>
-      <>
-        {renderConfirmation()}
-        
-        <View style={styles.left}>
-          <Label value={title[0]} style={styles.titleLeft}/>
+    <View style={styles.wrap}>
+
+      {renderConfirmation()}
+
+      <View style={styles.left}>
+        <Label value={title[0]} style={styles.titleLeft}/>
+      </View>
+      <View style={styles.componentsWrap}>
+        <View style={styles.titleWrap}>
+          <Label value={title} style={styles.title}/>
+
+          <TouchableHighlight style={styles.rmBtn}
+              underlayColor={Colors.white}
+              onPress={() => setShowConfirm(true)}>
+            <Icon icon={faTrash} style={{color:Colors.black}}/>
+          </TouchableHighlight>
         </View>
-        <View style={styles.componentsWrap}>
-          <View style={styles.titleWrap}>
-            <Label value={title} style={styles.title}/>
 
-            {renderTrash()}
+        <View style={styles.components}>
+          <View style={styles.compsItem}>
+            <Label value={subtitle} style={styles.subtitle}/>
           </View>
-
-          <View style={styles.components}>
-            <View style={styles.compsItem}>
-              {leftComponent}
-            </View>
-
-            <View style={styles.compsItem}>
-              {midleComponent}
-            </View>
-            
-            <View style={styles.compsItem}>
-              {rightComponent}
-            </View>
+          <View style={styles.arrowWrap}>
+            <TouchableHighlight underlayColor={'transparent'}
+                style={styles.btn}
+                onPress={onUp}>
+              <Icon icon={faArrowUp} />
+            </TouchableHighlight>
+          </View>
+          <View style={styles.arrowWrap}>
+            <TouchableHighlight underlayColor={'transparent'}
+                style={styles.btn}
+                onPress={onDown}>
+              <Icon icon={faArrowDown} />
+            </TouchableHighlight>
           </View>
         </View>
-      </>
-    </TouchableHighlight>
+      </View>
+    </View>
   );
 }
 
 const screen = Dimensions.get('screen');
-
-const widthComps = ((screen.width - 20) - ((screen.height * 0.12) * 0.5)) * 0.33;
 
 const styles = StyleSheet.create({
   wrap:{
@@ -123,13 +113,17 @@ const styles = StyleSheet.create({
   title:{
     color:Colors.black,
     fontSize:22,
-    fontFamily:'MartelSans-Bold',
+    fontFamily:'MartelSans-Bold'
   },
   titleWrap:{
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
     width:screen.width * 0.66
+  },
+  subtitle:{
+    color:Colors.black,
+    fontSize:14
   },
   components:{
     flexDirection:'row',
@@ -138,7 +132,10 @@ const styles = StyleSheet.create({
     marginTop:5,
   },
   compsItem:{
-    width: widthComps
+    width: (screen.width - ((screen.height * 0.12) * 0.5)) * 0.6
+  },
+  arrowWrap:{
+    width:screen.width * 0.1
   },
   confirmation:{
     position:'absolute',

@@ -56,10 +56,6 @@ export default function Classes({}) {
                 <Label value={`${item.students} alunos`}
                     style={styles.lbl}/>
               }
-              rightComponent={
-                <Label value={`Escalas`}
-                    style={[styles.lbl, styles.lblR]}/>
-              }
           />
         }
         ListFooterComponent={

@@ -5,6 +5,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import TeamScreen from './src/screens/TeamScreen';
+import ReportScreen from './src/screens/ReportScreen';
 import PrimeiroAcessoScreen from './src/screens/PrimeiroAcessoScreen';
 import ErrorScreen from './src/screens/ErrorScreen';
 
@@ -28,6 +30,8 @@ function App(): JSX.Element {
         <Stack.Navigator>
           <Stack.Screen name="login" component={LoginScreen} options={ScreensOptions} />
           <Stack.Screen name="home" component={HomeScreen} options={ScreensOptions} />
+          <Stack.Screen name="team" component={TeamScreen} options={ScreensOptions} />
+          <Stack.Screen name="reports" component={ReportScreen} options={ScreensOptions} />
           <Stack.Screen name="primeiroAcesso" component={PrimeiroAcessoScreen} options={ScreensOptions} />
           <Stack.Screen name="error" component={ErrorScreen} options={ScreensOptions} />
         </Stack.Navigator>

@@ -1,13 +1,16 @@
 import React,{useState} from "react";
 import {
-  StyleSheet,
   View,
+  StyleSheet,
   Dimensions,
+  TouchableHighlight,
 } from 'react-native';
 import { Colors } from "../utils/Colors";
 import Label from "./Label";
 import IconLabel from "./IconLabel";
-import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import Icon from "./Icon";
+import { faCheckSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Link from "./Link";
 
 export default function CheckListItem({
                                 title='',
@@ -15,9 +18,11 @@ export default function CheckListItem({
                                 checklistSelectedLbl='Selecionado',
                                 leftComponent=<></>,
                                 rightComponent=<></>,
-                                onSelect=()=>null
+                                onSelect=()=>null,
+                                onRemove=()=>null,
                               }) {
   const [selected, setSelected] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSelection = () => {
     setSelected(!selected);
@@ -25,16 +30,48 @@ export default function CheckListItem({
     onSelect(title);
   }
 
+  const renderConfirmation = () => {
+    if(showConfirm === true){
+      return (
+        <View style={styles.confirmation}>
+          <Label value={'Isso não pode ser desfeito!'} style={styles.dltTitle}/>
+
+          <View style={styles.confActions}>
+            <Link label={'Quero remover mesmo'} 
+                style={styles.dltLink}
+                onPress={onRemove}
+            />
+            <Link label={'Cancelar'} 
+                style={styles.cnclLink}
+                onPress={() => setShowConfirm(false)}
+            />
+          </View>
+        </View>
+      );
+    }
+  }
+
   return (
     <View style={styles.wrap}>
+      {renderConfirmation()}
+
       <View style={styles.left}>
         <IconLabel label={selected === true ? checklistSelectedLbl : checklistLbl}
             iconStyle={selected === true ? styles.slctd : styles.nSlctd}
             icon={faCheckSquare}
             onPress={handleSelection}/>
       </View>
+
       <View style={styles.componentsWrap}>
-        <Label value={title} style={styles.title}/>
+        <View style={styles.titleWrap}>
+          <Label value={title} style={styles.title}/>
+
+          <TouchableHighlight style={styles.rmBtn}
+              underlayColor={Colors.white}
+              onPress={() => setShowConfirm(true)}>
+            <Icon icon={faTrash} style={{color:Colors.black}}/>
+          </TouchableHighlight>
+        </View>
 
         <View style={styles.components}>
           <View style={styles.compsItem}>
@@ -73,12 +110,18 @@ const styles = StyleSheet.create({
     alignItems:'center',
     width:(screen.height * 0.12) * 0.5,
     height:(screen.height * 0.12) * 0.5,
-    marginRight:30
+    marginRight:20
   },
   title:{
     color:Colors.black,
     fontSize:22,
     fontFamily:'MartelSans-Bold'
+  },
+  titleWrap:{
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+    width:screen.width * 0.66
   },
   components:{
     flexDirection:'row',
@@ -94,5 +137,35 @@ const styles = StyleSheet.create({
   },
   nSlctd:{
     color:Colors.lightGray
-  }
+  },
+  confirmation:{
+    position:'absolute',
+    width:screen.width,
+    height:screen.height * 0.1,
+    backgroundColor:Colors.white,
+    zIndex:7
+  },
+  dltTitle:{
+    color:Colors.red,
+    fontSize:22,
+    fontFamily:'MartelSans-Bold',
+    textAlign:'center'
+  },
+  confActions:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  dltLink:{
+    color:Colors.red,
+    fontSize:16,
+    textAlign:'center',
+    marginRight:20,
+    fontFamily:'MartelSans-Bold',
+  },
+  cnclLink:{
+    color:Colors.black,
+    fontSize:16,
+    textAlign:'center'
+  },
 });

@@ -1,5 +1,5 @@
 import react, {useState, useEffect} from 'react';
-import { faChalkboard, faChalkboardTeacher, faChalkboardUser, faCoins, faHardHat, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faCalendarDays, faChalkboard, faChalkboardTeacher, faChalkboardUser, faCoins, faGraduationCap, faHardHat, faNewspaper, faPen, faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
 import {
   ScrollView,
   StyleSheet,
@@ -15,6 +15,14 @@ import Link from './Link';
 import Button from './Button';
 import IconLabel from './IconLabel';
 import CheckListItem from './CheckListItem';
+import NewListItem from './NewListItem';
+import NumberListItem from './NumberListItem';
+import ListItem from './ListItem';
+import StudentModal from './StudentModal';
+import OfferModal from './OfferModal';
+import TeacherModal from './TeacherModal';
+import PositionListItem from './PositionListItem';
+import EventModal from './EventModal';
 
 const ALUNOS = [
   {id:0, name:'Lucas Roberto', presence:10, ausence:5},
@@ -25,8 +33,52 @@ const ALUNOS = [
 ];
 
 const PROFS = [
-  {id:0, name:'Lucas Roberto', presence:10, ausence:5},
-  {id:2, name:'Lucas Roberto', presence:10, ausence:5},
+  {id:0, name:'Lucas Roberto', level:'Professor'},
+  {id:2, name:'Lucas Roberto', level:'Coordenador'},
+];
+
+const OFFERS = [
+  {id:0, dt:'19/03/2024', value:10},
+  {id:1, dt:'19/03/2024', value:5}
+];
+
+const EVENTS = [
+  {id:0, dt:'19/03/2024', title:'Encerramento\ndo trimeste', teacher:'Lucas Roberto'},
+  {id:1, dt:'19/03/2024', title:'Evento', teacher:'Carlos'}
+];
+
+const CLASS_OPTIONS = [
+  {
+    id:'opt1', 
+    icon:faGraduationCap,
+    title:'Alunos',
+    page:'students'
+  },
+  {
+    id:'opt2', 
+    icon:faCoins,
+    title:'Ofertas',
+    page:'offers'
+  },
+  {
+    id:'opt3', 
+    icon:faPersonChalkboard,
+    title:'Professores',
+    page:'teachers'
+  },
+  {
+    id:'opt4', 
+    icon:faCalendarDays,
+    title:'Escalas',
+    page:'calendar'
+  },
+];
+
+const CLASS_ORDER = [
+  {id:0, teacher:'Lucas Roberto',position:1},
+  {id:1, teacher:'Gessé',position:2},
+  {id:2, teacher:'Carlos',position:3},
+  {id:3, teacher:'Elecy',position:4},
 ];
 
 export default function Class({
@@ -34,19 +86,19 @@ export default function Class({
                           onGoBack=()=>null, 
                           onNameChange=(newName)=>null
                         }) {
-
   const [name, setName] = useState(null);
+  const [page, setPage] = useState('students');
   const [showSave, setShowSave] = useState(false);
-  const [page, setPage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [calendarList, setCalendarList] = useState([]);
 
   useEffect(() => {
     setName(item?.name);
     setShowSave(false);
-    setPage('students');
+    setCalendarList(CLASS_ORDER);
   },[]);
 
   const handleNameChanging = (v) => {
-    console.log(v);
     setName(v);
     setShowSave(v !== item?.name);
   }
@@ -74,6 +126,14 @@ export default function Class({
       return PROFS;
     }
 
+    if(page === 'offers'){
+      return OFFERS;
+    }
+
+    if(page === 'calendar'){
+      return EVENTS;
+    }
+
     return [];
   }
 
@@ -96,57 +156,197 @@ export default function Class({
     }
 
     if(page === 'teachers'){
+      return (
+        <ListItem title={item.name}
+          leftComponent={
+            <Label value={item.level} style={styles.lbl}/>
+          }
+        />
+      )
+    }
 
+    if(page === 'offers'){
+      return (
+        <NumberListItem number={item.value}/>
+      );
+    }
+
+    if(page === 'calendar'){
+      return (
+        <ListItem title={item.teacher}
+          leftComponent={
+            <Label value={`${item.title}`} style={styles.lbl}/>
+          }
+          midleComponent={
+            <Label value={`Data:\n${item.dt}`} style={styles.lbl}/>
+          }
+        />
+      )
     }
 
     return <></>
   }
 
-  return (
-    <FlatList 
-      contentContainerStyle={styles.wrap}
-      keyboardDismissMode='on-drag'
-      keyboardShouldPersistTaps='always'
-      ListHeaderComponent={
-        <>
-          <Link onPress={onGoBack} label={'< Voltar'}/>
+  const getFirstListItem = () => {
+    let title = '';
 
-          <View style={styles.header}>
-            <Label value={Days.label()} style={styles.dt}/>
+    if(page === 'students')
+      title = 'Novo aluno';
 
-            <Input placeholder={item.name} 
-                value={name}
-                onChange={handleNameChanging}
-                onEnter={handleSubmitNameChanging}
-                ico={faChalkboard}
-                style={styles.inputWrap}
-                inputStyle={styles.input}
-            />
+    if(page === 'teachers')
+      title = 'Novo professor';
 
-            {renderSave()}
+    if(page === 'offers')
+      title = 'Lançar oferta';
 
-            <View style={styles.optWrap}>
-              <IconLabel icon={faChalkboardUser} label='Alunos'
-                  lblStyle={styles.opt}
-                  selected={page === 'students'}
-                  onPress={() => setPage('students')}/>
-              <IconLabel icon={faChalkboardTeacher} label='Professores'
-                  lblStyle={styles.opt}
-                  selected={page === 'teachers'}
-                  onPress={() => setPage('teachers')}/>
-              <IconLabel icon={faCoins} label='Ofertas'
-                  lblStyle={styles.opt}
-                  selected={page === 'offers'}
-                  onPress={() => setPage('offers')}/>
-            </View>
-          </View>
-        </>
+    if(page === 'calendar')
+      title = 'Novo evento';
+    
+    return (
+      <NewListItem title={title} 
+          onPress={() => setShowModal(true)}/>
+    )
+  }
+
+  const getLastListItem = () => {
+    let c = [];
+
+    if(page === 'offers'){
+      let total = 0;
+
+      OFFERS.map(o => total+=o.value);
+      
+      c.push(<NumberListItem key={total} title='Total: ' number={total}/>);
+    }
+
+    c.push(<View key={'foot'} style={styles.foot}/>);
+
+    return <>{c}</>
+  }
+
+  const getCalendarList = () => {
+    if(page === 'calendar')
+      return calendarList;
+
+    return [];
+  }
+
+  const handlePositionChange = (item, movement) => {
+    let list = [...calendarList];
+
+    let newPos = new Number(item.position) + new Number(movement);
+    
+    if(newPos > 0 && newPos <= list.length){
+      for(let i=0; i < list.length; i++){
+        let ii = list[i];
+
+        if(ii.position === newPos){
+          if(movement > 0)
+            ii.position = ii.position - 1;//down
+      
+          if(movement < 0)
+            ii.position = ii.position + 1;//up
+        }
+
+        if(ii.id === item.id)
+          ii.position = newPos;
       }
-      data={getData()}
-      keyExtractor={(item) => item.id}
-      renderItem={({item}) => getListItem(item)}
-      ListFooterComponent={<View style={styles.foot}/>}
-    />
+    }
+    
+    setCalendarList(list.sort((a, b) => a.position < b.position ? -1 : 1));
+  }
+
+  const renderModal = () => {
+    if(showModal === true){
+      if(page === 'students')
+        return <StudentModal onClose={() => setShowModal(false)}/>
+
+      if(page === 'offers')
+        return <OfferModal onClose={() => setShowModal(false)}/>
+
+      if(page === 'teachers')
+        return <TeacherModal onClose={() => setShowModal(false)}/>
+
+      if(page === 'calendar')
+        return <EventModal onClose={() => setShowModal(false)}/>
+    }
+
+    return <></>
+  }
+
+  const renderClassHeader = () => {
+    return (
+      <>
+        <Link onPress={onGoBack} label={'< Voltar'}/>
+
+        <View style={styles.header}>
+          <Label value={Days.label()} style={styles.dt}/>
+
+          <Input placeholder={item.name} 
+              value={name}
+              onChange={handleNameChanging}
+              onEnter={handleSubmitNameChanging}
+              ico={faChalkboard}
+              style={styles.inputWrap}
+              inputStyle={styles.input}
+          />
+
+          {renderSave()}
+
+          <FlatList 
+            keyboardDismissMode='on-drag'
+            keyboardShouldPersistTaps='always'
+            horizontal
+            data={CLASS_OPTIONS}
+            keyExtractor={(item) => item.id}
+            renderItem={({item}) => 
+              <IconLabel icon={item.icon} 
+                label={item.title}
+                style={styles.opts}
+                lblStyle={styles.opt}
+                selected={page === item.page}
+                onPress={() => setPage(item.page)}
+              />
+            }
+          />
+        </View>
+
+        {getFirstListItem()}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {renderModal()}
+
+      <FlatList 
+        contentContainerStyle={styles.wrap}
+        keyboardDismissMode='on-drag'
+        keyboardShouldPersistTaps='always'
+        ListHeaderComponent={
+          <FlatList 
+            contentContainerStyle={styles.wrap}
+            keyboardDismissMode='on-drag'
+            keyboardShouldPersistTaps='always'
+            ListHeaderComponent={renderClassHeader()}
+            data={getData()}
+            keyExtractor={(item) => item.id}
+            renderItem={({item}) => getListItem(item)}
+          />
+        }
+        data={getCalendarList()}
+        keyExtractor={(item) => item.id}
+        renderItem={({item}) => 
+          <PositionListItem title={item.teacher}
+            subtitle={`Aula ${item.position}`}
+            onDown={() => handlePositionChange(item, 1)}
+            onUp={() => handlePositionChange(item, -1)}
+          />
+        }
+        ListFooterComponent={() => getLastListItem()}
+      />
+    </>
   );
 }
 
@@ -159,10 +359,9 @@ const styles = StyleSheet.create({
     width:screen.width - 10,
     borderRadius:20,
     padding:5,
-    overflow:'scroll'
   },
   header:{
-    alignItems:'center'
+    alignItems:'center',
   },
   dt:{
     color:Colors.black,
@@ -177,14 +376,11 @@ const styles = StyleSheet.create({
     minWidth:((screen.width - 40) * 0.5) * 0.9,
     maxWidth:(screen.width - 40) * 0.8,
   },
-  optWrap:{
-    flexDirection:'row',
-    alignItems:'center',
-    justifyContent:'space-between',
-    width:screen.width * 0.75
-  },
   opt:{
     fontSize:14
+  },
+  opts:{
+    marginHorizontal:25
   },
   lbl:{
     color:Colors.black,

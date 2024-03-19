@@ -42,7 +42,7 @@ const Header = ({
               lblStyle={styles.menuOpts}
               style={styles.menuOptsWrap}
               selected={page === 'classes'}
-              onPress={() => navigation.navigate('classes')}/>
+              onPress={() => navigation.navigate('home')}/>
 
           <IconLabel icon={faPeopleGroup} label='Equipe'
               lblStyle={styles.menuOpts}
