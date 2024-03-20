@@ -1,27 +1,28 @@
-import react, {useState, useEffect} from 'react';
+import React from 'react';
 import { 
   View,
   StyleSheet,
-  TouchableHighlight,
   Dimensions,
+  StatusBar,
+  FlatList,
   Linking,
-  TextInput,
-  StatusBar
 } from "react-native";
 import Logo from "./Logo";
-import Icon from "./Icon";
-import { faCircleUser, faPlaceOfWorship, faLungs, faUsers, faChalkboard, faPeopleGroup, faNewspaper } from '@fortawesome/free-solid-svg-icons'
-import Button from './Button';
+import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen } from '@fortawesome/free-solid-svg-icons'
 import IconLabel from './IconLabel';
 import { Colors } from '../utils/Colors';
 import Label from './Label';
+import { Texts } from '../utils/Texts';
 
-const Header = ({
-                  navigation, 
-                  title='',
-                  page='classes'
-                }) => {
+const OPTIONS = [
+  {id:0, label:'Turmas', page:'home', icon:faChalkboard},
+  {id:1, label:'Equipe', page:'team', icon:faPeopleGroup},
+  {id:2, label:'Relatórios', page:'reports', icon:faNewspaper},
+  {id:3, label:'Avalie o app', link: Texts.Avalie, icon:faStar},
+  {id:4, label:'Outros apps', link: Texts.GooglePlay, icon:faBoxOpen},
+];
 
+const Header = ({navigation, page='home', group}) => {
   return (
     <>
       <StatusBar translucent backgroundColor={Colors.white} 
@@ -31,31 +32,35 @@ const Header = ({
         <View style={styles.header}>
           <Logo />
 
-          <Label value={title} style={styles.title}/>
+          <Label value={group?.name} style={styles.title}/>
           
           <IconLabel icon={faUsers} label='Meus grupos'
-              onPress={() => navigation.navigate('groups')}/>
+              onPress={() => navigation.navigate('group')}/>
         </View>
 
-        <View style={styles.menu}>
-          <IconLabel icon={faChalkboard} label='Turmas'
+        <FlatList 
+          keyboardDismissMode='on-drag'
+          keyboardShouldPersistTaps='always'
+          contentContainerStyle={styles.list}
+          horizontal
+          data={OPTIONS}
+          keyExtractor={(item) => item.id}
+          renderItem={({item}) => 
+            <IconLabel icon={item.icon} 
+              iconSize={26}
+              label={item.label}
               lblStyle={styles.menuOpts}
               style={styles.menuOptsWrap}
-              selected={page === 'classes'}
-              onPress={() => navigation.navigate('home')}/>
-
-          <IconLabel icon={faPeopleGroup} label='Equipe'
-              lblStyle={styles.menuOpts}
-              style={styles.menuOptsWrap}
-              selected={page === 'team'}
-              onPress={() => navigation.navigate('team')}/>
-
-          <IconLabel icon={faNewspaper} label='Relatórios'
-              lblStyle={styles.menuOpts}
-              style={styles.menuOptsWrap}
-              selected={page === 'reports'}
-              onPress={() => navigation.navigate('reports')}/>
-        </View>
+              selected={page === item.page}
+              onPress={async () => {
+                if(item?.page && item?.page !== null)
+                  navigation.navigate(item?.page, {group:group});
+                else
+                  await Linking.openURL(item?.link);
+              }}
+            />
+          }
+        />
       </View>
     </>
   );
@@ -71,29 +76,29 @@ const styles = StyleSheet.create({
     paddingHorizontal:10,
     borderBottomLeftRadius:20,
     borderBottomRightRadius:20,
+    height: screen.height * 0.25,
   },
   header:{
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
     width:screen.width - 20,
-  },
-  menu:{
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'center',
-    marginVertical:20
-  },
-  menuOpts:{
-    fontSize:14,
-  },
-  menuOptsWrap:{
-    minWidth:(screen.width * 0.33) * 0.5,
-    marginHorizontal:(screen.width * 0.33) * 0.25,
+    
   },
   title:{
     color:Colors.black,
     fontSize:24
+  },
+  list:{
+    alignItems:"center"
+  },
+  menuOpts:{
+    fontSize:18,
+    textAlign:'center'
+  },
+  menuOptsWrap:{
+    minWidth:(screen.width * 0.33) * 0.5,
+    marginHorizontal:(screen.width * 0.33) * 0.25,
   },
 });
 

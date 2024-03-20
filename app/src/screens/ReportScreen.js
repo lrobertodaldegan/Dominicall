@@ -9,10 +9,6 @@ import {
 import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
 import Header from '../components/Header';
-import NewListItem from '../components/NewListItem';
-import ListItem from '../components/ListItem';
-import Label from '../components/Label';
-import MemberModal from '../components/MemberModal';
 import { Colors } from '../utils/Colors';
 import ReportListItem from '../components/ReportListItem';
 
@@ -24,8 +20,10 @@ const REPORTS = [
   {id:4, title:'Escalas', subtitle:'Escalas de professores', action:()=>null},
 ];
 
-const TeamScreen = ({navigation}) => {
+const ReportScreen = ({navigation, route}) => {
   const [showModal, setShowModal] = useState(false);
+
+  const {group} = route.params;
 
   const renderModal = () => {
     if(showModal === true){
@@ -37,7 +35,7 @@ const TeamScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <Header title={'Quitandinha'} page={'reports'} navigation={navigation}/>
+      <Header group={group} page={'reports'} navigation={navigation}/>
 
       {renderModal()}
 
@@ -84,4 +82,4 @@ const styles= StyleSheet.create({
   },
 });
 
-export default TeamScreen;
+export default ReportScreen;

@@ -11,10 +11,13 @@ import Classes from '../components/Classes';
 import { Colors } from '../utils/Colors';
 
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation, route}) => {
+
+  const {group} = route.params;
+
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <Header title={'Quitandinha'} page={'classes'} navigation={navigation}/>
+      <Header group={group} page={'home'} navigation={navigation}/>
 
       <Classes />
 

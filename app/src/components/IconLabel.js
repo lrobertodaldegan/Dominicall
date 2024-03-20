@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   },
   icon:{
     fontSize:16,
-    color:Colors.darkerGray,
+    color:Colors.black,
   },
   iconS:{
     color:Colors.white

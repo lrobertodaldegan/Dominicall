@@ -42,7 +42,7 @@ const LoginScreen = ({navigation}) => {
       //   }
       // }).catch(err => {console.log(err); setBtnLbl('Tente novamente!');});
 
-      navigation.navigate('home');
+      navigation.navigate('group');
     }else{
       setErrorMsg('Usuário e senha são obrigatórios para entrar!');
     }
