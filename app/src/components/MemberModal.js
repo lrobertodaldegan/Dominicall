@@ -3,26 +3,92 @@ import {
   View,
   Dimensions,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
-import { faClock, faGraduationCap, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
 
-export default function MemberModal({onClose=()=>null}){
+const TURMAS = [
+  {id:0, name:'Adultos', students:'10',teachers:'2'},
+  {id:1, name:'Discipulado', students:'10',teachers:'2'},
+  {id:2, name:'Insfantil II', students:'10',teachers:'2'},
+  {id:3, name:'Jovens', students:'10',teachers:'2'},
+  {id:4, name:'Insfantil I', students:'10',teachers:'2'},
+  {id:5, name:'Insfantil III', students:'10',teachers:'2'},
+  {id:6, name:'Esdras e Noemi Noemi Noemi', students:'10',teachers:'2'},
+];
+
+export default function MemberModal({classs=null, onClose=()=>null}){
   const [name, setName] = useState(null);
   const [paper, setPaper] = useState('Professor');
+  const [clas, setClas] = useState(classs);
+  const [err, setErr] = useState(null);
 
   const handleSubmit = () => {
+    if(name && name !== null && paper && paper !== null){
+      if(paper === 'Professor' && (!clas || clas === null)){
+        setErr('Por favor, selecione uma turma para o professor.');
+      } else {
+        //todo success
 
-    onClose();
+        onClose();
+      }
+    } else {
+      setErr('Por favor, informe todos os dados necessários.');
+    }
+  }
+
+  const renderClasses = () => {
+    if(paper === 'Professor'){
+      let classes = TURMAS;
+
+      return (
+        <>
+          <Label value={'Escolha uma classe para o professor:'}
+              style={styles.lbl}/>
+          
+          <View style={styles.papers}>
+            {classes.map(c => {
+              return (
+                <Button key={c.id}
+                  label={c.name} 
+                  onPress={() => setClas(c.name)}
+                  labelStyle={[
+                    styles.paperBtnLbl,
+                    clas === c.name ? styles.paperLblSlctd : {}
+                  ]}
+                  style={[
+                        styles.paperBtn,
+                        clas === c.name ? styles.paperSlctd : {}
+                  ]}
+                />
+              );
+            })}
+          </View>
+        </>
+      );
+    }
+
+    return <></>
+  }
+
+  const renderError = () => {
+    if(err && err !== null)
+      return <Label value={err} style={styles.error}/>
+
+    return <></>
   }
 
   return (
     <Modal onClose={onClose} content={
-      <View>
+      <ScrollView contentContainerStyle={styles.wrap}
+          keyboardDismissMode='on-drag'
+          keyboardShouldPersistTaps='always'>
+
         <Label value={'Novo membro'} style={styles.title}/>
 
         <Input ico={faUser} 
@@ -60,17 +126,6 @@ export default function MemberModal({onClose=()=>null}){
                 paper === 'Professor' ? styles.paperSlctd : {}
               ]}
           />
-          <Button label={'Secretário'} 
-              onPress={() => setPaper('Secretário')}
-              labelStyle={[
-                styles.paperBtnLbl,
-                paper === 'Secretário' ? styles.paperLblSlctd : {}
-              ]}
-              style={[
-                styles.paperBtn,
-                paper === 'Secretário' ? styles.paperSlctd : {}
-              ]}
-          />
           <Button label={'Auxiliar'} 
               onPress={() => setPaper('Auxiliar')}
               labelStyle={[
@@ -82,35 +137,17 @@ export default function MemberModal({onClose=()=>null}){
                 paper === 'Auxiliar' ? styles.paperSlctd : {}
               ]}
           />
-          <Button label={'Tesoureiro'} 
-              onPress={() => setPaper('Tesoureiro')}
-              labelStyle={[
-                styles.paperBtnLbl,
-                paper === 'Tesoureiro' ? styles.paperLblSlctd : {}
-              ]}
-              style={[
-                styles.paperBtn,
-                paper === 'Tesoureiro' ? styles.paperSlctd : {}
-              ]}
-          />
-          <Button label={'Supervisor'} 
-              onPress={() => setPaper('Supervisor')}
-              labelStyle={[
-                styles.paperBtnLbl,
-                paper === 'Supervisor' ? styles.paperLblSlctd : {}
-              ]}
-              style={[
-                styles.paperBtn,
-                paper === 'Supervisor' ? styles.paperSlctd : {}
-              ]}
-          />
         </View>
+
+        {renderClasses()}
+
+        {renderError()}
 
         <Button label={'Salvar'} 
             onPress={handleSubmit}
             style={styles.input}
         />
-      </View>
+      </ScrollView>
     }/>
   );
 }
@@ -119,10 +156,7 @@ const screen = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   wrap:{
-    position:'absolute',
-    width:screen.width,
-    height:screen.height,
-    backgroundColor:Colors.white,
+  
   },
   title:{
     color:Colors.black,
@@ -133,7 +167,8 @@ const styles = StyleSheet.create({
   },
   lbl:{
     color:Colors.black,
-    fontSize:18
+    fontSize:18,
+    marginTop:20,
   },
   input:{
     width:screen.width * 0.8
@@ -142,7 +177,8 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     width:screen.width * 0.8,
     flexWrap:'wrap',
-    justifyContent:'space-between'
+    justifyContent:'space-between',
+    marginBottom:10
   },
   paperBtn:{
     width: (screen.width * 0.8) * 0.45,
@@ -159,6 +195,12 @@ const styles = StyleSheet.create({
     backgroundColor:Colors.offWhite
   },
   paperLblSlctd:{
+    fontFamily:'MartelSans-Bold'
+  },
+  error:{
+    color:Colors.red,
+    fontSize:18,
+    marginVertical:10,
     fontFamily:'MartelSans-Bold'
   },
 });

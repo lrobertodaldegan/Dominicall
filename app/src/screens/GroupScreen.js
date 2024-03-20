@@ -14,6 +14,7 @@ import Label from '../components/Label';
 import { Colors } from '../utils/Colors';
 import Logo from '../components/Logo';
 import GroupModal from '../components/GroupModal';
+import Link from '../components/Link';
 
 const GROUPS = [
   {id:0, name:'Quitandinha', classes:5},
@@ -44,6 +45,10 @@ const GroupScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <View style={styles.logoffwrap}>
+        <Link label={'< Sair do app (logoff)'}
+          onPress={() => navigation.navigate('login')}/>
+      </View>
       <Logo style={styles.logo}/>
 
       <Label value={'Grupos educacionais'} style={styles.title}/>
@@ -90,10 +95,16 @@ const styles= StyleSheet.create({
     padding:10,
     alignItems:'center'
   },
+  logoffwrap:{
+    marginTop:screen.height * 0.04,
+    width:screen.width - 20,
+    alignItems:'flex-start',
+    justifyContent:'flex-start'
+  },
   logo:{
     height:screen.height * 0.1,
     width:screen.height * 0.1,
-    marginTop:screen.height * 0.12,
+    marginTop:screen.height * 0.08,
   },
   list:{
     marginVertical:20,

@@ -1,5 +1,5 @@
-import react, {useState, useEffect} from 'react';
-import { faCalendar, faCalendarDays, faChalkboard, faChalkboardTeacher, faChalkboardUser, faCoins, faGraduationCap, faHardHat, faNewspaper, faPen, faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
+import react, {useState, useEffect, useInsertionEffect} from 'react';
+import { faCalendar, faCalendarDays, faChalkboard, faChalkboardTeacher, faChalkboardUser, faCheckSquare, faChild, faCoins, faGraduationCap, faHardHat, faNewspaper, faPen, faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
 import {
   ScrollView,
   StyleSheet,
@@ -23,6 +23,9 @@ import OfferModal from './OfferModal';
 import TeacherModal from './TeacherModal';
 import PositionListItem from './PositionListItem';
 import EventModal from './EventModal';
+import VisitModal from './VisitModal';
+import IconOption from './IconOption';
+import StudentListItem from './StudentListItem';
 
 const ALUNOS = [
   {id:0, name:'Lucas Roberto', presence:10, ausence:5},
@@ -38,8 +41,8 @@ const PROFS = [
 ];
 
 const OFFERS = [
-  {id:0, dt:'19/03/2024', value:10},
-  {id:1, dt:'19/03/2024', value:5}
+  {id:0, dt:'19/03/2024', value:10, offerer:'Aluno'},
+  {id:1, dt:'19/03/2024', value:5, offerer:'Aluno'}
 ];
 
 const EVENTS = [
@@ -56,18 +59,24 @@ const CLASS_OPTIONS = [
   },
   {
     id:'opt2', 
+    icon:faChild,
+    title:'Visitas',
+    page:'visits'
+  },
+  {
+    id:'opt3', 
     icon:faCoins,
     title:'Ofertas',
     page:'offers'
   },
   {
-    id:'opt3', 
+    id:'opt4', 
     icon:faPersonChalkboard,
     title:'Professores',
     page:'teachers'
   },
   {
-    id:'opt4', 
+    id:'opt5', 
     icon:faCalendarDays,
     title:'Escalas',
     page:'calendar'
@@ -90,6 +99,7 @@ export default function Class({
   const [page, setPage] = useState('students');
   const [showSave, setShowSave] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [offering, setOffering] = useState(null);
   const [calendarList, setCalendarList] = useState([]);
 
   useEffect(() => {
@@ -140,17 +150,8 @@ export default function Class({
   const getListItem = (item) => {
     if(page === 'students'){
       return (
-        <CheckListItem title={item.name}
-          checklistLbl='Ausente'
-          checklistSelectedLbl='Presente'
-          leftComponent={
-            <Label value={`${item.presence} presença(s)`}
-                style={styles.lbl}/>
-          }
-          rightComponent={
-            <Label value={`${item.ausence} ausência(s)`}
-                style={styles.lbl}/>
-          }
+        <StudentListItem item={item}
+          onOfferPress={() => setOffering(item)}
         />
       )
     }
@@ -167,8 +168,14 @@ export default function Class({
 
     if(page === 'offers'){
       return (
-        <NumberListItem number={item.value}/>
+        <NumberListItem subtitle={item.offerer} number={item.value} />
       );
+    }
+
+    if(page === 'visits'){
+      return (
+        <ListItem title={item.name}/>
+      )
     }
 
     if(page === 'calendar'){
@@ -201,6 +208,9 @@ export default function Class({
 
     if(page === 'calendar')
       title = 'Novo evento';
+
+    if(page === 'visits')
+      title = 'Nova visita';
     
     return (
       <NewListItem title={title} 
@@ -216,7 +226,13 @@ export default function Class({
 
       OFFERS.map(o => total+=o.value);
       
-      c.push(<NumberListItem key={total} title='Total: ' number={total}/>);
+      c.push(
+        <NumberListItem key={total} 
+          subtitle='Total da classe ' 
+          number={total}
+          showRemove={false}
+        />
+      );
     }
 
     c.push(<View key={'foot'} style={styles.foot}/>);
@@ -269,6 +285,17 @@ export default function Class({
 
       if(page === 'calendar')
         return <EventModal onClose={() => setShowModal(false)}/>
+
+      if(page === 'visits')
+        return <VisitModal onClose={() => setShowModal(false)}/>
+    }
+
+    if(offering && offering !== null){
+      return (
+        <OfferModal offerer={offering} onClose={() => {
+          setOffering(null);
+        }}/>
+      );
     }
 
     return <></>

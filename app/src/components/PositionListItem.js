@@ -141,11 +141,12 @@ const styles = StyleSheet.create({
     position:'absolute',
     width:screen.width,
     height:screen.height * 0.1,
-    backgroundColor:Colors.white,
+    backgroundColor:Colors.red,
+    justifyContent:'center',
     zIndex:7
   },
   dltTitle:{
-    color:Colors.red,
+    color:Colors.white,
     fontSize:22,
     fontFamily:'MartelSans-Bold',
     textAlign:'center'
@@ -156,14 +157,14 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   dltLink:{
-    color:Colors.red,
+    color:Colors.black,
     fontSize:16,
     textAlign:'center',
     marginRight:20,
     fontFamily:'MartelSans-Bold',
   },
   cnclLink:{
-    color:Colors.black,
+    color:Colors.white,
     fontSize:16,
     textAlign:'center'
   },

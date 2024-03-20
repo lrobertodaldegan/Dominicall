@@ -16,6 +16,7 @@ export default function ListItem({
                                 leftComponent=<></>,
                                 midleComponent=<></>,
                                 rightComponent=<></>,
+                                bottomComponent=<></>,
                                 showRemove=true,
                                 onPress=()=>null,
                                 onRemove=()=>null,
@@ -87,6 +88,12 @@ export default function ListItem({
               {rightComponent}
             </View>
           </View>
+
+          <View style={styles.components}>
+            <View style={styles.bottomCompWrap}>
+              {bottomComponent}
+            </View>
+          </View>
         </View>
       </>
     </TouchableHighlight>
@@ -140,15 +147,19 @@ const styles = StyleSheet.create({
   compsItem:{
     width: widthComps
   },
+  bottomCompWrap:{
+    width: (screen.width - 20) - ((screen.height * 0.12) * 0.5)
+  },
   confirmation:{
     position:'absolute',
     width:screen.width,
     height:screen.height * 0.1,
-    backgroundColor:Colors.white,
+    backgroundColor:Colors.red,
+    justifyContent:'center',
     zIndex:7
   },
   dltTitle:{
-    color:Colors.red,
+    color:Colors.white,
     fontSize:22,
     fontFamily:'MartelSans-Bold',
     textAlign:'center'
@@ -159,14 +170,14 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   dltLink:{
-    color:Colors.red,
+    color:Colors.black,
     fontSize:16,
     textAlign:'center',
     marginRight:20,
     fontFamily:'MartelSans-Bold',
   },
   cnclLink:{
-    color:Colors.black,
+    color:Colors.white,
     fontSize:16,
     textAlign:'center'
   },

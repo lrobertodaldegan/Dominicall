@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { Colors } from "../utils/Colors";
 import Class from "./Class";
+import ClassModal from "./ClassModal";
 import Label from "./Label";
 import ListItem from "./ListItem";
 import NewListItem from "./NewListItem";
@@ -23,6 +24,7 @@ const TURMAS = [
 export default function Classes({}) {
   const [comp, setComp] = useState('list');
   const [selected, setSelected] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleListItem = (item) => {
     setComp('class');
@@ -34,34 +36,47 @@ export default function Classes({}) {
     setComp('list');
   }
 
+  const renderModal = () => {
+    if(showModal === true){
+      return <ClassModal onClose={() => setShowModal(false)}/>
+    }
+
+    return <></>
+  }
+
   if(comp === 'list'){
     return (
-      <FlatList 
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps='always'
-        contentContainerStyle={styles.list}
-        keyExtractor={(item) => item.id}
-        data={TURMAS}
-        ListHeaderComponent={
-          <NewListItem title="Nova turma"/>
-        }
-        renderItem={({item}) => 
-          <ListItem onPress={() => handleListItem(item)}
-              title={item.name}
-              leftComponent={
-                <Label value={`${item.teachers} professores`}
-                    style={styles.lbl}/>
-              }
-              midleComponent={
-                <Label value={`${item.students} alunos`}
-                    style={styles.lbl}/>
-              }
-          />
-        }
-        ListFooterComponent={
-          <View style={styles.listFoot}/>
-        }
-      />
+      <>
+        {renderModal()}
+      
+        <FlatList 
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps='always'
+          contentContainerStyle={styles.list}
+          keyExtractor={(item) => item.id}
+          data={TURMAS}
+          ListHeaderComponent={
+            <NewListItem title="Nova turma"
+              onPress={() => setShowModal(true)}/>
+          }
+          renderItem={({item}) => 
+            <ListItem onPress={() => handleListItem(item)}
+                title={item.name}
+                leftComponent={
+                  <Label value={`${item.teachers} professores`}
+                      style={styles.lbl}/>
+                }
+                midleComponent={
+                  <Label value={`${item.students} alunos`}
+                      style={styles.lbl}/>
+                }
+            />
+          }
+          ListFooterComponent={
+            <View style={styles.listFoot}/>
+          }
+        />
+      </>
     );
   }
 

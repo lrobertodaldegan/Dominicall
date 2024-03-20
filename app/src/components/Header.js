@@ -32,7 +32,10 @@ const Header = ({navigation, page='home', group}) => {
         <View style={styles.header}>
           <Logo />
 
-          <Label value={group?.name} style={styles.title}/>
+          <View style={styles.titleWrap}>
+            <Label value={group?.name} style={styles.title}/>
+            <Label value={'Usuário'} style={styles.user}/>
+          </View>
           
           <IconLabel icon={faUsers} label='Meus grupos'
               onPress={() => navigation.navigate('group')}/>
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
   wrap:{
     alignItems:'center',
     backgroundColor:Colors.white,
-    paddingTop:30,
+    paddingTop:screen.height * 0.04,
     paddingHorizontal:10,
     borderBottomLeftRadius:20,
     borderBottomRightRadius:20,
@@ -87,7 +90,12 @@ const styles = StyleSheet.create({
   },
   title:{
     color:Colors.black,
-    fontSize:24
+    fontSize:24,
+    fontFamily:'MartelSans-Bold'
+  },
+  user:{
+    color:Colors.black,
+    textAlign:'center'
   },
   list:{
     alignItems:"center"

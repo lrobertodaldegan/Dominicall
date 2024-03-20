@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  View,
   StyleSheet,
+  TouchableHighlight,
 } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons'
@@ -19,14 +19,19 @@ const IconLabel = ({
                 onPress=()=>null
               }) => {
   return (
-    <View style={[styles.wrap, style, selected === true ? styles.wrapS : {}]}>
-      <FontAwesomeIcon size={iconSize} 
-          style={[styles.icon, iconStyle, selected === true ? styles.iconS : {}]} 
-          icon={icon} />
+    <TouchableHighlight 
+        underlayColor={Colors.white}
+        onPress={onPress}
+        style={[styles.wrap, style, selected === true ? styles.wrapS : {}]}>
+      <>
+        <FontAwesomeIcon size={iconSize} 
+            style={[styles.icon, iconStyle, selected === true ? styles.iconS : {}]} 
+            icon={icon} />
 
-      <Link label={label} onPress={onPress} 
-          style={[styles.link, lblStyle, selected === true ? styles.linkS : {}]}/>
-    </View>
+        <Link label={label} onPress={onPress} 
+            style={[styles.link, lblStyle, selected === true ? styles.linkS : {}]}/>
+      </>          
+    </TouchableHighlight>
   );
 }
 

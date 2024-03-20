@@ -4,52 +4,54 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { faCoins, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
 
-export default function OfferModal({offerer=null, onClose=()=>null}){
-  const [value, setValue] = useState(null);
-  const [offererr, setOffererr] = useState(null);
+export default function ClassModal({onClose=()=>null}){
+  const [name, setName] = useState(null);
+  const [err, setErr] = useState(null);
 
   useEffect(() => {
-    setOffererr(offerer);
+    setErr(null);
   }, []);
 
   const handleSubmit = () => {
-    //TODO tratar 0 na api
+    if(name && name !== null){
 
-    onClose();
+      onClose();
+    } else {
+      setErr('Por favor, informe um nome válido para a turma.');
+    }
+  }
+
+  const renderError = () => {
+    if(err && err !== null)
+      return <Label value={err} style={styles.error}/>
+
+    return <></>
   }
 
   return (
     <Modal onClose={onClose} content={
       <View>
-        <Label value={'Oferta'} style={styles.title}/>
+        <Label value={'Nova turma'} style={styles.title}/>
 
-        <Input ico={faCoins} 
-            placeholder='Valor ofertado'
-            value={value}
+        <Input ico={faUsers} 
+            placeholder='Nome da turma'
+            value={name}
             iconSize={30}
-            keyboardType={'numeric'}
             style={styles.input}
-            onChange={setValue}
+            onChange={setName}
             onEnter={handleSubmit}
         />
 
-        <Input ico={faGraduationCap} 
-            placeholder='Ofertante (opcional)'
-            value={offererr?.name}
-            iconSize={30}
-            style={styles.input}
-            onChange={setOffererr}
-            onEnter={handleSubmit}
-        />
+        {renderError()}
 
-        <Button label={'Lançar'} 
+        <Button label={'Salvar'} 
             onPress={handleSubmit}
             style={styles.input}
         />
@@ -61,6 +63,12 @@ export default function OfferModal({offerer=null, onClose=()=>null}){
 const screen = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
+  wrap:{
+    position:'absolute',
+    width:screen.width,
+    height:screen.height,
+    backgroundColor:Colors.white,
+  },
   title:{
     color:Colors.black,
     textAlign:'center',

@@ -61,7 +61,7 @@ const LoginScreen = ({navigation}) => {
         <Logo style={styles.logo} />
 
         <View style={styles.formWrap}>
-          <Input onChange={setUser} placeholder='Seu usuario'
+          <Input onChange={setUser} placeholder='Seu usuário'
               value={user}
               ico={faUser}
               iconSize={24}/>

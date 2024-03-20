@@ -18,6 +18,7 @@ export default function CheckListItem({
                                 checklistSelectedLbl='Selecionado',
                                 leftComponent=<></>,
                                 rightComponent=<></>,
+                                bottomComponent=<></>,
                                 onSelect=()=>null,
                                 onRemove=()=>null,
                               }) {
@@ -82,6 +83,12 @@ export default function CheckListItem({
             {rightComponent}
           </View>
         </View>
+
+        <View style={styles.components}>
+          <View style={styles.bottomCompWrap}>
+            {bottomComponent}
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -89,17 +96,15 @@ export default function CheckListItem({
 
 const screen = Dimensions.get('screen');
 
-const widthComps = ((screen.width - 20) - ((screen.height * 0.12) * 0.5)) * 0.33;
-
 const styles = StyleSheet.create({
   wrap:{
     flexDirection:'row',
     alignItems:'center',
     width:screen.width - 20,
-    height:screen.height * 0.12,
+    minHeight:screen.height * 0.12,
     backgroundColor:Colors.white,
-    borderRadius:10,
-    marginBottom:10
+    marginBottom:20,
+    paddingVertical:10,
   },
   titleLeft:{
     color:Colors.white,
@@ -130,7 +135,10 @@ const styles = StyleSheet.create({
     marginTop:5,
   },
   compsItem:{
-    width: widthComps
+    width: ((screen.width - 20) - ((screen.height * 0.12) * 0.5)) * 0.5
+  },
+  bottomCompWrap:{
+    width: (screen.width - 20) - ((screen.height * 0.12) * 0.5)
   },
   slctd:{
     color:Colors.black
@@ -141,12 +149,14 @@ const styles = StyleSheet.create({
   confirmation:{
     position:'absolute',
     width:screen.width,
-    height:screen.height * 0.1,
+    height:screen.height * 0.15,
     backgroundColor:Colors.white,
-    zIndex:7
+    zIndex:7,
+    justifyContent:'center',
+    backgroundColor:Colors.red,
   },
   dltTitle:{
-    color:Colors.red,
+    color:Colors.white,
     fontSize:22,
     fontFamily:'MartelSans-Bold',
     textAlign:'center'
@@ -157,14 +167,14 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   dltLink:{
-    color:Colors.red,
+    color:Colors.black,
     fontSize:16,
     textAlign:'center',
     marginRight:20,
     fontFamily:'MartelSans-Bold',
   },
   cnclLink:{
-    color:Colors.black,
+    color:Colors.white,
     fontSize:16,
     textAlign:'center'
   },

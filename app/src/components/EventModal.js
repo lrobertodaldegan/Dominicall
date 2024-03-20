@@ -4,7 +4,7 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { faCalendarDay } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-native-modern-datepicker';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
@@ -13,13 +13,38 @@ import Modal from './Modal';
 import Button from './Button';
 
 export default function EventModal({onClose=()=>null}){
+  const [event, setEvent] = useState(null);
   const [teacher, setTeacher] = useState(null);
   const [dt, setDt] = useState(null);
+  const [err, setErr] = useState(null);
 
   const handleSubmit = () => {
+    console.log(event);
     console.log(teacher);
     console.log(dt);//yyyy/mm/dd
-    onClose();
+
+    if(!event || event === null){
+      setErr('Por favor, informe o nome do evento.');
+    } else {
+      if(!teacher || teacher === null){
+        setErr('Por favor, informe o nome do professor ou palestrante.');
+      } else {
+        if(!dt || dt === null){
+          setErr('Por favor, informe a data do evento.');
+        } else {
+          //todo success
+
+          onClose();
+        }
+      }
+    }
+  }
+
+  const renderError = () => {
+    if(err && err !== null)
+      return <Label value={err} style={styles.error}/>
+
+    return <></>
   }
 
   return (
@@ -29,6 +54,15 @@ export default function EventModal({onClose=()=>null}){
 
         <Input ico={faCalendarDay} 
             placeholder='Nome do evento'
+            value={event}
+            iconSize={30}
+            style={styles.input}
+            onChange={setEvent}
+            onEnter={handleSubmit}
+        />
+
+        <Input ico={faChalkboardTeacher} 
+            placeholder='Nome do professor'
             value={teacher}
             iconSize={30}
             style={styles.input}
@@ -45,6 +79,8 @@ export default function EventModal({onClose=()=>null}){
           }}
           onSelectedChange={date => setDt(date)}
         />
+
+        {renderError()}
 
         <Button label={'Salvar'} 
             onPress={handleSubmit}
@@ -78,5 +114,11 @@ const styles = StyleSheet.create({
     width:screen.width * 0.8,
     marginBottom:10,
     borderRadius:10
+  },
+  error:{
+    color:Colors.red,
+    fontSize:18,
+    marginVertical:10,
+    fontFamily:'MartelSans-Bold'
   },
 });

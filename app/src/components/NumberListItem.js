@@ -12,8 +12,9 @@ import Icon from "./Icon";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export default function NumberListItem({
-                                title='',
+                                subtitle='',
                                 number=0,
+                                showRemove=true,
                                 onPress=()=>null,
                                 onRemove=()=>null,
                               }) {
@@ -40,6 +41,20 @@ export default function NumberListItem({
       );
     }
   }
+
+  const renderRemove = () => {
+    if(showRemove === true){
+      return (
+        <TouchableHighlight style={styles.rmBtn}
+            underlayColor={Colors.white}
+            onPress={() => setShowConfirm(true)}>
+          <Icon icon={faTrash} style={{color:Colors.black}}/>
+        </TouchableHighlight>
+      );
+    }
+
+    return <></>
+  }
                               
   return (
     <TouchableHighlight style={styles.wrap}
@@ -52,14 +67,14 @@ export default function NumberListItem({
           <Label value={'R$'} style={styles.titleLeft}/>
         </View>
 
-        <View style={styles.componentsWrap}>
-          <Label value={`${title}${number}`} style={styles.title}/>
+        <View>
+          <View style={styles.componentsWrap}>
+            <Label value={`${number}`} style={styles.title}/>
 
-          <TouchableHighlight style={styles.rmBtn}
-                underlayColor={Colors.white}
-                onPress={() => setShowConfirm(true)}>
-              <Icon icon={faTrash} style={{color:Colors.black}}/>
-            </TouchableHighlight>
+            {renderRemove()}
+          </View>
+
+          <Label value={`${subtitle}`} style={styles.subtitle}/>
         </View>
       </>
     </TouchableHighlight>
@@ -104,15 +119,20 @@ const styles = StyleSheet.create({
     fontSize:22,
     fontFamily:'MartelSans-Bold'
   },
+  subtitle:{
+    color:Colors.darkGray,
+    fontSize:18,
+  },
   confirmation:{
     position:'absolute',
     width:screen.width,
     height:screen.height * 0.1,
-    backgroundColor:Colors.white,
+    backgroundColor:Colors.red,
+    justifyContent:'center',
     zIndex:7
   },
   dltTitle:{
-    color:Colors.red,
+    color:Colors.white,
     fontSize:22,
     fontFamily:'MartelSans-Bold',
     textAlign:'center'
@@ -123,14 +143,14 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   dltLink:{
-    color:Colors.red,
+    color:Colors.black,
     fontSize:16,
     textAlign:'center',
     marginRight:20,
     fontFamily:'MartelSans-Bold',
   },
   cnclLink:{
-    color:Colors.black,
+    color:Colors.white,
     fontSize:16,
     textAlign:'center'
   },

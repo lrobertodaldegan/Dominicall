@@ -59,6 +59,8 @@ const styles = StyleSheet.create({
   content:{
     alignItems:'center',
     justifyContent:'center',
-    zIndex:11
+    zIndex:11,
+    backgroundColor:Colors.white,
+    maxHeight: screen.height * 0.8
   },
 });

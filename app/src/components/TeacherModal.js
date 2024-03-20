@@ -4,23 +4,36 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons';
+import { faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
 
-export default function TeacherModal({teacher=null, onClose=()=>null}){
+export default function TeacherModal({classs=null, teacher=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [err, setErr] = useState(null);
 
   useEffect(() => {
     setName(teacher?.name);
   }, []);
 
   const handleSubmit = () => {
+    if(name && name !== null){
+      //todo success
 
-    onClose();
+      onClose();
+    } else {
+      setErr('Por favor, informe um nome válido.');
+    }
+  }
+
+  const renderError = () => {
+    if(err && err !== null)
+      return <Label value={err} style={styles.error}/>
+
+    return <></>
   }
 
   return (
@@ -28,7 +41,7 @@ export default function TeacherModal({teacher=null, onClose=()=>null}){
       <View>
         <Label value={'Professor'} style={styles.title}/>
 
-        <Input ico={faChalkboardTeacher} 
+        <Input ico={faPersonChalkboard} 
             placeholder='Nome do professor'
             value={name}
             iconSize={30}
@@ -36,6 +49,8 @@ export default function TeacherModal({teacher=null, onClose=()=>null}){
             onChange={setName}
             onEnter={handleSubmit}
         />
+
+        {renderError()}
 
         <Button label={'Salvar'} 
             onPress={handleSubmit}
@@ -64,5 +79,11 @@ const styles = StyleSheet.create({
   },
   input:{
     width:screen.width * 0.8
+  },
+  error:{
+    color:Colors.red,
+    fontSize:18,
+    marginVertical:10,
+    fontFamily:'MartelSans-Bold'
   },
 });

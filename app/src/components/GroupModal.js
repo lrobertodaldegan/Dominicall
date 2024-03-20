@@ -13,14 +13,27 @@ import Button from './Button';
 
 export default function GroupModal({group=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [err, setErr] = useState(null);
 
   useEffect(() => {
     setName(group?.name);
+    setErr(null);
   }, []);
 
   const handleSubmit = () => {
+    if(name && name !== null){
 
-    onClose();
+      onClose();
+    } else {
+      setErr('Por favor, informe um nome válido para o grupo.');
+    }
+  }
+
+  const renderError = () => {
+    if(err && err !== null)
+      return <Label value={err} style={styles.error}/>
+
+    return <></>
   }
 
   return (
@@ -36,6 +49,8 @@ export default function GroupModal({group=null, onClose=()=>null}){
             onChange={setName}
             onEnter={handleSubmit}
         />
+
+        {renderError()}
 
         <Button label={'Salvar'} 
             onPress={handleSubmit}
@@ -64,5 +79,11 @@ const styles = StyleSheet.create({
   },
   input:{
     width:screen.width * 0.8
+  },
+  error:{
+    color:Colors.red,
+    fontSize:18,
+    marginVertical:10,
+    fontFamily:'MartelSans-Bold'
   },
 });
