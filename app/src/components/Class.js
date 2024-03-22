@@ -1,7 +1,13 @@
-import react, {useState, useEffect, useInsertionEffect} from 'react';
-import { faCalendar, faCalendarDays, faChalkboard, faChalkboardTeacher, faChalkboardUser, faCheckSquare, faChild, faCoins, faGraduationCap, faHardHat, faNewspaper, faPen, faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
+import React, {useState, useEffect} from 'react';
+import { 
+  faCalendarDays, 
+  faChalkboard, 
+  faChild, 
+  faCoins, 
+  faGraduationCap, 
+  faPersonChalkboard 
+} from '@fortawesome/free-solid-svg-icons';
 import {
-  ScrollView,
   StyleSheet,
   Dimensions,
   View,
@@ -14,7 +20,6 @@ import Label from './Label';
 import Link from './Link';
 import Button from './Button';
 import IconLabel from './IconLabel';
-import CheckListItem from './CheckListItem';
 import NewListItem from './NewListItem';
 import NumberListItem from './NumberListItem';
 import ListItem from './ListItem';
@@ -24,7 +29,6 @@ import TeacherModal from './TeacherModal';
 import PositionListItem from './PositionListItem';
 import EventModal from './EventModal';
 import VisitModal from './VisitModal';
-import IconOption from './IconOption';
 import StudentListItem from './StudentListItem';
 
 const ALUNOS = [

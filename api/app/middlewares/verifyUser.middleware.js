@@ -1,5 +1,6 @@
 const db = require("../models");
 const User = db.user;
+const GroupMember = db.groupmember;
 
 const errorHandler = (err, res) => {
   if (err) {
@@ -9,66 +10,158 @@ const errorHandler = (err, res) => {
   }
 }
 
-checkDuplicateEmail = (req, res, next) => {
-  User.findOne({
-    email: req.body.email
-  }).then((user) => {
-    if (user) {
-      if(req.userId && req.userId != null){
-        User.findById(req.userId).exec().then(userById => {
-          if(`${user._id}` === `${userById._id}`){
-            next();
-          } else {
-            res.status(400).send({ message: "Email is already in use!" });
-            return;
-          }
-        }).catch(err => errorHandler(err, res));
+exists = (req, res, next) => {
+  if(req.body.username){
+    User.findOne({
+      username:req.body.username
+    })
+    .then(user => {
+      if(!user) {
+        return res.status(404).send({message:"Não encontramos o usuário!"});
       } else {
-        res.status(400).send({ message: "Failed! Email is already in use!" });
-        return;
+        if(!req.user)
+          req.user = user;
+
+        next();
       }
+    }).catch(err => errorHandler(err, res));
+  } else {
+    return res.status(400)
+              .send({message: "informe o usuário para realizar a operação!"});
+  }
+}
+
+hasEmail = (req, res, next) => {
+  let errormsg = {message: "Usuário sem e-mail cadastrado!"};
+
+  if(req.userId && req.userId !== null){
+    User.findById(req.userId)
+    .then((user) => {
+      if(user?.email && user?.email !== null){
+        if(!req.user)
+          req.user = user;
+
+        next();
+      }else{
+        return res.status(400).send(errormsg);
+      }
+    });
+  } else {
+    if(req.body?.username && req.body?.username !== null){
+      User.findOne({
+        username:req.body.username
+      }).then((user) => {
+        if(user?.email && user?.email !== null){
+          if(!req.user)
+            req.user = user;
+
+          next();
+        } else {
+          return res.status(400).send(errormsg);
+        }
+      });
     } else {
-      next();
+      return res.status(400).send({message: "Usuário não informado!"});
     }
-  }).catch(err => errorHandler(err, res));
+  }
+}
+
+checkDuplicateUsername = (req, res, next) => {
+  if(req.body.username){
+    User.findOne({
+      username: req.body.username
+    }).then((user) => {
+      if (user) {
+        if(req.userId && req.userId != null){
+          User.findById(req.userId).exec().then(userById => {
+            if(`${user._id}` === `${userById._id}`){
+
+              if(!req.user)
+                req.user = gm.user
+
+              next();
+            } else {
+              res.status(400).send({ message: "Usuário já existe!" });
+              return;
+            }
+          }).catch(err => errorHandler(err, res));
+        } else {
+          res.status(400).send({ message: "Usuário já existe!" });
+          return;
+        }
+      } else {
+        next();
+      }
+    }).catch(err => errorHandler(err, res));
+  } else {
+    return res.status(400).send({message: "informe o usuário para realizar a operação!"});
+  }
 };
 
-justInstitution = (req, res, next) => {
-  if(!req.userId || req.userId == null){
-    res.status(401).send({ message: "Unauthorized!" });
+justCoord = (req, res, next) => {
+  if(!req.userId || req.userId === null
+    || !req.groupId || req.groupId === null){
+
+    res.status(401).send({ message: "Sem autorização!" });
+
     return;
   } else {
-    User.findById(req.userId).populate("role").exec().then(user => {
-      if(user.role.name === 'institution'){
+    GroupMember.findOne({
+      user: req.userId, 
+      group:req.groupId
+    })
+    .populate("role")
+    .populate("user")
+    .exec()
+    .then(gm => {
+      if(gm.role.name === 'Coordenador'){
+        if(!req.user)
+          req.user = gm.user
+
         next();
       } else {
-        res.status(401).send({ message: "Unauthorized!" });
+        res.status(401).send({ message: "Sem autorização!" });
+
         return;
       }
     }).catch(err => errorHandler(err, res));
   }
 }
 
-justVoluntair = (req, res, next) => {
-  if(!req.userId || req.userId == null){
-    res.status(401).send({ message: "Unauthorized!" });
+justTeacher = (req, res, next) => {
+  if(!req.userId || req.userId === null 
+    || !req.groupId || req.groupId === null){
+
+    res.status(401).send({ message: "Sem autorização!" });
+
     return;
   } else {
-    User.findById(req.userId).populate("role").exec().then(user => {
-      if(user.role.name === 'voluntair'){
+    GroupMember.findOne({
+      user: req.userId, 
+      group:req.groupId
+    })
+    .populate("role")
+    .populate("user")
+    .exec()
+    .then(gm => {
+      if(gm.role.name === 'Coordenador' || gm.role.name === 'Professor'){
+        if(!req.user)
+          req.user = gm.user
+
         next();
       } else {
-        res.status(401).send({ message: "Unauthorized!" });
+        res.status(401).send({ message: "Sem autorização!" });
+
         return;
       }
     }).catch(err => errorHandler(err, res));
   }
 }
 
-const verifyUser = {
-  checkDuplicateEmail,
-  justInstitution,
-  justVoluntair
+module.exports = {
+  checkDuplicateUsername,
+  justCoord,
+  justTeacher,
+  exists,
+  hasEmail,
 };
-
-module.exports = verifyUser;

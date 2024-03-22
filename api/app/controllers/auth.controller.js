@@ -1,8 +1,6 @@
 const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
-const Role = db.role;
-const Device = db.device;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -15,144 +13,88 @@ const errorHandler = (err, res) => {
   }
 }
 
-exports.institutionSignUp = (req, res) => {
+exports.signUp = (req, res) => {
   const user = new User({
     name: req.body.name,
+    username: req.body.username,
     email: req.body.email,
-    phone: req.body.phone,
-    site: req.body.site,
-    contactEmail: req.body.contactEmail,
-    contactPhone: req.body.contactPhone,
     password: bcrypt.hashSync(req.body.password, 8),
-    resume: req.body.resume,
-    zipcode: req.body.zipcode,
-    address: req.body.address
   });
 
   user.save().then(user => {
-    Role.findOne({ name: "institution" }).then(role => {
-      user.role = role._id;
-
-      user.save().then(user => {
-        let successMsg = { message: `User ${user.name} was registered successfully!` };
-
-        if(req.body.device){
-          const device = new Device({
-            deviceId: req.body.device.id,
-            uniqueId: req.body.device.uniqueId,
-            user: user._id
-          });
-  
-          device.save().then(device => res.status(201).send(successMsg))
-                        .catch(err => errorHandler(err, res));
-        } else {
-          res.status(201).send(successMsg);
-        }
-      }).catch(err => errorHandler(err, res));
-    }).catch(err => errorHandler(err, res));
+    res.status(201).send({ 
+      message: `Usuário ${user.name} criado com sucesso!` 
+    });
   }).catch(err => errorHandler(err, res));
 }
 
-exports.voluntairSignUp = (req, res) => {
-  const user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    phone: req.body.phone,
-    contactEmail: req.body.email,
-    contactPhone: req.body.phone,
-    password: bcrypt.hashSync(req.body.password, 8),
-    resume: req.body.resume,
-  });
+exports.signin = (req, res) => {
+  User.findOne({
+    username: req.body.username
+  })
+  .exec()
+  .then(user => {
+    if (!user)
+      return res.status(404).send({ message: "Usuário não encontrado!" });
 
-  user.save().then(user => {
-    Role.findOne({ name: "voluntair" }).then(role => {
-      user.role = role._id;
+    var passwordIsValid = bcrypt.compareSync(
+      req.body.password,
+      user.password
+    );
 
-      user.save().then(user => {
-        let successMsg = { message: `User ${user.name} was registered successfully!` };
+    if (!passwordIsValid)
+      return res.status(401).send({ message: "Ops! Senha errada!" });
 
-        if(req.body.device){
-          const device = new Device({
-            deviceId: req.body.device.id,
-            uniqueId: req.body.device.uniqueId,
-            user: user._id
-          });
-  
-          device.save().then(device => res.status(201).send(successMsg))
-                        .catch(err => errorHandler(err, res));
-        } else {
-          res.status(201).send(successMsg);
-        }
-      }).catch(err => errorHandler(err, res));
-    }).catch(err => errorHandler(err, res));
+    const token = jwt.sign({ id: user._id },
+                            config.secret,
+                            {
+                              algorithm: 'HS256',
+                              allowInsecureKeySizes: true,
+                              expiresIn: '300d',
+                            });
+
+    res.setHeader('Authorization', token);
+
+    res.status(200).send({
+      id: user._id,
+      username: user.username,
+      name: user.name,
+      token: token
+    });
   }).catch(err => errorHandler(err, res));
 };
 
-exports.signin = (req, res) => {
-  User.findOne({email: req.body.email}).populate("role")
-      .exec()
-      .then(user => {
-        if (!user)
-          return res.status(404).send({ message: "User Not found." });
-
-        var passwordIsValid = bcrypt.compareSync(
-          req.body.password,
-          user.password
-        );
-
-        if (!passwordIsValid)
-          return res.status(401).send({ message: "Invalid Password!" });
-
-        var authorities = `ROLE_${user.role.name.toUpperCase()}`;
-
-        const token = jwt.sign({ id: user._id, role: authorities},
-                                config.secret,
-                                {
-                                  algorithm: 'HS256',
-                                  allowInsecureKeySizes: true,
-                                  expiresIn: 5184000,//60 days
-                                });
-
-        res.setHeader('Authorization', token);
-
-        res.status(200).send({
-          id: user._id,
-          role: authorities,
-          token: token
-        });
-    }).catch(err => errorHandler(err, res));
-};
-
 exports.refresh = async (req, res) => {
-  User.findById(req.userId).populate("role").exec()
-      .then(user => {
-        if (!user)
-          return res.status(404).send({ message: "User Not found." });
+  User.findById(req.userId)
+  .exec()
+  .then(user => {
+    if (!user)
+      return res.status(404).send({ message: "Usuário não encontrado!" });
 
-        var authorities = `ROLE_${user.role.name.toUpperCase()}`;
+    const token = jwt.sign({ id: user._id },
+                            config.secret,
+                            {
+                              algorithm: 'HS256',
+                              allowInsecureKeySizes: true,
+                              expiresIn: '300d',
+                            });
 
-        const token = jwt.sign({ id: user._id, role: authorities},
-                                config.secret,
-                                {
-                                  algorithm: 'HS256',
-                                  allowInsecureKeySizes: true,
-                                  expiresIn: 5184000,//60 days
-                                });
+    res.setHeader('Authorization', token);
 
-        res.setHeader('Authorization', token);
-
-        res.status(200).send({
-          id: user._id,
-          role: authorities,
-          token: token
-        });
-      }).catch(err => errorHandler(err, res));
+    res.status(200).send({
+      id: user._id,
+      username: user.username,
+      name: user.name,
+      token: token
+    });
+  }).catch(err => errorHandler(err, res));
 };
 
 exports.signout = async (req, res) => {
   try {
     req.session = null;
-    return res.status(200).send({ message: "You've been signed out!" });
+
+    res.status(200).send({ message: "Você foi desconectado!" });
   } catch (err) {
     this.next(err);
   }

@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
@@ -24,12 +24,16 @@ const TURMAS = [
 
 export default function MemberModal({classs=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
   const [paper, setPaper] = useState('Professor');
   const [clas, setClas] = useState(classs);
   const [err, setErr] = useState(null);
 
   const handleSubmit = () => {
-    if(name && name !== null && paper && paper !== null){
+    if(name && name !== null && paper && paper !== null
+            && username && username !== null){
+
       if(paper === 'Professor' && (!clas || clas === null)){
         setErr('Por favor, selecione uma turma para o professor.');
       } else {
@@ -41,6 +45,8 @@ export default function MemberModal({classs=null, onClose=()=>null}){
       setErr('Por favor, informe todos os dados necessários.');
     }
   }
+
+  //TODO gerar username automatico como sugestão
 
   const renderClasses = () => {
     if(paper === 'Professor'){
@@ -97,6 +103,24 @@ export default function MemberModal({classs=null, onClose=()=>null}){
             iconSize={30}
             style={styles.input}
             onChange={setName}
+            onEnter={handleSubmit}
+        />
+
+        <Input ico={faUser} 
+            placeholder='Usuário para acesso'
+            value={username}
+            iconSize={30}
+            style={styles.input}
+            onChange={setUsername}
+            onEnter={handleSubmit}
+        />
+
+        <Input ico={faEnvelope} 
+            placeholder='E-mail para acesso'
+            value={email}
+            iconSize={30}
+            style={styles.input}
+            onChange={setEmail}
             onEnter={handleSubmit}
         />
 

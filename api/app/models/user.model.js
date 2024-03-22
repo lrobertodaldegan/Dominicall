@@ -1,23 +1,12 @@
 const mongoose = require("mongoose");
 
 const User = mongoose.model(
-  "User",
+  "Dominicall_User",
   new mongoose.Schema({
     name: String,
+    username: String,
     email: String,
     password: String,
-    phone: String,
-    contactPhone: String,
-    contactEmail: String,
-    resume: String,
-    site: String,
-    address: String,
-    zipcode: String,
-    photos:[String],
-    role: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Role"
-    }
   })
 );
 

@@ -4,7 +4,7 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faPersonChalkboard, faUsd, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
@@ -13,21 +13,26 @@ import Button from './Button';
 
 export default function TeacherModal({classs=null, teacher=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
     setName(teacher?.name);
+    setName(teacher?.email);
   }, []);
 
   const handleSubmit = () => {
-    if(name && name !== null){
+    if(name && name !== null && username && username !== null){
       //todo success
 
       onClose();
     } else {
-      setErr('Por favor, informe um nome válido.');
+      setErr('Por favor, informe um nome e usuário válidos.');
     }
   }
+
+  //TODO gerar nome automatico como sugestao
 
   const renderError = () => {
     if(err && err !== null)
@@ -47,6 +52,24 @@ export default function TeacherModal({classs=null, teacher=null, onClose=()=>nul
             iconSize={30}
             style={styles.input}
             onChange={setName}
+            onEnter={handleSubmit}
+        />
+
+        <Input ico={faUser} 
+            placeholder='Usuário para acesso'
+            value={username}
+            iconSize={30}
+            style={styles.input}
+            onChange={setUsername}
+            onEnter={handleSubmit}
+        />
+
+      <Input ico={faEnvelope} 
+            placeholder='E-mail para acesso'
+            value={email}
+            iconSize={30}
+            style={styles.input}
+            onChange={setEmail}
             onEnter={handleSubmit}
         />
 

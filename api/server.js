@@ -8,7 +8,7 @@ app.use(express.json({limit:'50mb'}));
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true, limit:'50mb' }));
  
-//mongoose
+//start mongoose
 const db = require("./app/models");
 const Role = db.role;
  
@@ -32,27 +32,27 @@ function initial() {
   Role.estimatedDocumentCount()
     .then((count) => {
       if (count === 0) {
-        new Role({
-          name: "voluntair"
-        }).save()
-          .then(() => {
-            console.log("added 'voluntair' to roles collection");
-          })
-          .catch(err => {
-            if (err)
-              console.log("error", err);
-          });//criando role voluntair
+        new Role({name: "Coordenador"})
+        .save()
+        .then(() => console.log("Role 'Coordenador' adicionado"))
+        .catch(err => {
+          if (err)
+            console.log("Erro ao tentar adicionar Role 'Coordenador'", err);
+        });
  
-        new Role({
-          name: "institution"
-        }).save()
-          .then(() => {
-            console.log("added 'institution' to roles collection");
-          })
-          .catch(err => {
-            if (err)
-              console.log("error", err);
-          });//criando role instituicao
+        new Role({name: "Professor"}).save()
+        .then(() => console.log("Role 'Professor' adicionado"))
+        .catch(err => {
+          if (err)
+            console.log("Erro ao tentar adicionar Role 'Professor'", err);
+        });
+
+        new Role({name: "Auxiliar"}).save()
+        .then(() => console.log("Role 'Auxiliar' adicionado"))
+        .catch(err => {
+          if (err)
+            console.log("Erro ao tentar adicionar Role 'Auxiliar'", err);
+        });
       }
     })
     .catch(err => {
@@ -60,15 +60,10 @@ function initial() {
         console.log("error", err);
     });
 }
-//mongoose
- 
-// simple route
-app.get("/dominicall/", (req, res) => {
-  res.json({ message: "Welcome to ruachcollab application." });
-});
+//end mongoose
  
 app.use((_req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://rc.acaodoespirito.com.br');
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,UserAgent,X-Requested-With,Accept');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,PATCH,DELETE,POST');
   res.header('Access-Control-Allow-Credentials', true);
@@ -92,5 +87,5 @@ require('./app/routes/device.routes')(app);
 // set port, listen for requests
 const PORT = 21017;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+  console.log(`API is running on port ${PORT}.`);
 });

@@ -1,38 +1,13 @@
-const { verifyUser, authJwt } = require("../middlewares");
+const { verifyUser } = require("../middlewares");
 const controller = require("../controllers/auth.controller");
 
 module.exports = function(app) {
-  app.use(function(req, res, next) {
-    res.header(
-      "Access-Control-Allow-Headers",
-      'Access-Control-Allow-Credentials',
-      "Origin, Content-Type, Accept"
-    );
-    next();
-  });
-
   app.post(
-    "/dominicall/auth/v/signup",
+    "/dominicall/auth/signup",
     [
-      verifyUser.checkDuplicateEmail,
+      verifyUser.checkDuplicateUsername,
     ],
-    controller.voluntairSignUp
-  );
-
-  app.post(
-    "/dominicall/auth/i/signup",
-    [
-      verifyUser.checkDuplicateEmail,
-    ],
-    controller.institutionSignUp
-  );
-
-  app.post(
-    "/dominicall/auth/refresh",
-    [
-      authJwt.verifyToken,
-    ],
-    controller.refresh
+    controller.signUp
   );
 
   app.post("/dominicall/auth/signin", controller.signin);
