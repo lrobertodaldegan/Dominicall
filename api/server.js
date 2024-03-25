@@ -15,7 +15,7 @@ const Role = db.role;
 const dbConfig = require("./app/config/db.config");
  
 db.mongoose
-  .connect(`mongodb://${dbConfig.USER}:${dbConfig.PASS}@${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+  .connect(`mongodb+srv://${dbConfig.USER}:${dbConfig.PASS}@${dbConfig.HOST}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -80,9 +80,12 @@ app.use((_req, res, next) => {
 // routes
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
-require('./app/routes/demand.routes')(app);
-require('./app/routes/subscription.routes')(app);
-require('./app/routes/device.routes')(app);
+require('./app/routes/clas.routes')(app);
+require('./app/routes/group.routes')(app);
+
+app.all('*', [], (req, res, next) => {
+  return res.status(404).send({message: 'Ops! Não tem nada aqui!'});
+})
  
 // set port, listen for requests
 const PORT = 21017;

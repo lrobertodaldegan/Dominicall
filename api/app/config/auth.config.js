@@ -1,3 +1,3 @@
 module.exports = {
-  secret: "rushcollab-secret-key"
+  secret: "dominicall-secret-key"
 };

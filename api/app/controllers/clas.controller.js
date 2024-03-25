@@ -1,4 +1,4 @@
-const { student } = require("../models");
+const util = require('../utils');
 const db = require("../models");
 const Clas = db.clas;
 const Offer = db.offer;
@@ -101,7 +101,18 @@ exports.getOffers = (req, res) => {
   }).catch(err => errorHandler(err, res));
 }
 
-exports.createOffer = (req, res) => {}
+exports.createOffer = (req, res) => {
+  const offer = new Offer({
+    value:req.body.value,
+    dt:req.body.dt,
+    offerer:req.body.offerer,
+    clas:req.body.classId
+  });
+
+  offer.save().then(o => {
+    res.status(201).send({message:'Oferta registrada com sucesso!'});
+  }).catch(err => errorHandler(err, res));
+}
 
 exports.removeOffer = (req, res) => {
   Offer.deleteOne({_id:req.params.id})
@@ -122,7 +133,17 @@ exports.getVisitors = (req, res) => {
   }).catch(err => errorHandler(err, res));
 }
 
-exports.createVisitor = (req, res) => {}
+exports.createVisitor = (req, res) => {
+  const visitor = new Visitor({
+    clas:req.body.classId,
+    dt:req.body.dt,
+    name:req.body.name
+  });
+
+  visitor.save().then(o => {
+    res.status(201).send({message:'Visita registrada com sucesso!'});
+  }).catch(err => errorHandler(err, res));
+}
 
 exports.removeVisitor = (req, res) => {
   Visitor.deleteOne({_id:req.params.id})
@@ -195,7 +216,18 @@ exports.getEvents = (req, res) => {
   }).catch(err => errorHandler(err, res));
 }
 
-exports.createEvent = (req, res) => {}
+exports.createEvent = (req, res) => {
+  const event = new Event({
+    clas:req.query.classId,
+    dt:req.query.dt,
+    name:req.query.name,
+    teacher:req.body.teacher
+  });
+
+  event.save().then(o => {
+    res.status(201).send({message:'Evento registrado com sucesso!'});
+  }).catch(err => errorHandler(err, res));
+}
 
 exports.removeEvent = (req, res) => {
   Event.deleteOne({_id:req.params.id})
@@ -261,7 +293,15 @@ exports.getStudents = (req, res) => {
 }
 
 exports.createStudent = (req, res) => {
+  const student = new Student({
+    clas:req.body.classId,
+    name:req.body.name,
+    since:util.date.dateLabel()
+  });
 
+  student.save().then(o => {
+    res.status(201).send({message:`Aluno ${o.name} matriculado com sucesso!`});
+  }).catch(err => errorHandler(err, res));
 }
 
 exports.removeStudent = (req, res) => {
