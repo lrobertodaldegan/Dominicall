@@ -140,7 +140,7 @@ module.exports = function(app) {
   );
 
   app.get(
-    "/dominicall/class/offer",
+    "/dominicall/class/event",
     [
       authJwt.verifyToken,
       verifyGroup.verifyUserGroup,

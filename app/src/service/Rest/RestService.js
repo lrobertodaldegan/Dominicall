@@ -1,9 +1,6 @@
 import axios from 'axios';
 import CacheService from '../Cache/CacheService';
-
-//const BASEURL = 'https://acaodoespirito.com.br/dominicall';
-//const BASEURL = 'http://10.0.2.2:21017/dominicall';
-const BASEURL = 'http://192.168.100.27:21017/dominicall';
+import { Texts } from '../../utils/Texts';
 
 const DEFAULT_HEADERS = {
   'X-Requested-With': 'XMLHttpRequest'
@@ -13,7 +10,7 @@ const get = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
   try{
     let jwt = await CacheService.get('@jwt');
 
-    let response = await axios.get(`${BASEURL}${urlPath}`, {
+    let response = await axios.get(urlPath, {
       withCredentials:true,
       headers: {...headers, 'Authorization':jwt}
     });
@@ -32,7 +29,7 @@ const post = async (urlPath, body={}, errorHandler=()=>null, headers=DEFAULT_HEA
   try{
     let jwt = await CacheService.get('@jwt');
     
-    let response = await axios.post(`${BASEURL}${urlPath}`, body, {
+    let response = await axios.post(urlPath, body, {
       withCredentials:true,
       headers: {...headers, 'Authorization':jwt}
     });
@@ -51,7 +48,7 @@ const del = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
   try{
     let jwt = await CacheService.get('@jwt');
     
-    let response = await axios.delete(`${BASEURL}${urlPath}`, {
+    let response = await axios.delete(urlPath, {
       withCredentials:true,
       headers: {...headers, 'Authorization':jwt}
     });
@@ -70,7 +67,7 @@ const put = async (urlPath, body={}, errorHandler=()=>null, headers=DEFAULT_HEAD
   try{
     let jwt = await CacheService.get('@jwt');
     
-    let response = await axios.put(`${BASEURL}${urlPath}`, body, {
+    let response = await axios.put(urlPath, body, {
       withCredentials:true,
       headers: {...headers, 'Authorization':jwt}
     });

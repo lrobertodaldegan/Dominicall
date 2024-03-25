@@ -46,7 +46,20 @@ export default function MemberModal({classs=null, onClose=()=>null}){
     }
   }
 
-  //TODO gerar username automatico como sugestão
+  const handleChangeName = (val) => {
+    let un = '';
+
+    if(val?.length > 2){
+      if(paper && paper !== null)
+        un += paper.substring(0, 3); 
+
+      un += val.substring(0, 3) + '01';
+
+      setUsername(un);
+    }
+
+    setName(val);
+  }
 
   const renderClasses = () => {
     if(paper === 'Professor'){
@@ -102,7 +115,7 @@ export default function MemberModal({classs=null, onClose=()=>null}){
             value={name}
             iconSize={30}
             style={styles.input}
-            onChange={setName}
+            onChange={handleChangeName}
             onEnter={handleSubmit}
         />
 
