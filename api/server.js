@@ -82,6 +82,7 @@ require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/clas.routes')(app);
 require('./app/routes/group.routes')(app);
+require('./app/routes/report.routes')(app);
 
 app.all('*', [], (req, res, next) => {
   return res.status(404).send({message: 'Ops! Não tem nada aqui!'});

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Relatório Geral - {{group.name}}</title>
+    <style>
+        body{
+            font-family: sans-serif
+        }
+        table{
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table,tr,th,td{
+            border:1px solid #000;
+            border-collapse: collapse;
+            text-align:center;
+        }
+        h1{
+            text-align: center;
+            font-weight: bolder;
+        }
+        small{
+            text-align: center;
+            display:block;
+            margin-top:20px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Relatório geral<br/>{{group.name}} - {{dt}}</h1>
+    <table>
+        <tr>
+            <th>Classes</th>
+            <th>Matriculados</th>
+            <th>Presentes</th>
+            <th>Ausentes</th>
+            <th>Visitantes</th>
+            <th>Total</th>
+            <th>Bíblias</th>
+            <th>Revistas</th>
+            <th>Ofertas</th>
+            <th>%</th>
+        </tr>
+            {{#each classes}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td>{{this.students}}</td>
+                    <td>{{this.presences}}</td>
+                    <td>{{this.ausences}}</td>
+                    <td>{{this.visitors}}</td>
+                    <td>{{this.audience}}</td>
+                    <td>{{this.bibles}}</td>
+                    <td>{{this.books}}</td>
+                    <td>{{this.offers}}</td>
+                    <td>{{this.percent}}</td>
+                </tr>  
+            {{/each}}
+        <tr>
+            <th>Total geral:</th>
+            <td>{{this.total.students}}</td>
+            <td>{{this.total.presences}}</td>
+            <td>{{this.total.ausences}}</td>
+            <td>{{this.total.visitors}}</td>
+            <td>{{this.total.audience}}</td>
+            <td>{{this.total.bibles}}</td>
+            <td>{{this.total.books}}</td>
+            <td>{{this.total.offers}}</td>
+            <td>{{this.total.percent}}</td>
+        </tr>
+        <tr>
+            <th>Última semana:</th>
+            <td>{{this.lastWeek.students}}</td>
+            <td>{{this.lastWeek.presences}}</td>
+            <td>{{this.lastWeek.ausences}}</td>
+            <td>{{this.lastWeek.visitors}}</td>
+            <td>{{this.lastWeek.audience}}</td>
+            <td>{{this.lastWeek.bibles}}</td>
+            <td>{{this.lastWeek.books}}</td>
+            <td>{{this.lastWeek.offers}}</td>
+            <td>{{this.lastWeek.percent}}</td>
+        </tr>
+    </table>
+    <small>Gerado por Dominicall em {{dt}}<br/>Por <a href='https://linktr.ee/lrobertodaldegan'>@lucasrobertodev</a></small>
+  </body>
+</html>
