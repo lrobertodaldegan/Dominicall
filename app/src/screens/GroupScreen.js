@@ -5,6 +5,7 @@ import {
   Dimensions,
   ImageBackground,
   FlatList,
+  ToastAndroid,
 } from 'react-native';
 import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
@@ -15,30 +16,60 @@ import { Colors } from '../utils/Colors';
 import Logo from '../components/Logo';
 import GroupModal from '../components/GroupModal';
 import Link from '../components/Link';
-
-const GROUPS = [
-  {id:0, name:'Quitandinha', classes:5},
-  {id:1, name:'Maracanã', classes:5},
-];
+import { del, get } from '../service/Rest/RestService';
+import { Texts } from '../utils/Texts';
+import CacheService from '../service/Cache/CacheService';
 
 const GroupScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
-    setGroups(GROUPS);
-
-    if(GROUPS.length === 1)
-      navigation.navigate('home', {group:GROUPS[0]});
+    search();
   }, []);
 
+  const search = () => {
+    setGroups([]);
+
+    get(Texts.API.group).then(response => {
+      if(response.status === 200){
+        let gps = response.data.groups;
+
+        console.log(gps);
+
+        setGroups(gps);
+        
+        if(gps.length === 1)
+          handleGroupSelection(gps[0]);
+      } else {
+        if(response.data && response.data.message)
+          ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+
+        if(response.status === 403){
+          CacheService.wipe('@user');
+          
+          navigation.navigate('login');
+        }
+      }
+    });
+  }
+
+  const handleGroupSelection = (group) => {
+    CacheService.register('@group', group);
+
+    navigation.navigate('home', {group:group});
+  }
+
   const handleDeletion = (group) => {
-    //todo
+    del(`${Texts.API.group}/${group._id}`).then(response => {
+      console.log(response.data)
+      search();
+    });
   }
 
   const renderModal = () => {
     if(showModal === true)
-      return <GroupModal onClose={() => setShowModal(false)}/>
+      return <GroupModal onClose={() => {search(); setShowModal(false);}}/>
 
     return <></>
   }
@@ -63,11 +94,11 @@ const GroupScreen = ({navigation}) => {
           <NewListItem title='Novo grupo'
             onPress={() => setShowModal(true)}/>
         }
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         data={groups}
         renderItem={({item}) => 
           <ListItem title={item.name}
-            onPress={() => navigation.navigate('home', {group:item})}
+            onPress={() => handleGroupSelection(item)}
             onRemove={() => handleDeletion(item)}
             leftComponent={
               <Label value={`${item.classes} turmas`}

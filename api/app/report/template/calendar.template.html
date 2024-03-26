@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Escala - Turma {{className}} - {{groupName}}</title>
+    <style>
+        body{
+            font-family: sans-serif
+        }
+        table{
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table,tr,th,td{
+            border:1px solid #000;
+            border-collapse: collapse;
+            text-align:center;
+        }
+        h1{
+            text-align: center;
+            font-weight: bolder;
+        }
+        small{
+            text-align: center;
+            display:block;
+            margin-top:20px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Escala - Turma {{className}}<br/>{{groupName}} - {{dt}}</h1>
+    <br/>
+    <h3>Eventos</h3>
+    <table>
+        <tr>
+            <th>Evento</th>
+            <th>Data</th>
+            <th>Professor/Palestrante</th>
+        </tr>
+            {{#each events}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td>{{this.dt}}</td>
+                    <td>{{this.teacher}}</td>
+                </tr>  
+            {{/each}}
+    </table>
+
+    <h3>Escala</h3>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Professor/Palestrante</th>
+        </tr>
+            {{#each teachers}}
+                <tr>
+                    <td>{{this.order}}ª aula</td>
+                    <td>{{this.teacher.user.name}}</td>
+                </tr>  
+            {{/each}}
+    </table>
+    <br/>
+    <small>Gerado por Dominicall em {{dt}}<br/>Por <a href='https://linktr.ee/lrobertodaldegan'>@lucasrobertodev</a></small>
+  </body>
+</html>

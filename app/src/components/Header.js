@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { 
   View,
   StyleSheet,
@@ -13,6 +13,7 @@ import IconLabel from './IconLabel';
 import { Colors } from '../utils/Colors';
 import Label from './Label';
 import { Texts } from '../utils/Texts';
+import CacheService from '../service/Cache/CacheService';
 
 const OPTIONS = [
   {id:0, label:'Turmas', page:'home', icon:faChalkboard},
@@ -23,6 +24,12 @@ const OPTIONS = [
 ];
 
 const Header = ({navigation, page='home', group}) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    CacheService.get('@user').then(u => setUser(u.name))
+  }, []);
+
   return (
     <>
       <StatusBar translucent backgroundColor={Colors.white} 
@@ -34,7 +41,7 @@ const Header = ({navigation, page='home', group}) => {
 
           <View style={styles.titleWrap}>
             <Label value={group?.name} style={styles.title}/>
-            <Label value={'Usuário'} style={styles.user}/>
+            <Label value={user} style={styles.user}/>
           </View>
           
           <IconLabel icon={faUsers} label='Meus grupos'

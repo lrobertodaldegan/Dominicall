@@ -18,6 +18,7 @@ export default function Input({
                         placeholder='',
                         value=null,
                         keyboardType='default',
+                        hideValue=false,
                         onChange=(v)=>null,
                         onEnter=(v)=>null
                       }) {
@@ -39,6 +40,7 @@ export default function Input({
           keyboardType={keyboardType}
           onSubmitEditing={onEnter}
           onChangeText={onChange}
+          secureTextEntry={hideValue}
       />
     </View>
   );

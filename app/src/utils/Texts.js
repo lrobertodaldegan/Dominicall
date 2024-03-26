@@ -1,4 +1,4 @@
-const API_BASE_PATH = 'http://localhost:21017/dominicall/';
+const API_BASE_PATH = 'http://192.168.100.33:21017/dominicall/';
 
 export const Texts = {
   Insta:'https://www.instagram.com/lucasrobertodev/',
@@ -20,5 +20,6 @@ export const Texts = {
     offers: `${API_BASE_PATH}class/offer`,
     events: `${API_BASE_PATH}class/event`,
     teachers: `${API_BASE_PATH}class/teachers`,
+    report: `${API_BASE_PATH}report`
   }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Relatório de Ofertas - {{groupName}}</title>
+    <style>
+        body{
+            font-family: sans-serif
+        }
+        table{
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table,tr,th,td{
+            border:1px solid #000;
+            border-collapse: collapse;
+            text-align:center;
+        }
+        h1{
+            text-align: center;
+            font-weight: bolder;
+        }
+        small{
+            text-align: center;
+            display:block;
+            margin-top:20px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Relatório de Ofertas<br/>{{groupName}} - {{dt}}</h1>
+    <br/>
+    {{#each this.itens}}
+        <h3>{{this.className}}</h3>
+        <table>
+            <tr>
+                <th>Ofertante</th>
+                <th>Valor</th>
+            </tr>
+                {{#each this.offers}}
+                    <tr>
+                        <td>{{this.offerer}}</td>
+                        <td>{{this.value}}</td>
+                    </tr>  
+                {{/each}}
+            <tr>
+                <th>Total:</th>
+                <td>{{this.total}}</td>
+            </tr>
+        </table>
+    {{/each}}
+    <small>Gerado por Dominicall em {{dt}}<br/>Por <a href='https://linktr.ee/lrobertodaldegan'>@lucasrobertodev</a></small>
+  </body>
+</html>

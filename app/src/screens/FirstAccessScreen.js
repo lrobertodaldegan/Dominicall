@@ -18,6 +18,7 @@ import { faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import By from '../components/By';
 import { Colors } from '../utils/Colors';
 import Label from '../components/Label';
+import { Texts } from '../utils/Texts';
 
 const FirstAccessScreen = ({navigation}) => {
   const [user, setUser] = useState(null);
@@ -31,21 +32,34 @@ const FirstAccessScreen = ({navigation}) => {
     if(user && user != null && pass && pass != null){
       setErrorMsg(null);
 
-      CacheService.wipe('@jwt');
+      CacheService.wipe('@user');
 
       setBtnLbl('Cadastrando...');
 
-      // post('/auth/signin', {email: email, password: pass}).then((response) => {
-      //   if(response.status == 200){
-      //     CacheService.register('@jwt', response.data.token);
+      let body = {
+        username: user,
+        password: pass,
+        name: name,
+        email:email
+      };
 
-      //     navigation.navigate('inscricoes');
-      //   } else {
-      //     setBtnLbl('Tente novamente!');
-      //   }
-      // }).catch(err => {console.log(err); setBtnLbl('Tente novamente!');});
-
-      navigation.navigate('group');
+      post(Texts.API.signup, body).then((response) => {
+        if(response.status == 201){
+          post(Texts.API.signin, body).then((response) => {
+            if(response.status == 200){
+              CacheService.register('@user', response.data);
+    
+              navigation.navigate('group');
+            } else {
+              setErrorMsg('Cadastro realizado! Vamos te redirecionar para o login...');
+              setTimeout(() => navigation.navigate('login'), 3000);
+            }
+          })
+        } else {
+          setErrorMsg(response.data.message);
+          setBtnLbl('Tente novamente!');
+        }
+      });
     }else{
       setErrorMsg('Usuário e senha são obrigatórios para entrar!');
     }
@@ -55,9 +69,6 @@ const FirstAccessScreen = ({navigation}) => {
     let un = '';
 
     if(val?.length > 2){
-      if(paper && paper !== null)
-        un += paper.substring(0, 3); 
-
       un += val.substring(0, 3) + '01';
 
       setUser(un);
@@ -79,6 +90,10 @@ const FirstAccessScreen = ({navigation}) => {
         <Logo style={styles.logo} />
 
         <View style={styles.formWrap}>
+
+        <Label style={styles.title}
+              value={`Bem-vindo(a)${name && name !== null ? ', ' + name : ''}!`}/>
+
           <Input onChange={handleChangeName} placeholder='Seu nome'
               value={name}
               ico={faUser}
@@ -89,6 +104,11 @@ const FirstAccessScreen = ({navigation}) => {
               ico={faUser}
               iconSize={24}/>
 
+          <Input onChange={setPass} placeholder='Sua senha'
+              value={pass}
+              ico={faKey}
+              iconSize={24}/>
+
           <Input onChange={setEmail} placeholder='Seu e-mail'
               value={email}
               ico={faUser}
@@ -97,17 +117,9 @@ const FirstAccessScreen = ({navigation}) => {
           <Label style={styles.legend}
               value={'Seu e-mail é opcional, mas é a única forma automática de recuperar o seu acesso ao sistema.'}/>
 
-          <Input onChange={setPass} placeholder='Sua senha'
-              value={pass}
-              ico={faKey}
-              iconSize={24}/>
-
           {renderError()}
 
           <Button label={btnLbl} onPress={() => handleSubmit()}/>
-
-          <Link label='Esqueceu sua senha ou é seu primeiro acesso? Toque aqui' 
-              onPress={() => navigation.navigate('reset')}/>
         </View>
 
         <By />
@@ -137,8 +149,16 @@ const styles= StyleSheet.create({
     marginTop:screen.height * 0.1,
     marginBottom:20,
   },
+  title:{
+    fontSize:20,
+    textAlign: 'center',
+    color:Colors.black,
+    marginBottom: 20
+  },
   legend:{
-    fontSize:12
+    fontSize:14,
+    color:Colors.black,
+    marginBottom: 10
   },
 });
 

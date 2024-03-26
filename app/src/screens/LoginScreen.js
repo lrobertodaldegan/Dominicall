@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -17,6 +17,7 @@ import Input from '../components/Input';
 import { faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import By from '../components/By';
 import { Colors } from '../utils/Colors';
+import { Texts } from '../utils/Texts';
 
 const LoginScreen = ({navigation}) => {
   const [user, setUser] = useState(null);
@@ -24,25 +25,34 @@ const LoginScreen = ({navigation}) => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [btnLbl, setBtnLbl] = useState('Entrar');
 
+  useEffect(() => {
+    setBtnLbl('Entrar');
+    
+    CacheService.get('@user')
+    .then(user => {
+      if(user && user !== null)
+        navigation.navigate('group');
+    });
+  }, []);
+
   const handleSubmit = () => {
     if(user && user != null && pass && pass != null){
       setErrorMsg(null);
 
-      CacheService.wipe('@jwt');
+      CacheService.wipe('@user');
 
       setBtnLbl('Entrando...');
 
-      // post('/auth/signin', {email: email, password: pass}).then((response) => {
-      //   if(response.status == 200){
-      //     CacheService.register('@jwt', response.data.token);
+      post(Texts.API.signin, {username: user, password: pass}).then((response) => {
+        if(response.status == 200){
+          CacheService.register('@user', response.data);
 
-      //     navigation.navigate('inscricoes');
-      //   } else {
-      //     setBtnLbl('Tente novamente!');
-      //   }
-      // }).catch(err => {console.log(err); setBtnLbl('Tente novamente!');});
-
-      navigation.navigate('group');
+          navigation.navigate('group');
+        } else {
+          setErrorMsg(response.data?.message);
+          setBtnLbl('Tente novamente!');
+        }
+      });
     }else{
       setErrorMsg('Usuário e senha são obrigatórios para entrar!');
     }
@@ -69,13 +79,19 @@ const LoginScreen = ({navigation}) => {
           <Input onChange={setPass} placeholder='Sua senha'
               value={pass}
               ico={faKey}
+              hideValue={true}
               iconSize={24}/>
 
           {renderError()}
 
+          <Link label='É seu primeiro acesso? Toque aqui' 
+              style={styles.linkFA}
+              onPress={() => navigation.navigate('firstAccess')}/>
+
           <Button label={btnLbl} onPress={() => handleSubmit()}/>
 
-          <Link label='Esqueceu sua senha ou é seu primeiro acesso? Toque aqui' 
+          <Link label='Esqueceu sua senha? Toque aqui' 
+              style={styles.linkFA}
               onPress={() => navigation.navigate('reset')}/>
         </View>
 
@@ -105,6 +121,10 @@ const styles= StyleSheet.create({
     height:screen.width * 0.4,
     marginTop:screen.height * 0.22,
     marginBottom:20,
+  },
+  linkFA:{
+    marginBottom:10,
+    textAlign:'center'
   },
 });
 

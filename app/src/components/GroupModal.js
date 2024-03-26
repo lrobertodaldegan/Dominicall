@@ -3,6 +3,7 @@ import {
   View,
   Dimensions,
   StyleSheet,
+  ToastAndroid,
 } from 'react-native';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
@@ -10,9 +11,12 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { post } from '../service/Rest/RestService';
+import { Texts } from '../utils/Texts';
 
 export default function GroupModal({group=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
@@ -22,9 +26,21 @@ export default function GroupModal({group=null, onClose=()=>null}){
 
   const handleSubmit = () => {
     if(name && name !== null){
+      setLoading(true);
 
-      onClose();
+      post(Texts.API.group, {name:name}).then(response => {
+        if(response.status === 201){
+          
+          onClose();
+        } else {
+          if(response.data && response.data.message)
+            setErr(response.data.message);
+
+          setLoading(false);
+        }
+      });
     } else {
+      setLoading(false);
       setErr('Por favor, informe um nome válido para o grupo.');
     }
   }
@@ -55,6 +71,7 @@ export default function GroupModal({group=null, onClose=()=>null}){
         <Button label={'Salvar'} 
             onPress={handleSubmit}
             style={styles.input}
+            loading={loading}
         />
       </View>
     }/>

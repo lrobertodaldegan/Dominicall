@@ -25,7 +25,7 @@ exports.create = (req, res) => {
       Role.findOne({name:'Coordenador'})
       .exec().then(coord => {
         const newGm = new GroupMember({
-          user:req.user._id,
+          user:req.userId,
           group:group._id,
           role:coord._id,
         });
@@ -182,7 +182,7 @@ exports.userGroups = (req, res)  => {
         const csQtd = await Clas.where({group:mg.group._id}).countDocuments();
 
         result.push({
-          _id:mb.group._id,
+          _id:mg.group._id,
           name:mg.group.name,
           roleId:mg.role._id,
           role:mg.role.name,

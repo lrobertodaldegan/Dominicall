@@ -40,7 +40,7 @@ verifyGroupMemberDuplicity = (req, res, next) => {
 verifyGroupDuplicity = (req, res, next) => {
   Group.findOne({
     owner:req.userId,
-    _id:req.groupId
+    name:req.body.name
   })
   .exec()
   .then(group => {

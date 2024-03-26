@@ -71,11 +71,11 @@ app.use((_req, res, next) => {
   next();
 });
 
-// app.use((_req, res, next) => {
-//  console.log(`Req: body: ${_req.body ? JSON.stringify(_req.body) : 'empty'}, query: ${_req.params ? JSON.stringify(_req.params) : 'empty'}`);
+app.use((_req, res, next) => {
+ console.log(`Req: body: ${_req.body ? JSON.stringify(_req.body) : 'empty'}, query: ${_req.params ? JSON.stringify(_req.params) : 'empty'}, headers: ${JSON.stringify(_req.headers)}`);
 
-//  next();
-// });
+ next();
+});
  
 // routes
 require('./app/routes/auth.routes')(app);

@@ -6,7 +6,6 @@ module.exports = function(app) {
     '/dominicall/group',
     [
       authJwt.verifyToken,
-      verifyGroup.verifyUserGroup,
     ],
     controller.userGroups
   );
@@ -15,8 +14,6 @@ module.exports = function(app) {
     "/dominicall/group",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
-      verifyGroup.verifyUserGroup,
       verifyGroup.verifyGroupDuplicity,
     ],
     controller.create
@@ -36,8 +33,7 @@ module.exports = function(app) {
     "/dominicall/group/:id",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
-      verifyGroup.verifyUserGroup,
+      verifyUser.justGroupOwner
     ],
     controller.remove
   );

@@ -1,6 +1,7 @@
 const db = require("../models");
 const User = db.user;
 const GroupMember = db.groupmember;
+const Group = db.group;
 
 const errorHandler = (err, res) => {
   if (err) {
@@ -98,11 +99,32 @@ checkDuplicateUsername = (req, res, next) => {
   }
 };
 
+justGroupOwner = (req, res, next) => {
+  if(!req.userId || req.userId === null
+                 || !req.params.id){
+    res.status(401).send({ message: "JO1 - Sem autorização!" });
+
+    return;
+  } else {
+    Group.find({
+      owner: req.userId,
+      _id:req.params.id
+    })
+    .exec().
+    then(group => {
+      if(group)
+        next();
+      else
+        return res.status(401).send({ message: "JO2 - Sem autorização!" });
+    }).catch(err => errorHandler(err, res));
+  }
+};
+
 justCoord = (req, res, next) => {
   if(!req.userId || req.userId === null
     || !req.groupId || req.groupId === null){
 
-    res.status(401).send({ message: "Sem autorização!" });
+    res.status(401).send({ message: "JC1 - Sem autorização!" });
 
     return;
   } else {
@@ -120,7 +142,7 @@ justCoord = (req, res, next) => {
 
         next();
       } else {
-        res.status(401).send({ message: "Sem autorização!" });
+        res.status(401).send({ message: "JC2 - Sem autorização!" });
 
         return;
       }
@@ -132,7 +154,7 @@ justTeacher = (req, res, next) => {
   if(!req.userId || req.userId === null 
     || !req.groupId || req.groupId === null){
 
-    res.status(401).send({ message: "Sem autorização!" });
+    res.status(401).send({ message: "JT1 - Sem autorização!" });
 
     return;
   } else {
@@ -150,7 +172,7 @@ justTeacher = (req, res, next) => {
 
         next();
       } else {
-        res.status(401).send({ message: "Sem autorização!" });
+        res.status(401).send({ message: "JT2 - Sem autorização!" });
 
         return;
       }
@@ -162,6 +184,7 @@ module.exports = {
   checkDuplicateUsername,
   justCoord,
   justTeacher,
+  justGroupOwner,
   exists,
   hasEmail,
 };

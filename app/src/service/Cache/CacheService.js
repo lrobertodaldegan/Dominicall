@@ -3,14 +3,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const CacheService = {
   get: async (key) => {
     try{
-      return await AsyncStorage.getItem(key);
+      return JSON.parse(await AsyncStorage.getItem(key));
     } catch(e){
       console.log(e);
     }
   },
   register: async (key, value) => {
     try{
-      await AsyncStorage.setItem(key, value);
+      await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch(e){
       console.log(e);
     }

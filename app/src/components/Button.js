@@ -2,6 +2,7 @@ import {
   TouchableHighlight,
   StyleSheet,
   Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import { Colors } from '../utils/Colors';
 import Icon from './Icon';
@@ -13,6 +14,7 @@ const Button = ({label,
                   icon=null, 
                   iconStyle={}, 
                   iconPosition='r', 
+                  loading=false,
                   onPress=()=>null
                 }) => {
   
@@ -22,6 +24,14 @@ const Button = ({label,
                   : <Icon icon={icon} size={18} 
                         style={[styles.icon, iconStyle]}/>;
   }
+
+  const renderLoadingOrLabel = () => {
+    if(loading === true){
+      return <ActivityIndicator color={Colors.white}/>
+    } else {
+      return <Label value={label} style={[styles.lbl, labelStyle]}/>
+    }
+  }
   
   return (
     <TouchableHighlight underlayColor='rgba(0,0,0,0)'
@@ -30,7 +40,7 @@ const Button = ({label,
       <>
         {iconPosition === 'l' ? getIcon() : <></>}
 
-        <Label value={label} style={[styles.lbl, labelStyle]}/>
+        {renderLoadingOrLabel()}
 
         {iconPosition === 'r' ? getIcon() : <></>}
       </>

@@ -1,4 +1,3 @@
-const { authJwt } = require("../middlewares");
 const controller = require("../controllers/report.controller");
 
 module.exports = function(app) {
@@ -6,5 +5,17 @@ module.exports = function(app) {
     "/dominicall/report",
     [],
     controller.report
+  );
+
+  app.get(
+    "/dominicall/report/offer",
+    [],
+    controller.reportOffers
+  );
+
+  app.get(
+    "/dominicall/report/calendar",
+    [],
+    controller.reportCalendars
   );
 };
