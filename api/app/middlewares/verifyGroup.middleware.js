@@ -5,8 +5,11 @@ const GroupMember = db.groupmember;
 verifyUserGroup = (req, res, next) => {
   let group = req.get('Group');
 
+  if(!group)
+    group = req.get('group');
+
   if (!group || !req.userId)
-    return res.status(403).send({ message: "Acesso negado!" });
+    return res.status(403).send({ message: "G1 - Acesso negado!" });
 
   GroupMember.findOne({
     user: req.userId, 
@@ -15,7 +18,7 @@ verifyUserGroup = (req, res, next) => {
   .exec()
   .then(gm => {
     if(!gm)
-      return res.status(403).send({ message: "Acesso negado ao grupo!" });
+      return res.status(403).send({ message: "G2 - Acesso negado ao grupo!" });
 
     req.groupId = group;
 

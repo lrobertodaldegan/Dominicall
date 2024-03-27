@@ -27,16 +27,16 @@ export default function GroupModal({group=null, onClose=()=>null}){
   const handleSubmit = () => {
     if(name && name !== null){
       setLoading(true);
+      setErr(null);
 
       post(Texts.API.group, {name:name}).then(response => {
+        setLoading(false);
+
         if(response.status === 201){
-          
           onClose();
         } else {
           if(response.data && response.data.message)
             setErr(response.data.message);
-
-          setLoading(false);
         }
       });
     } else {

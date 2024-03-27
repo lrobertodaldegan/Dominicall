@@ -4,6 +4,11 @@ export const Texts = {
   Insta:'https://www.instagram.com/lucasrobertodev/',
   GooglePlay: 'https://play.google.com/store/apps/developer?id=Lucas+Roberto+Daldegan',
   Avalie: 'https://play.google.com/store/apps/details?id=com.dominicall',
+  Cache:{
+    group:'@group',
+    jwt: '@jwt',
+    user: '@user',
+  },
   API: {
     signup: `${API_BASE_PATH}auth/signup`,
     signin: `${API_BASE_PATH}auth/signin`,

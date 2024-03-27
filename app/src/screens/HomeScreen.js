@@ -1,4 +1,4 @@
-import react, {useState} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -10,14 +10,11 @@ import Header from '../components/Header';
 import Classes from '../components/Classes';
 import { Colors } from '../utils/Colors';
 
-
-const HomeScreen = ({navigation, route}) => {
-
-  const {group} = route.params;
+const HomeScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <Header group={group} page={'home'} navigation={navigation}/>
+      <Header page={'home'} navigation={navigation}/>
 
       <Classes />
 

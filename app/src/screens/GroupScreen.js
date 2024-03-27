@@ -6,6 +6,7 @@ import {
   ImageBackground,
   FlatList,
   ToastAndroid,
+  RefreshControl,
 } from 'react-native';
 import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
@@ -22,6 +23,7 @@ import CacheService from '../service/Cache/CacheService';
 
 const GroupScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const GroupScreen = ({navigation}) => {
   }, []);
 
   const search = () => {
-    setGroups([]);
+    setLoading(true);
 
     get(Texts.API.group).then(response => {
       if(response.status === 200){
@@ -46,18 +48,20 @@ const GroupScreen = ({navigation}) => {
           ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
 
         if(response.status === 403){
-          CacheService.wipe('@user');
+          CacheService.wipe(Texts.Cache.user);
           
           navigation.navigate('login');
         }
       }
+
+      setLoading(false);
     });
   }
 
   const handleGroupSelection = (group) => {
-    CacheService.register('@group', group);
+    CacheService.register(Texts.Cache.group, group);
 
-    navigation.navigate('home', {group:group});
+    navigation.navigate('home');
   }
 
   const handleDeletion = (group) => {
@@ -90,6 +94,10 @@ const GroupScreen = ({navigation}) => {
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps='always'
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={loading} 
+              onRefresh={search}/>
+        }
         ListHeaderComponent={
           <NewListItem title='Novo grupo'
             onPress={() => setShowModal(true)}/>

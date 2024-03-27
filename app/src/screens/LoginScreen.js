@@ -23,12 +23,10 @@ const LoginScreen = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [pass, setPass]   = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [btnLbl, setBtnLbl] = useState('Entrar');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setBtnLbl('Entrar');
-    
-    CacheService.get('@user')
+    CacheService.get(Texts.Cache.user)
     .then(user => {
       if(user && user !== null)
         navigation.navigate('group');
@@ -37,18 +35,21 @@ const LoginScreen = ({navigation}) => {
 
   const handleSubmit = () => {
     if(user && user != null && pass && pass != null){
+      setLoading(true);
+
       setErrorMsg(null);
 
-      CacheService.wipe('@user');
+      CacheService.wipe(Texts.Cache.user);
 
       setBtnLbl('Entrando...');
 
       post(Texts.API.signin, {username: user, password: pass}).then((response) => {
         if(response.status == 200){
-          CacheService.register('@user', response.data);
+          CacheService.register(Texts.Cache.user, response.data);
 
           navigation.navigate('group');
         } else {
+          setLoading(false);
           setErrorMsg(response.data?.message);
           setBtnLbl('Tente novamente!');
         }
@@ -88,7 +89,8 @@ const LoginScreen = ({navigation}) => {
               style={styles.linkFA}
               onPress={() => navigation.navigate('firstAccess')}/>
 
-          <Button label={btnLbl} onPress={() => handleSubmit()}/>
+          <Button label={'Entrar'} onPress={() => handleSubmit()}
+            loading={loading}/>
 
           <Link label='Esqueceu sua senha? Toque aqui' 
               style={styles.linkFA}

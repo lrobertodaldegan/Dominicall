@@ -10,10 +10,13 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { post } from '../service/Rest/RestService';
+import { Texts } from '../utils/Texts';
 
 export default function ClassModal({onClose=()=>null}){
   const [name, setName] = useState(null);
   const [err, setErr] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setErr(null);
@@ -21,9 +24,23 @@ export default function ClassModal({onClose=()=>null}){
 
   const handleSubmit = () => {
     if(name && name !== null){
+      setLoading(true);
+      setErr(null);
+
+      post(Texts.API.class, {name:name}).then(response => {
+        setLoading(false);
+        
+        if(response.status === 201){
+          onClose();
+        } else {
+          if(response.data && response.data.message)
+            setErr(response.data.message);
+        }
+      });
 
       onClose();
     } else {
+      setLoading(false);
       setErr('Por favor, informe um nome válido para a turma.');
     }
   }
@@ -54,6 +71,7 @@ export default function ClassModal({onClose=()=>null}){
         <Button label={'Salvar'} 
             onPress={handleSubmit}
             style={styles.input}
+            loading={loading}
         />
       </View>
     }/>

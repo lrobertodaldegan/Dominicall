@@ -3,6 +3,8 @@ import {
   FlatList,
   StyleSheet,
   View,
+  ToastAndroid,
+  RefreshControl,
 } from 'react-native';
 import { Colors } from "../utils/Colors";
 import Class from "./Class";
@@ -10,21 +12,43 @@ import ClassModal from "./ClassModal";
 import Label from "./Label";
 import ListItem from "./ListItem";
 import NewListItem from "./NewListItem";
-
-const TURMAS = [
-  {id:0, name:'Adultos', students:'10',teachers:'2'},
-  {id:1, name:'Discipulado', students:'10',teachers:'2'},
-  {id:2, name:'Insfantil II', students:'10',teachers:'2'},
-  {id:3, name:'Jovens', students:'10',teachers:'2'},
-  {id:4, name:'Insfantil I', students:'10',teachers:'2'},
-  {id:5, name:'Insfantil III', students:'10',teachers:'2'},
-  {id:6, name:'Esdras e Noemi Noemi Noemi', students:'10',teachers:'2'},
-];
+import { get } from "../service/Rest/RestService";
+import { Texts } from "../utils/Texts";
+import CacheService from "../service/Cache/CacheService";
 
 export default function Classes({}) {
   const [comp, setComp] = useState('list');
+  const [classList, setClassList] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    loadClassList();
+  }, []);
+
+  const loadClassList = () => {
+    setLoading(true);
+
+    get(Texts.API.class).then(response => {
+      if(response.status === 200){
+        setClassList(response.data.classes);
+      } else {
+        if(response.status !== 204){
+          if(response.data && response.data.message)
+            ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+
+          if(response.status === 403){
+            CacheService.wipe(Texts.Cache.user);
+            
+            navigation.navigate('login');
+          }
+        }
+      }
+
+      setLoading(false);
+    });
+  }
 
   const handleListItem = (item) => {
     setComp('class');
@@ -53,8 +77,12 @@ export default function Classes({}) {
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps='always'
           contentContainerStyle={styles.list}
-          keyExtractor={(item) => item.id}
-          data={TURMAS}
+          keyExtractor={(item) => item._id}
+          data={classList}
+          RefreshControl={
+            <RefreshControl refreshing={loading} 
+                onRefresh={loadClassList}/>
+          }
           ListHeaderComponent={
             <NewListItem title="Nova turma"
               onPress={() => setShowModal(true)}/>

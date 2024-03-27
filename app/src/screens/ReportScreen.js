@@ -20,10 +20,8 @@ const REPORTS = [
   {id:4, title:'Escalas', subtitle:'Escalas de professores', action:()=>null},
 ];
 
-const ReportScreen = ({navigation, route}) => {
+const ReportScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
-
-  const {group} = route.params;
 
   const renderModal = () => {
     if(showModal === true){
@@ -35,7 +33,7 @@ const ReportScreen = ({navigation, route}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <Header group={group} page={'reports'} navigation={navigation}/>
+      <Header page={'reports'} navigation={navigation}/>
 
       {renderModal()}
 

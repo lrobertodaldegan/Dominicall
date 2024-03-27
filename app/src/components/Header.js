@@ -23,11 +23,13 @@ const OPTIONS = [
   {id:4, label:'Outros apps', link: Texts.GooglePlay, icon:faBoxOpen},
 ];
 
-const Header = ({navigation, page='home', group}) => {
+const Header = ({navigation, page='home'}) => {
   const [user, setUser] = useState(null);
+  const [group, setGroup] = useState(null);
 
   useEffect(() => {
-    CacheService.get('@user').then(u => setUser(u.name))
+    CacheService.get(Texts.Cache.user).then(u => setUser(u.name));
+    CacheService.get(Texts.Cache.group).then(u => setGroup(g));
   }, []);
 
   return (

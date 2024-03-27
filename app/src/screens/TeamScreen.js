@@ -22,10 +22,8 @@ const MEMBERS = [
   {id:3, name:'Arlam', level:'Coordenador'},
 ];
 
-const TeamScreen = ({navigation, route}) => {
+const TeamScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
-
-  const {group} = route.params;
 
   const handleRemove = (item) => {
     //todo
@@ -41,7 +39,7 @@ const TeamScreen = ({navigation, route}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <Header group={group} page={'team'} navigation={navigation}/>
+      <Header page={'team'} navigation={navigation}/>
 
       {renderModal()}
 

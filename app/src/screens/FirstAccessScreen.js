@@ -26,15 +26,15 @@ const FirstAccessScreen = ({navigation}) => {
   const [email, setEmail] = useState(null);
   const [pass, setPass]   = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [btnLbl, setBtnLbl] = useState('Salvar');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
     if(user && user != null && pass && pass != null){
+      setLoading(true);
+
       setErrorMsg(null);
 
-      CacheService.wipe('@user');
-
-      setBtnLbl('Cadastrando...');
+      CacheService.wipe(Texts.Cache.user);
 
       let body = {
         username: user,
@@ -47,21 +47,24 @@ const FirstAccessScreen = ({navigation}) => {
         if(response.status == 201){
           post(Texts.API.signin, body).then((response) => {
             if(response.status == 200){
-              CacheService.register('@user', response.data);
+              CacheService.register(Texts.Cache.user, response.data);
     
               navigation.navigate('group');
             } else {
               setErrorMsg('Cadastro realizado! Vamos te redirecionar para o login...');
               setTimeout(() => navigation.navigate('login'), 3000);
             }
+
+            setLoading(false);
           })
         } else {
           setErrorMsg(response.data.message);
-          setBtnLbl('Tente novamente!');
+          setLoading(false);
         }
       });
     }else{
       setErrorMsg('Usuário e senha são obrigatórios para entrar!');
+      setLoading(false);
     }
   }
 
@@ -119,7 +122,8 @@ const FirstAccessScreen = ({navigation}) => {
 
           {renderError()}
 
-          <Button label={btnLbl} onPress={() => handleSubmit()}/>
+          <Button label={'Entrar'} onPress={() => handleSubmit()}
+              loading={loading}/>
         </View>
 
         <By />

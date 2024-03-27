@@ -1,5 +1,6 @@
 import axios from 'axios';
 import CacheService from '../Cache/CacheService';
+import { Texts } from '../../utils/Texts';
 
 const DEFAULT_HEADERS = {
   'X-Requested-With': 'XMLHttpRequest'
@@ -27,7 +28,7 @@ const handleCatch = (err, errorHandler=()=>null) => {
 }
 
 const getJwt = async () => {
-  let user = await CacheService.get('@user');
+  let user = await CacheService.get(Texts.Cache.user);
 
   if(user && user !== null)
     return user.token;
@@ -35,13 +36,20 @@ const getJwt = async () => {
   return null;
 }
 
+const getGroupId = async () => {
+  let group = await CacheService.get(Texts.Cache.group);
+
+  return group && group!== null && group._id ? group._id : '';
+}
+
 const get = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
   try{
     let jwt = await getJwt();
+    let gId = await getGroupId();
 
     let response = await axios.get(urlPath, {
       withCredentials:true,
-      headers: {...headers, 'Authorization':jwt}
+      headers: {...headers, 'Authorization':jwt, 'Group':gId}
     });
 
     return response;
@@ -53,10 +61,11 @@ const get = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
 const post = async (urlPath, body={}, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {  
   try{
     let jwt = await getJwt();
+    let gId = await getGroupId();
     
     let response = await axios.post(urlPath, body, {
       withCredentials:true,
-      headers: {...headers, 'Authorization':jwt}
+      headers: {...headers, 'Authorization':jwt, 'Group':gId}
     });
 
     return response;
@@ -68,10 +77,11 @@ const post = async (urlPath, body={}, errorHandler=()=>null, headers=DEFAULT_HEA
 const del = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
   try{
     let jwt = await getJwt();
+    let gId = await getGroupId();
     
     let response = await axios.delete(urlPath, {
       withCredentials:true,
-      headers: {...headers, 'Authorization':jwt}
+      headers: {...headers, 'Authorization':jwt, 'Group':gId}
     });
 
     return response;
@@ -83,10 +93,11 @@ const del = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
 const put = async (urlPath, body={}, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
   try{
     let jwt = await getJwt();
+    let gId = await getGroupId();
     
     let response = await axios.put(urlPath, body, {
       withCredentials:true,
-      headers: {...headers, 'Authorization':jwt}
+      headers: {...headers, 'Authorization':jwt, 'Group':gId}
     });
 
     return response;
