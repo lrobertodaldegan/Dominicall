@@ -16,7 +16,7 @@ const HomeScreen = ({navigation}) => {
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
       <Header page={'home'} navigation={navigation}/>
 
-      <Classes />
+      <Classes navigation={navigation}/>
 
       <By />
     </ImageBackground>

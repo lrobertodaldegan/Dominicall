@@ -10,29 +10,68 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { Texts } from '../utils/Texts';
+import { post } from '../service/Rest/RestService';
 
-export default function TeacherModal({classs=null, teacher=null, onClose=()=>null}){
+export default function TeacherModal({
+                                navigation, 
+                                classs, 
+                                teacher=null, 
+                                onClose=()=>null
+                              }){
   const [name, setName] = useState(null);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [err, setErr] = useState(null);
+  const [loading, setLoading] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    setName(teacher?.name);
-    setName(teacher?.email);
+    handleChangeName(teacher?.name);
+    setEmail(teacher?.email);
+    setShowForm(false);
   }, []);
 
   const handleSubmit = () => {
     if(name && name !== null && username && username !== null){
-      //todo success
+      setLoading(true);
+      setErr(null);
 
-      onClose();
+      let body = {
+        classId: classs?._id,
+        username: username,
+        name: name,
+        email: email,
+        role: 'Professor'
+      };
+
+      post(Texts.API.member, body).then(response => {
+        setLoading(false);
+        
+        if(response.status === 201){
+          onClose();
+        } else {
+          if(response.data && response.data.message)
+            setErr(response.data.message);
+        }
+      });
     } else {
+      setLoading(false);
       setErr('Por favor, informe um nome e usuário válidos.');
     }
   }
 
-  //TODO gerar nome automatico como sugestao
+  const handleChangeName = (val) => {
+    let un = '';
+
+    if(val?.length > 2){
+      un += 'Pro' + val.substring(0, 3) + '01';
+
+      setUsername(un);
+    }
+
+    setName(val);
+  }
 
   const renderError = () => {
     if(err && err !== null)
@@ -41,44 +80,74 @@ export default function TeacherModal({classs=null, teacher=null, onClose=()=>nul
     return <></>
   }
 
-  return (
-    <Modal onClose={onClose} content={
-      <View>
-        <Label value={'Professor'} style={styles.title}/>
-
-        <Input ico={faPersonChalkboard} 
+  const renderComp = () => {
+    if(showForm === true){
+      return (
+        <>
+          <Input ico={faPersonChalkboard} 
             placeholder='Nome do professor'
             value={name}
             iconSize={30}
             style={styles.input}
-            onChange={setName}
+            onChange={handleChangeName}
             onEnter={handleSubmit}
-        />
+          />
 
-        <Input ico={faUser} 
+          <Input ico={faUser} 
             placeholder='Usuário para acesso'
             value={username}
             iconSize={30}
             style={styles.input}
             onChange={setUsername}
             onEnter={handleSubmit}
-        />
+          />
 
-      <Input ico={faEnvelope} 
+          <Input ico={faEnvelope} 
             placeholder='E-mail para acesso'
             value={email}
             iconSize={30}
             style={styles.input}
             onChange={setEmail}
             onEnter={handleSubmit}
-        />
+          />
 
-        {renderError()}
+          {renderError()}
 
-        <Button label={'Salvar'} 
-            onPress={handleSubmit}
+          <Button label={'Salvar'} 
+              onPress={handleSubmit}
+              style={styles.input}
+              loading={loading}
+          />
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Label value={'Você pode convidar alguém que já usa o APP ou criar um usuário novo para alguém.\nO que você quer fazer?'} 
+            style={styles.legend}/>
+
+          <Button label={'Convidar alguém'} 
+            onPress={() => navigation.navigate('invite', {role:'Professor'})}
             style={styles.input}
-        />
+            loading={loading}
+          />
+
+          <Button label={'Criar usuário'} 
+            onPress={() => setShowForm(true)}
+            style={styles.input}
+            loading={loading}
+          />
+        </>
+      );
+    }
+  }
+
+  return (
+    <Modal onClose={onClose} content={
+      <View style={styles.input}>
+        <Label value={'Novo Professor'} style={styles.title}/>
+
+        {renderComp()}
       </View>
     }/>
   );
@@ -99,6 +168,11 @@ const styles = StyleSheet.create({
     fontSize:20,
     marginBottom:20,
     fontFamily:'MartelSans-Bold'
+  },
+  legend:{
+    color:Colors.black,
+    fontSize:16,
+    marginBottom:20,
   },
   input:{
     width:screen.width * 0.8

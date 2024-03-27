@@ -23,8 +23,8 @@ module.exports = function(app) {
     "/dominicall/group",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
     ],
     controller.update
   );
@@ -51,9 +51,8 @@ module.exports = function(app) {
     "/dominicall/group/member",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
-      verifyGroup.verifyGroupMemberDuplicity,
+      verifyUser.justCoord,
     ],
     controller.createMember
   );
@@ -62,8 +61,8 @@ module.exports = function(app) {
     "/dominicall/group/member/:id",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
     ],
     controller.removeMember
   );

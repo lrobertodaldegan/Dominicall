@@ -12,6 +12,8 @@ import {
   Dimensions,
   View,
   FlatList,
+  RefreshControl,
+  ToastAndroid,
 } from 'react-native';
 import { Colors } from '../utils/Colors';
 import { Days } from '../utils/Days';
@@ -30,6 +32,8 @@ import PositionListItem from './PositionListItem';
 import EventModal from './EventModal';
 import VisitModal from './VisitModal';
 import StudentListItem from './StudentListItem';
+import { del, get } from '../service/Rest/RestService';
+import { Texts } from '../utils/Texts';
 
 const ALUNOS = [
   {id:0, name:'Lucas Roberto', presence:10, ausence:5},
@@ -95,22 +99,99 @@ const CLASS_ORDER = [
 ];
 
 export default function Class({
+                          navigation,
                           item, 
                           onGoBack=()=>null, 
                           onNameChange=(newName)=>null
                         }) {
+
   const [name, setName] = useState(null);
-  const [page, setPage] = useState('students');
+  const [page, setPage] = useState(null);
   const [showSave, setShowSave] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [offering, setOffering] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [calendarList, setCalendarList] = useState([]);
+  const [list, setList] = useState([]);
 
   useEffect(() => {
     setName(item?.name);
     setShowSave(false);
-    setCalendarList(CLASS_ORDER);
+    setPage('students');
   },[]);
+
+  useEffect(() => {
+    setList([]);
+
+    loadPageList();
+  }, [page]);
+
+  const loadPageList = () => {
+    if(page === 'students')
+      loadStudentsList();
+
+    if(page === 'teachers')
+      loadTeachersList();
+
+    if(page === 'offers')
+      loadOffersList();
+
+    if(page === 'calendar')
+      loadCalendarList();
+
+    if(page === 'visits')
+      loadVisitorsList();
+  }
+
+  const loadPageListAux = (url, onSuccess=(r)=>null) => {
+    setLoading(true);
+
+    get(getURLWithClassIdAndDateQuery(url))
+    .then(response => {
+      if(response.status === 200){
+        onSuccess(response);
+      } else {
+        if(response.status !== 204){
+          if(response.data && response.data.message)
+            ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+        }
+      }
+
+      setLoading(false);
+    });
+  }
+
+  const getURLWithClassIdAndDateQuery = (prefix) => {
+    return `${prefix}?classId=${item._id}&dt=${Days.label()}`; 
+  }
+
+  const loadVisitorsList = () => {
+    loadPageListAux(Texts.API.visitors, (response) => {
+      setList(response.data.visitors);
+    });
+  }
+
+  const loadStudentsList = () => {
+    loadPageListAux(Texts.API.visitors, (response) => {
+      setList(response.data.students);
+    });
+  }
+
+  const loadOffersList = () => {
+    loadPageListAux(Texts.API.offers, (response) => {
+      setList(response.data.offers);
+    });
+  }
+
+  const loadTeachersList = () => {
+    loadPageListAux(Texts.API.teachers, (response) => {
+      setList(response.data.teachers);
+    });
+  }
+
+  const loadCalendarList = () => {
+    setCalendarList(CLASS_ORDER);
+  }
 
   const handleNameChanging = (v) => {
     setName(v);
@@ -119,6 +200,41 @@ export default function Class({
 
   const handleSubmitNameChanging = () => {
     onNameChange(name);
+  }
+
+  const sendRemove = (url) => {
+    del(url).then(response => {
+      if(response.data && response.data.message)
+        ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+      
+      if(response.status === 200){
+        setList([]);
+
+        loadPageList();
+      }
+    });
+  }
+
+  const handleRemove = (item) => {
+    let url = null;
+
+    if(page === 'students')
+      url = Texts.API.students;
+
+    if(page === 'teachers')
+      url = Texts.API.teachers;
+
+    if(page === 'offers')
+      url = Texts.API.offers;
+
+    if(page === 'calendar')
+      url = Texts.API.events;
+
+    if(page === 'visits')
+      url = Texts.API.visitors;
+
+    if(url !== null)
+      sendRemove(`${url}/${item._id}`);
   }
 
   const renderSave = () => {
@@ -131,30 +247,11 @@ export default function Class({
     return <></>
   }
 
-  const getData = () => {
-    if(page === 'students'){
-      return ALUNOS;
-    }
-
-    if(page === 'teachers'){
-      return PROFS;
-    }
-
-    if(page === 'offers'){
-      return OFFERS;
-    }
-
-    if(page === 'calendar'){
-      return EVENTS;
-    }
-
-    return [];
-  }
-
   const getListItem = (item) => {
     if(page === 'students'){
       return (
         <StudentListItem item={item}
+          onRemove={() => handleRemove(item)}
           onOfferPress={() => setOffering(item)}
         />
       )
@@ -163,8 +260,9 @@ export default function Class({
     if(page === 'teachers'){
       return (
         <ListItem title={item.name}
+          onRemove={() => handleRemove(item)}
           leftComponent={
-            <Label value={item.level} style={styles.lbl}/>
+            <Label value={item.role} style={styles.lbl}/>
           }
         />
       )
@@ -172,19 +270,23 @@ export default function Class({
 
     if(page === 'offers'){
       return (
-        <NumberListItem subtitle={item.offerer} number={item.value} />
+        <NumberListItem subtitle={item.offerer ? item.offerer : ''} 
+          number={item.value} 
+          onRemove={() => handleRemove(item)}/>
       );
     }
 
     if(page === 'visits'){
       return (
-        <ListItem title={item.name}/>
+        <ListItem title={item.name} 
+          onRemove={() => handleRemove(item)}/>
       )
     }
 
     if(page === 'calendar'){
       return (
         <ListItem title={item.teacher}
+          onRemove={() => handleRemove(item)}
           leftComponent={
             <Label value={`${item.title}`} style={styles.lbl}/>
           }
@@ -228,7 +330,7 @@ export default function Class({
     if(page === 'offers'){
       let total = 0;
 
-      OFFERS.map(o => total+=o.value);
+      list.map(o => total+=o.value);
       
       c.push(
         <NumberListItem key={total} 
@@ -276,22 +378,28 @@ export default function Class({
     setCalendarList(list.sort((a, b) => a.position < b.position ? -1 : 1));
   }
 
+  const handleModalClose = () => {
+    loadPageList();
+    setShowModal(false);
+  }
+
   const renderModal = () => {
     if(showModal === true){
       if(page === 'students')
-        return <StudentModal onClose={() => setShowModal(false)}/>
+        return <StudentModal classs={item} onClose={handleModalClose}/>
 
       if(page === 'offers')
-        return <OfferModal onClose={() => setShowModal(false)}/>
+        return <OfferModal classs={item} onClose={handleModalClose}/>
 
       if(page === 'teachers')
-        return <TeacherModal onClose={() => setShowModal(false)}/>
+        return <TeacherModal navigation={navigation} 
+                  classs={item} onClose={handleModalClose}/>
 
       if(page === 'calendar')
-        return <EventModal onClose={() => setShowModal(false)}/>
+        return <EventModal classs={item} onClose={handleModalClose}/>
 
       if(page === 'visits')
-        return <VisitModal onClose={() => setShowModal(false)}/>
+        return <VisitModal classs={item} onClose={handleModalClose}/>
     }
 
     if(offering && offering !== null){
@@ -355,14 +463,18 @@ export default function Class({
         contentContainerStyle={styles.wrap}
         keyboardDismissMode='on-drag'
         keyboardShouldPersistTaps='always'
+        refreshControl={
+          <RefreshControl refreshing={loading}
+            onRefresh={loadPageList}/>
+        }
         ListHeaderComponent={
           <FlatList 
             contentContainerStyle={styles.wrap}
             keyboardDismissMode='on-drag'
             keyboardShouldPersistTaps='always'
             ListHeaderComponent={renderClassHeader()}
-            data={getData()}
-            keyExtractor={(item) => item.id}
+            data={list}
+            keyExtractor={(item) => item._id}
             renderItem={({item}) => getListItem(item)}
           />
         }

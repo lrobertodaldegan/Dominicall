@@ -10,20 +10,50 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { Texts } from '../utils/Texts';
+import { Days } from '../utils/Days';
+import { post } from '../service/Rest/RestService';
 
-export default function OfferModal({offerer=null, onClose=()=>null}){
+export default function OfferModal({classs, offerer=null, onClose=()=>null}){
   const [value, setValue] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [offererr, setOffererr] = useState(null);
+  const [err, setErr] = useState(null);
 
   useEffect(() => {
     setOffererr(offerer);
   }, []);
 
   const handleSubmit = () => {
-    //TODO tratar 0 na api
+    setLoading(true);
+    setErr(null);
 
-    onClose();
+    let body = {
+      value:value !== null ? value : 0,
+      classId: classs?._id,
+      offerer: offererr,
+      dt:Days.label()
+    };
+
+    post(Texts.API.offers, body).then(response => {
+      setLoading(false);
+      
+      if(response.status === 201){
+        onClose();
+      } else {
+        if(response.data && response.data.message)
+          setErr(response.data.message);
+      }
+    });
   }
+
+  const renderError = () => {
+    if(err && err !== null)
+      return <Label value={err} style={styles.error}/>
+
+    return <></>
+  }
+
 
   return (
     <Modal onClose={onClose} content={
@@ -49,9 +79,12 @@ export default function OfferModal({offerer=null, onClose=()=>null}){
             onEnter={handleSubmit}
         />
 
+        {renderError()}
+
         <Button label={'Lançar'} 
             onPress={handleSubmit}
             style={styles.input}
+            loading={loading}
         />
       </View>
     }/>

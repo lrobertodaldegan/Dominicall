@@ -37,8 +37,6 @@ export default function ClassModal({onClose=()=>null}){
             setErr(response.data.message);
         }
       });
-
-      onClose();
     } else {
       setLoading(false);
       setErr('Por favor, informe um nome válido para a turma.');

@@ -8,6 +8,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import TeamScreen from './src/screens/TeamScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import GroupScreen from './src/screens/GroupScreen';
+import InviteScreen from './src/screens/InviteScreen';
 import FirstAccessScreen from './src/screens/FirstAccessScreen';
 import ResetScreen from './src/screens/ResetScreen';
 import ErrorScreen from './src/screens/ErrorScreen';
@@ -35,6 +36,7 @@ function App(): JSX.Element {
           <Stack.Screen name="team" component={TeamScreen} options={ScreensOptions} />
           <Stack.Screen name="reports" component={ReportScreen} options={ScreensOptions} />
           <Stack.Screen name="group" component={GroupScreen} options={ScreensOptions} />
+          <Stack.Screen name="invite" component={InviteScreen} options={ScreensOptions} />
           <Stack.Screen name="firstAccess" component={FirstAccessScreen} options={ScreensOptions} />
           <Stack.Screen name="reset" component={ResetScreen} options={ScreensOptions} />
           <Stack.Screen name="error" component={ErrorScreen} options={ScreensOptions} />

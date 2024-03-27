@@ -25,6 +25,7 @@ export const Texts = {
     offers: `${API_BASE_PATH}class/offer`,
     events: `${API_BASE_PATH}class/event`,
     teachers: `${API_BASE_PATH}class/teachers`,
-    report: `${API_BASE_PATH}report`
+    report: `${API_BASE_PATH}report`,
+    users: `${API_BASE_PATH}users`
   }
 }

@@ -29,7 +29,7 @@ const Header = ({navigation, page='home'}) => {
 
   useEffect(() => {
     CacheService.get(Texts.Cache.user).then(u => setUser(u.name));
-    CacheService.get(Texts.Cache.group).then(u => setGroup(g));
+    CacheService.get(Texts.Cache.group).then(g => setGroup(g));
   }, []);
 
   return (

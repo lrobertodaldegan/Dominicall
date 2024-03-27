@@ -1,6 +1,15 @@
 const db = require("../models");
 const Group = db.group;
 const GroupMember = db.groupmember;
+const User = db.user;
+
+const errorHandler = (err, res) => {
+  if (err) {
+    console.log(err);
+    res.status(500).send({ message:  `Ops!` });
+    return;
+  }
+}
 
 verifyUserGroup = (req, res, next) => {
   let group = req.get('Group');
@@ -27,16 +36,25 @@ verifyUserGroup = (req, res, next) => {
 };
 
 verifyGroupMemberDuplicity = (req, res, next) => {
-  GroupMember.findOne({
-    user: req.body.username, 
-    group:req.groupId
+  User.findOne({
+    username: req.body.username
   })
   .exec()
-  .then(gm => {
-    if(gm)
-      return res.status(400).send({ message: "Usuário já possui acesso ao grupo!" });
-
-    next();
+  .then(user => {
+    if(!user)
+      return next();
+      
+    GroupMember.findOne({
+      user: user._id, 
+      group:req.groupId
+    })
+    .exec()
+    .then(gm => {
+      if(gm)
+        return res.status(400).send({ message: "Usuário já possui acesso ao grupo!" });
+  
+      next();
+    }).catch(err => errorHandler(err, res));
   }).catch(err => errorHandler(err, res));
 };
 

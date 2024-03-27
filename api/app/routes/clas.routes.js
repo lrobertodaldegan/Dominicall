@@ -15,8 +15,8 @@ module.exports = function(app) {
     "/dominicall/class",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
       verifyClas.verifyDuplicationInGroup
     ],
     controller.create
@@ -26,8 +26,8 @@ module.exports = function(app) {
     "/dominicall/class",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
       verifyClas.verifyId,
       verifyClas.verifyDuplicationInGroup,
     ],
@@ -38,8 +38,8 @@ module.exports = function(app) {
     "/dominicall/class/:id",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
       verifyClas.verifyId,
     ],
     controller.remove
@@ -49,8 +49,8 @@ module.exports = function(app) {
     "/dominicall/class/event/:id",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
       verifyClas.verifyId,
     ],
     controller.removeEvent
@@ -163,8 +163,8 @@ module.exports = function(app) {
     "/dominicall/class/event",
     [
       authJwt.verifyToken,
-      verifyUser.justCoord,
       verifyGroup.verifyUserGroup,
+      verifyUser.justCoord,
       verifyClas.verifyClassId,
       verifyClas.verifyEventDuplication,
     ],

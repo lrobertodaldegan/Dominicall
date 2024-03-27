@@ -10,9 +10,13 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { Texts } from '../utils/Texts';
+import { Days } from '../utils/Days';
+import { post } from '../service/Rest/RestService';
 
-export default function VisitModal({onClose=()=>null}){
+export default function VisitModal({classs, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
@@ -21,8 +25,27 @@ export default function VisitModal({onClose=()=>null}){
 
   const handleSubmit = () => {
     if(name && name !== null){
-      onClose();
+      setLoading(true);
+      setErr(null);
+
+      let body = {
+        name:name,
+        classId: classs?._id,
+        dt:Days.label()
+      };
+
+      post(Texts.API.visitors, body).then(response => {
+        setLoading(false);
+        
+        if(response.status === 201){
+          onClose();
+        } else {
+          if(response.data && response.data.message)
+            setErr(response.data.message);
+        }
+      });
     } else {
+      setLoading(false);
       setErr('Por favor, informe um nome válido.');
     }
   }
@@ -53,6 +76,7 @@ export default function VisitModal({onClose=()=>null}){
         <Button label={'Salvar'} 
             onPress={handleSubmit}
             style={styles.input}
+            loading={loading}
         />
       </View>
     }/>

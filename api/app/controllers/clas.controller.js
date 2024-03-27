@@ -38,9 +38,10 @@ exports.getClasses = (req, res) => {
                                            .countDocuments();
 
         result.push({
+          _id: classs._id,
           name: classs.name,
           groupId: classs.group,
-          techers: teachers,
+          teachers: teachers,
           students: students
         });
       }
@@ -97,7 +98,7 @@ exports.getOffers = (req, res) => {
   .then(offers => {
     let status = offers && offers.length > 0 ? 200 : 204;
 
-    res.status(status).send(offers);
+    res.status(status).send({offers: offers});
   }).catch(err => errorHandler(err, res));
 }
 
@@ -129,7 +130,7 @@ exports.getVisitors = (req, res) => {
   .then(visitors => {
     let status = visitors && visitors.length > 0 ? 200 : 204;
 
-    res.status(status).send(visitors);
+    res.status(status).send({visitors: visitors});
   }).catch(err => errorHandler(err, res));
 }
 
@@ -154,12 +155,18 @@ exports.removeVisitor = (req, res) => {
 
 exports.getClassTeachers = (req, res) => {
   ClassTeacher.find({
-    clas:classId
+    clas:req.query.classId
   })
   .populate({
     path:"teacher",
     populate:{
       path:'role'
+    }
+  })
+  .populate({
+    path:"teacher",
+    populate:{
+      path:'user'
     }
   })
   .then(async (teachers) => {
@@ -178,14 +185,14 @@ exports.getClassTeachers = (req, res) => {
 
         result.push({
           _id:classTeacher._id,
-          name:classTeacher.name,
+          name:classTeacher.teacher.user.name,
           role:classTeacher.teacher.role.name,
           order:classTeacher.order,
         });
       }
     }
 
-    res.status(status).send(result);
+    res.status(status).send({teachers: result});
   }).catch(err => errorHandler(err, res));
 }
 
@@ -212,7 +219,7 @@ exports.getEvents = (req, res) => {
   .then(events => {
     let status = events && events.length > 0 ? 200 : 204;
 
-    res.status(status).send(events);
+    res.status(status).send({events: events});
   }).catch(err => errorHandler(err, res));
 }
 
@@ -245,7 +252,7 @@ exports.getPresences = (req, res) => {
   .then(presences => {
     let status = presences && presences.length > 0 ? 200 : 204;
 
-    res.status(status).send(presences);
+    res.status(status).send({presences: presences});
   }).catch(err => errorHandler(err, res));
 }
 
@@ -285,9 +292,9 @@ exports.getStudents = (req, res) => {
         });
       }
 
-      res.status(status).send(result);
+      res.status(status).send({students: result});
     } else {
-      res.status(status).send(students);
+      res.status(status).send({students: students});
     }
   }).catch(err => errorHandler(err, res));
 }

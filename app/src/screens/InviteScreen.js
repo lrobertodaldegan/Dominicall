@@ -20,27 +20,23 @@ import Link from '../components/Link';
 import { del, get } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
+import Input from '../components/Input';
+import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons';
+import Button from '../components/Button';
 
-const GroupScreen = ({navigation}) => {
-  const [showModal, setShowModal] = useState(false);
+const InviteScreen = ({navigation, route}) => {
+  const [filter, setFilter] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [groups, setGroups] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    search();
-  }, []);
+  const {role, classId} = route.params;
 
   const search = () => {
     setLoading(true);
 
-    get(Texts.API.group).then(response => {
+    get(`${Texts.API.users}?filter=${filter}`).then(response => {
       if(response.status === 200){
-        let gps = response.data.groups;
-
-        setGroups(gps);
-        
-        if(gps.length === 1)
-          handleGroupSelection(gps[0]);
+        setUsers(response.data.users);
       } else {
         if(response.data && response.data.message)
           ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
@@ -56,37 +52,49 @@ const GroupScreen = ({navigation}) => {
     });
   }
 
-  const handleGroupSelection = (group) => {
-    CacheService.register(Texts.Cache.group, group);
+  const sendInvite = (user) => {
+    if(!role){
+      //showMemberModal
+    } else {
+      if(role && paper === 'Professor' && (!clas || clas === null)){
+        setLoading(false);
+        setErr('Por favor, selecione uma turma para o professor.');
+      } else {
+        setLoading(true);
+        setErr(null);
 
-    navigation.navigate('home');
-  }
+        let body = {
+          classId: classs?._id,
+          username: username,
+          name: name,
+          email: email,
+          role: paper
+        };
 
-  const handleDeletion = (group) => {
-    del(`${Texts.API.group}/${group._id}`).then(response => {
-      console.log(response.data)
-      search();
-    });
-  }
-
-  const renderModal = () => {
-    if(showModal === true)
-      return <GroupModal onClose={() => {search(); setShowModal(false);}}/>
-
-    return <></>
+        post(Texts.API.member, body).then(response => {
+          setLoading(false);
+          
+          if(response.status === 201){
+            onClose();
+          } else {
+            if(response.data && response.data.message)
+              setErr(response.data.message);
+          }
+        });
+      }
+    }
   }
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
       <View style={styles.logoffwrap}>
-        <Link label={'< Sair do app (logoff)'}
-          onPress={() => navigation.navigate('login')}/>
+        <Link label={'< voltar'}
+          onPress={() => navigation.goBack()}/>
       </View>
+      
       <Logo style={styles.logo}/>
 
-      <Label value={'Grupos educacionais'} style={styles.title}/>
-
-      {renderModal()}
+      <Label value={'Convidar alguém'} style={styles.title}/>
 
       <FlatList 
         keyboardDismissMode="on-drag"
@@ -97,17 +105,31 @@ const GroupScreen = ({navigation}) => {
               onRefresh={search}/>
         }
         ListHeaderComponent={
-          <NewListItem title='Novo grupo'
-            onPress={() => setShowModal(true)}/>
+          <View style={styles.form}>
+            <Input ico={faSearch}
+              value={filter}
+              onChange={setFilter}
+              onEnter={search}
+              placeholder='Informe um usuário desejado'
+            />
+
+            <Button label={'Pesquisar'}
+              loading={loading}
+              onPress={search}
+            />
+
+            <Label value={'Toque em um usuário para enviar o convite.\nOs resultados serão exibidos aqui embaixo:'} 
+              style={styles.legend}/>
+          </View>
         }
-        keyExtractor={(item) => item._id}
-        data={groups}
+        keyExtractor={(item) => item.username}
+        data={users}
         renderItem={({item}) => 
           <ListItem title={item.name}
-            onPress={() => handleGroupSelection(item)}
-            onRemove={() => handleDeletion(item)}
+            onPress={() => sendInvite(item)}
+            showRemove={false}
             leftComponent={
-              <Label value={`${item.classes} turmas`}
+              <Label value={`${item.username}`}
                 style={styles.lbl}/>
             }
           />
@@ -143,17 +165,23 @@ const styles= StyleSheet.create({
     width:screen.height * 0.1,
     marginTop:screen.height * 0.08,
   },
-  list:{
-    marginVertical:20,
-    backgroundColor:Colors.white,
-    borderTopLeftRadius:20,
-    borderTopRightRadius:20,
-  },
   title:{
     fontSize:26,
     fontFamily:'MartelSans-Bold',
     color:Colors.dark,
     marginVertical:screen.height * 0.05
+  },
+  legend:{
+    fontSize:14,
+    textAlign:'center',
+    color:Colors.dark,
+    marginVertical:10
+  },
+  list:{
+    marginVertical:20,
+    backgroundColor:Colors.white,
+    borderTopLeftRadius:20,
+    borderTopRightRadius:20,
   },
   lbl:{
     color:Colors.gray
@@ -163,4 +191,4 @@ const styles= StyleSheet.create({
   },
 });
 
-export default GroupScreen;
+export default InviteScreen;

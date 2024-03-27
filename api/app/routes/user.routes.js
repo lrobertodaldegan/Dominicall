@@ -21,4 +21,12 @@ module.exports = function(app) {
     ],
     controller.resetPass
   );
+
+  app.get(
+    '/dominicall/users',
+    [
+      authJwt.verifyToken,
+    ],
+    controller.searchUsers
+  );
 };

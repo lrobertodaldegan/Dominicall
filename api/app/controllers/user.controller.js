@@ -125,3 +125,24 @@ exports.resetPass = (req, res) => {
     res.status(400).send({message:"Informe uma senha nova para realizar a operação!"});
   }
 }
+
+exports.searchUsers = (req, res) => {
+  if(req.query.filter){
+    User.find({
+      $or:[
+        {name: { "$regex": `.*${req.query.filter}.*`, '$options': 'i' }},
+        {username: { "$regex": `.*${req.query.filter}.*`, '$options': 'i' }}
+      ]
+    })
+    .select('name username -_id')
+    .limit(5)
+    .exec()
+    .then(users => {
+      let status = users && users.length > 0 ? 200 : 204;
+
+      res.status(status).send({users: users ? users : []});
+    }).catch(err => errorHandler(err, res));
+  } else {
+    res.status(400).send({message:"Informe os dados necessários para realizar a operação!"});
+  }
+}

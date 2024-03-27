@@ -12,11 +12,11 @@ import ClassModal from "./ClassModal";
 import Label from "./Label";
 import ListItem from "./ListItem";
 import NewListItem from "./NewListItem";
-import { get } from "../service/Rest/RestService";
+import { del, get } from "../service/Rest/RestService";
 import { Texts } from "../utils/Texts";
 import CacheService from "../service/Cache/CacheService";
 
-export default function Classes({}) {
+export default function Classes({navigation}) {
   const [comp, setComp] = useState('list');
   const [classList, setClassList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,6 +50,16 @@ export default function Classes({}) {
     });
   }
 
+  const handleRemove = (item) => {
+    del(`${Texts.API.class}/${item._id}`).then(response => {
+      if(response.data && response.data.message)
+        ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+      
+      if(response.status === 200)
+        loadClassList();
+    });
+  }
+
   const handleListItem = (item) => {
     setComp('class');
     setSelected(item);
@@ -62,7 +72,7 @@ export default function Classes({}) {
 
   const renderModal = () => {
     if(showModal === true){
-      return <ClassModal onClose={() => setShowModal(false)}/>
+      return <ClassModal onClose={() => {loadClassList(); setShowModal(false);}}/>
     }
 
     return <></>
@@ -79,7 +89,7 @@ export default function Classes({}) {
           contentContainerStyle={styles.list}
           keyExtractor={(item) => item._id}
           data={classList}
-          RefreshControl={
+          refreshControl={
             <RefreshControl refreshing={loading} 
                 onRefresh={loadClassList}/>
           }
@@ -89,6 +99,7 @@ export default function Classes({}) {
           }
           renderItem={({item}) => 
             <ListItem onPress={() => handleListItem(item)}
+                onRemove={() => handleRemove(item)}
                 title={item.name}
                 leftComponent={
                   <Label value={`${item.teachers} professores`}
@@ -109,7 +120,7 @@ export default function Classes({}) {
   }
 
   if(comp === 'class' && selected !== null){
-    return <Class item={selected} onGoBack={handleGoBack}/>
+    return <Class navigation={navigation} item={selected} onGoBack={handleGoBack}/>
   }
 
   return <></>

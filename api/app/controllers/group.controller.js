@@ -74,9 +74,11 @@ exports.remove = (req, res) => {
 }
 
 exports.createMember = (req, res) => {
-  let reqOk = (req.body.username && req.body.name && req.body.roleId) === true;
+  let reqOk = (req.body.username && req.body.name && req.body.role) === true;
 
-  Role.findById(req.body.roleId)
+  Role.findOne({
+    name: req.body.role
+  })
   .then(role => {
     let isTeacher = role?.name === 'Professor';
 
@@ -99,40 +101,44 @@ exports.createMember = (req, res) => {
           email:req.body.email,
         });
 
-        const nUser = await newUser.save();
-        
-        memberUser = nUser;
+        memberUser = await newUser.save();
       }
 
-      const newGroupMember = new GroupMember({
-        user:memberUser,
-        role:req.body.roleId,
-        group:req.groupId
-      });
+      let nGm = await GroupMember.findOne({
+                                    user:memberUser._id,
+                                    group: req.groupId
+                                  });
+      if(!nGm){
+        const newGroupMember = new GroupMember({
+          user:memberUser,
+          role:role._id,
+          group:req.groupId
+        });
+        
+        nGm = await newGroupMember.save();
+      }
 
-      newGroupMember.save().then(nGm => {
-        let msg = {message: `Usuário ${memberUser.name} foi adicionado ao grupo!`};
+      if(isTeacher === true){
+        ClassTeacher.where({
+          clas:req.body.classId
+        })
+        .countDocuments()
+        .then(qtd => {
+          const ct = new ClassTeacher({
+            clas:req.body.classId,
+            teacher:nGm._id,
+            order:qtd + 1,
+          });
 
-        if(isTeacher === true){
-          ClassTeacher.where({
-            clas:req.body.classId
-          })
-          .countDocuments()
-          .then(qtd => {
-            const ct = new ClassTeacher({
-              clas:req.body.classId,
-              teacher:nGm._id,
-              order:qtd + 1,
-            });
+          ct.save().then(teacher => {
+            res.status(201).send({message: `Professor ${memberUser.name} adicionado ao grupo!`});
 
-            ct.save().then(teacher => {
-              res.status(201).send(msg);
-            }).catch(err => errorHandler(err, res));
           }).catch(err => errorHandler(err, res));
-        } else {
-          res.status(201).send(msg);
-        }
-      }).catch(err => errorHandler(err, res));
+        }).catch(err => errorHandler(err, res));
+
+      } else {
+        res.status(201).send({message: `Usuário ${memberUser.name} adicionado ao grupo!`});
+      }
     }).catch(err => errorHandler(err, res));
   }).catch(err => errorHandler(err, res));
 }
