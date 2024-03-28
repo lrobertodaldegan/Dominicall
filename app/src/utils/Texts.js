@@ -24,7 +24,7 @@ export const Texts = {
     presences: `${API_BASE_PATH}class/presence`,
     offers: `${API_BASE_PATH}class/offer`,
     events: `${API_BASE_PATH}class/event`,
-    teachers: `${API_BASE_PATH}class/teachers`,
+    teachers: `${API_BASE_PATH}class/teacher`,
     report: `${API_BASE_PATH}report`,
     users: `${API_BASE_PATH}users`
   }

@@ -150,7 +150,7 @@ module.exports = function(app) {
   );
 
   app.get(
-    "/dominicall/class/teachers",
+    "/dominicall/class/teacher",
     [
       authJwt.verifyToken,
       verifyGroup.verifyUserGroup,
@@ -200,7 +200,6 @@ module.exports = function(app) {
       authJwt.verifyToken,
       verifyGroup.verifyUserGroup,
       verifyClas.verifyClassId,
-      verifyClas.verifyDt,
     ],
     controller.createPresence
   );
@@ -225,5 +224,15 @@ module.exports = function(app) {
       verifyClas.verifyId,
     ],
     controller.changeTeacherOrder
+  );
+
+  app.put(
+    "/dominicall/class/presence/:id",
+    [
+      authJwt.verifyToken,
+      verifyGroup.verifyUserGroup,
+      verifyClas.verifyId,
+    ],
+    controller.updatePresence
   );
 };

@@ -2,33 +2,87 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
-  Dimensions
+  Dimensions,
+  ToastAndroid,
 } from 'react-native';
 import CheckListItem from './CheckListItem';
 import IconLabel from './IconLabel';
-import Label from './Label';
 import { Colors } from '../utils/Colors';
-import { faBible, faCheckSquare, faCoins } from '@fortawesome/free-solid-svg-icons';
-import { Screen } from 'react-native-screens';
+import { faBible, faBook, faCoins } from '@fortawesome/free-solid-svg-icons';
+import { Texts } from '../utils/Texts';
+import { post, put, del } from '../service/Rest/RestService';
 
-export default function StudentListItem({item, onOfferPress=(item)=>null}) {
+
+export default function StudentListItem({
+                                    item, 
+                                    onOfferPress=(item)=>null,
+                                    onRemove=()=>null
+                                  }) {
+
+  const [presenceId, setPresenceId] = useState(item.presence?._id);
+  const [selected, setSelected] = useState(false);
   const [bible, setBible] = useState(false);
   const [book, setBook] = useState(false);
 
-  const handleBiblePress = () => {
-    //todo
-    
-    setBible(!bible);
-  }
+  useEffect(() => {
+    if(selected === false){
+      setPresenceId(null);
+      setBible(false);
+      setBook(false);
 
-  const handleBookPress = () => {
-    //todo
+      if(presenceId && presenceId !== null){
+        del(`${Texts.API.presences}/${presenceId}`).then(response => {
+          if(response.status !== 200 && response.data && response.data.message)
+            ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+        });
+      }
+    }
     
-    setBook(!book);
-  }
+    if(selected === true) {
+      let body = {
+        classId: item.clas,
+        studentId: item._id,
+        bible: bible,
+        book: book
+      };
 
-  const handleSelection = () => {
-    //todo
+      post(Texts.API.presences, body).then(response => {
+        if(response.status === 201 && response.data && response.data.message)
+          ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+
+        setPresenceId(response.data._id);
+      });
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    if(selected === true) {
+      let body = {bible: bible,book: book};
+     
+      if(presenceId && presenceId !== null){
+        put(`${Texts.API.presences}/${presenceId}`, body).then(response => { 
+          if(response.status !== 201 && response.data && response.data.message)
+            ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+        });
+      }
+    }
+
+    if(selected === false && (bible === true || book == true))
+      setSelected(true);
+  }, [bible, book]);
+
+  const handleBibleOrBookPress = (pressOn) => { 
+    let bi = bible === true;
+    let bo = book === true;
+    
+    if(pressOn === 'bible')
+      bi = !bi;
+
+    if(pressOn === 'book')
+      bo = !bo;
+
+    setBible(bi);
+    setBook(bo);
   }
 
   return (
@@ -36,33 +90,27 @@ export default function StudentListItem({item, onOfferPress=(item)=>null}) {
       title={item?.name}
       checklistLbl='Ausente'
       checklistSelectedLbl='Presente'
-      onSelect={handleSelection}
-      leftComponent={
-        <Label value={`${item?.presence} presença(s)`}
-            style={styles.lbl}/>
-      }
-      rightComponent={
-        <Label value={`${item?.ausence} ausência(s)`}
-            style={styles.lbl}/>
-      }
+      selected={selected}
+      onSelect={() => setSelected(!selected)}
+      onRemove={onRemove}
       bottomComponent={
         <View style={styles.botWrap}>
           <IconLabel
-            icon={faCheckSquare}
+            icon={faBible}
             label='Bíblia'
             style={styles.botOpt}
             lblStyle={bible === true ? styles.botLblS : styles.botLbl}
             iconStyle={bible === true ? styles.botLblS : styles.botIco}
-            onPress={handleBiblePress}
+            onPress={() => handleBibleOrBookPress('bible')}
           />
 
           <IconLabel
-            icon={faBible}
+            icon={faBook}
             label='Revista'
             style={styles.botOpt}
             lblStyle={book === true ? styles.botLblS : styles.botLbl}
             iconStyle={book === true ? styles.botLblS : styles.botIco}
-            onPress={handleBookPress}
+            onPress={() => handleBibleOrBookPress('book')}
           />
 
           <IconLabel
@@ -70,7 +118,6 @@ export default function StudentListItem({item, onOfferPress=(item)=>null}) {
             label='Oferta'
             style={styles.botOpt}
             lblStyle={styles.botLblS}
-            iconStyle={styles.botIcoS}
             onPress={onOfferPress}
           />
         </View>

@@ -14,7 +14,6 @@ import Link from "./Link";
 export default function ListItem({
                                 title=' ',
                                 leftComponent=<></>,
-                                midleComponent=<></>,
                                 rightComponent=<></>,
                                 bottomComponent=<></>,
                                 showRemove=true,
@@ -79,10 +78,6 @@ export default function ListItem({
             <View style={styles.compsItem}>
               {leftComponent}
             </View>
-
-            <View style={styles.compsItem}>
-              {midleComponent}
-            </View>
             
             <View style={styles.compsItem}>
               {rightComponent}
@@ -102,7 +97,7 @@ export default function ListItem({
 
 const screen = Dimensions.get('screen');
 
-const widthComps = ((screen.width - 20) - ((screen.height * 0.12) * 0.5)) * 0.33;
+const widthComps = ((screen.width - 20) - ((screen.height * 0.12) * 0.5)) * 0.45;
 
 const styles = StyleSheet.create({
   wrap:{
@@ -145,7 +140,7 @@ const styles = StyleSheet.create({
     marginTop:5,
   },
   compsItem:{
-    width: widthComps
+    width: widthComps,
   },
   bottomCompWrap:{
     width: (screen.width - 20) - ((screen.height * 0.12) * 0.5)

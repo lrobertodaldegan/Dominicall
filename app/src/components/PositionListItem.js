@@ -71,8 +71,7 @@ export default function PositionListItem({
                 onPress={onUp}>
               <Icon icon={faArrowUp} />
             </TouchableHighlight>
-          </View>
-          <View style={styles.arrowWrap}>
+          
             <TouchableHighlight underlayColor={'transparent'}
                 style={styles.btn}
                 onPress={onDown}>
@@ -129,13 +128,19 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
-    marginTop:5,
+    marginTop:10,
   },
   compsItem:{
-    width: (screen.width - ((screen.height * 0.12) * 0.5)) * 0.6
+    width: (screen.width - ((screen.height * 0.12) * 0.5)) * 0.4
   },
   arrowWrap:{
-    width:screen.width * 0.1
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+  },
+  btn:{
+    marginTop: 10,
+    marginLeft:screen.width * 0.05
   },
   confirmation:{
     position:'absolute',

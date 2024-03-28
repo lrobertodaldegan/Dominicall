@@ -49,6 +49,9 @@ const GroupScreen = ({navigation}) => {
           CacheService.wipe(Texts.Cache.user);
           
           navigation.navigate('login');
+        } else {
+          if(response.status === 204)
+            setGroups([]);
         }
       }
 
@@ -64,9 +67,15 @@ const GroupScreen = ({navigation}) => {
 
   const handleDeletion = (group) => {
     del(`${Texts.API.group}/${group._id}`).then(response => {
-      console.log(response.data)
       search();
     });
+  }
+
+  const handleLogoff = () => {
+    CacheService.wipe(Texts.Cache.group);
+    CacheService.wipe(Texts.Cache.user);
+    
+    navigation.navigate('login');
   }
 
   const renderModal = () => {
@@ -80,7 +89,7 @@ const GroupScreen = ({navigation}) => {
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
       <View style={styles.logoffwrap}>
         <Link label={'< Sair do app (logoff)'}
-          onPress={() => navigation.navigate('login')}/>
+          onPress={handleLogoff}/>
       </View>
       <Logo style={styles.logo}/>
 
@@ -107,7 +116,7 @@ const GroupScreen = ({navigation}) => {
             onPress={() => handleGroupSelection(item)}
             onRemove={() => handleDeletion(item)}
             leftComponent={
-              <Label value={`${item.classes} turmas`}
+              <Label value={`${item.classes} turma(s)`}
                 style={styles.lbl}/>
             }
           />

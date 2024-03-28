@@ -83,11 +83,47 @@ exports.update = (req, res) => {
   }
 }
 
+const handleClassDeletion = (classId, callback=()=>null) => {
+  try{
+    Promise.allSettled([
+      Event.deleteMany({clas:classId}).exec(),
+      Offer.deleteMany({clas:classId}).exec(),
+      Student.deleteMany({clas:classId}).exec(),
+      Visitor.deleteMany({clas:classId}).exec(),
+      Presence.deleteMany({clas:classId}).exec(),
+      ClassTeacher.deleteMany({clas:classId}).exec(),
+    ]).then(() => {
+      Clas.deleteOne({
+        _id:classId
+      })
+      .exec()
+      .catch(err => console.log(err));
+    }).then(callback);
+  }catch(err){
+    console.log(err);
+  }
+}
+
+exports.handleGroupDeletion = (groupId, callback=()=>null) => {
+  try{
+    Clas.find({
+      group:groupId
+    })
+    .exec()
+    .then(classes => {
+      if(classes)
+        classes.map(c => handleClassDeletion(c._id));
+    })
+    .then(callback);
+  }catch(err){
+    console.log(err);
+  }
+}
+
 exports.remove = (req, res) => {
-  Clas.deleteOne({_id:req.params.id})
-  .then(() => {
+  return handleClassDeletion(req.params.id, () => {
     res.status(200).send({message: 'Operação realizada com sucesso!'});
-  }).catch(err => errorHandler(err, res));
+  });
 }
 
 exports.getOffers = (req, res) => {
@@ -185,7 +221,9 @@ exports.getClassTeachers = (req, res) => {
 
         result.push({
           _id:classTeacher._id,
+          memberId:classTeacher.teacher._id,
           name:classTeacher.teacher.user.name,
+          username: classTeacher.teacher.user.username,
           role:classTeacher.teacher.role.name,
           order:classTeacher.order,
         });
@@ -244,19 +282,64 @@ exports.removeEvent = (req, res) => {
 }
 
 exports.getPresences = (req, res) => {
-  Presence.find({
-    clas:req.query.classId,
-    dt:req.query.dt,
-  })
-  .populate('student')
-  .then(presences => {
-    let status = presences && presences.length > 0 ? 200 : 204;
+  if(req.query.studentId){
+    Presence.findOne({
+      clas:req.query.classId,
+      dt:req.query.dt,
+      student: req.query.studentId
+    })
+    .populate('student')
+    .then(presence => {
+      if(presence){
+        res.status(200).send(presence);
+      } else {
+        res.status(404).send({message:'Não encontramos o item.'});
+      }
+    }).catch(err => errorHandler(err, res));
+  } else {
+    Presence.find({
+      clas:req.query.classId,
+      dt:req.query.dt,
+    })
+    .populate('student')
+    .then(presences => {
+      let status = presences && presences.length > 0 ? 200 : 204;
 
-    res.status(status).send({presences: presences});
+      res.status(status).send({presences: presences});
+    }).catch(err => errorHandler(err, res));
+  }
+}
+
+exports.createPresence = (req, res) => {
+  new Presence({
+    dt: req.body.dt ? req.body.dt : util.date.dateLabel(),
+    clas: req.body.classId,
+    student: req.body.studentId,
+    bible: req.body.bible === true,
+    book: req.body.book === true
+  })
+  .save()
+  .then(presence => {
+    res.status(201).send(presence);
   }).catch(err => errorHandler(err, res));
 }
 
-exports.createPresence = (req, res) => {}
+exports.updatePresence = (req, res) => {
+  Presence.findById(req.params.id)
+  .then(presence => {
+    if(presence){
+      presence.bible = req.body.bible === true;
+      presence.book  = req.body.book  === true;
+
+      presence.save().then(p => {
+        res.status(200).send(p);
+      });
+
+    } else {
+      res.status(404).send({message: 'Item não encontrado!'});
+    }
+  }).catch(err => errorHandler(err, res));
+}
 
 exports.removePresence = (req, res) => {
   Presence.deleteOne({_id:req.params.id})
@@ -269,7 +352,7 @@ exports.getStudents = (req, res) => {
   Student.find({
     clas:req.query.classId,
   })
-  .then(students => {
+  .then(async (students) => {
     let status = students && students.length > 0 ? 200 : 204;
 
     if(req.query.dt){
@@ -279,16 +362,23 @@ exports.getStudents = (req, res) => {
       
         let student = students[i];
 
-        Presence.findOne({
+        let filter = {
           clas:req.query.classId,
           dt:req.query.dt,
           student:student._id,
-        })
-        .then(presence => {
-          result.push({
-            ...student,
-            presence:presence
-          });
+        }
+
+        let qtd = await Presence.where(filter).countDocuments();
+
+        let presence = null;
+
+        if(qtd > 0)
+          presence = await Presence.findOne(filter);
+
+        result.push({
+          ...student._doc,
+          presence:presence,
+          presences:qtd
         });
       }
 
@@ -312,8 +402,22 @@ exports.createStudent = (req, res) => {
 }
 
 exports.removeStudent = (req, res) => {
-  Student.deleteOne({_id:req.params.id})
-  .then(() => {
-    res.status(200).send({message:'Operação realizada com sucesso!'});
-  }).catch(err => errorHandler(err, res));
+  try{
+    Student.findById(req.params.id)
+    .then((student) => {
+      if(student){
+        Presence.deleteMany({
+          student: student._id
+        })
+        .exec()
+        .then(() => {
+          Student.deleteOne({_id:student._id}).exec();
+        });
+      }
+
+      res.status(200).send({message:'Operação realizada com sucesso!'});
+    });
+  }catch(err){
+    return errorHandler(err, res)
+  }
 }

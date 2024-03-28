@@ -74,7 +74,7 @@ export default function MemberModal({
         setErr(null);
 
         let body = {
-          classId: classs?._id,
+          classId: clas?._id,
           username: username,
           name: name,
           email: email,
@@ -114,7 +114,7 @@ export default function MemberModal({
   }
 
   const renderClasses = () => {
-    if(paper === 'Professor' && clas === null){
+    if(paper === 'Professor' && classs === null){
       return (
         <>
           <Label value={'Escolha uma classe para o professor:'}
@@ -123,16 +123,16 @@ export default function MemberModal({
           <View style={styles.papers}>
             {classes.map(c => {
               return (
-                <Button key={c.id}
+                <Button key={c._id}
                   label={c.name} 
-                  onPress={() => setClas(c.name)}
+                  onPress={() => setClas(c)}
                   labelStyle={[
                     styles.paperBtnLbl,
-                    clas === c.name ? styles.paperLblSlctd : {}
+                    clas?.name === c.name ? styles.paperLblSlctd : {}
                   ]}
                   style={[
                         styles.paperBtn,
-                        clas === c.name ? styles.paperSlctd : {}
+                        clas?.name === c.name ? styles.paperSlctd : {}
                   ]}
                 />
               );

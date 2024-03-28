@@ -127,7 +127,7 @@ export default function TeacherModal({
             style={styles.legend}/>
 
           <Button label={'Convidar alguém'} 
-            onPress={() => navigation.navigate('invite', {role:'Professor'})}
+            onPress={() => navigation.navigate('invite', {role:'Professor', classs:classs})}
             style={styles.input}
             loading={loading}
           />

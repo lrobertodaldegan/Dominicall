@@ -10,9 +10,12 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { Texts } from '../utils/Texts';
+import { post } from '../service/Rest/RestService';
 
-export default function StudentModal({student=null, onClose=()=>null}){
+export default function StudentModal({classs, student=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
@@ -22,9 +25,26 @@ export default function StudentModal({student=null, onClose=()=>null}){
 
   const handleSubmit = () => {
     if(name && name !== null){
+      setLoading(true);
+      setErr(null);
 
-      onClose();
+      let body = {
+        name:name,
+        classId: classs?._id,
+      };
+
+      post(Texts.API.students, body).then(response => {
+        setLoading(false);
+        
+        if(response.status === 201){
+          onClose();
+        } else {
+          if(response.data && response.data.message)
+            setErr(response.data.message);
+        }
+      });
     } else {
+      setLoading(false);
       setErr('Por favor, informe um nome válido para o aluno.');
     }
   }
@@ -39,7 +59,7 @@ export default function StudentModal({student=null, onClose=()=>null}){
   return (
     <Modal onClose={onClose} content={
       <View>
-        <Label value={'Aluno'} style={styles.title}/>
+        <Label value={'Novo aluno'} style={styles.title}/>
 
         <Input ico={faGraduationCap} 
             placeholder='Nome do aluno'
@@ -55,6 +75,7 @@ export default function StudentModal({student=null, onClose=()=>null}){
         <Button label={'Salvar'} 
             onPress={handleSubmit}
             style={styles.input}
+            loading={loading}
         />
       </View>
     }/>

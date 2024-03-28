@@ -34,29 +34,7 @@ import VisitModal from './VisitModal';
 import StudentListItem from './StudentListItem';
 import { del, get } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
-
-const ALUNOS = [
-  {id:0, name:'Lucas Roberto', presence:10, ausence:5},
-  {id:1, name:'Lucas Roberto', presence:10, ausence:5},
-  {id:2, name:'Lucas Roberto', presence:10, ausence:5},
-  {id:3, name:'Jéssica Sabrina', presence:10, ausence:5},
-  {id:4, name:'Luiz Carlos', presence:10, ausence:5},
-];
-
-const PROFS = [
-  {id:0, name:'Lucas Roberto', level:'Professor'},
-  {id:2, name:'Lucas Roberto', level:'Coordenador'},
-];
-
-const OFFERS = [
-  {id:0, dt:'19/03/2024', value:10, offerer:'Aluno'},
-  {id:1, dt:'19/03/2024', value:5, offerer:'Aluno'}
-];
-
-const EVENTS = [
-  {id:0, dt:'19/03/2024', title:'Encerramento\ndo trimeste', teacher:'Lucas Roberto'},
-  {id:1, dt:'19/03/2024', title:'Evento', teacher:'Carlos'}
-];
+import CacheService from '../service/Cache/CacheService';
 
 const CLASS_OPTIONS = [
   {
@@ -154,6 +132,12 @@ export default function Class({
         if(response.status !== 204){
           if(response.data && response.data.message)
             ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+
+          if(response.status === 403){
+            CacheService.wipe(Texts.Cache.user);
+            
+            navigation.navigate('login');
+          }
         }
       }
 
@@ -172,7 +156,9 @@ export default function Class({
   }
 
   const loadStudentsList = () => {
-    loadPageListAux(Texts.API.visitors, (response) => {
+    loadPageListAux(Texts.API.students, (response) => {
+      console.log(response.data);
+
       setList(response.data.students);
     });
   }
@@ -215,26 +201,26 @@ export default function Class({
     });
   }
 
-  const handleRemove = (item) => {
+  const handleRemove = (listItem) => {
     let url = null;
 
     if(page === 'students')
-      url = Texts.API.students;
+      url = `${Texts.API.students}/${listItem._id}`;
 
     if(page === 'teachers')
-      url = Texts.API.teachers;
+    url = `${Texts.API.member}/${listItem.memberId}?classId=${item._id}`;
 
     if(page === 'offers')
-      url = Texts.API.offers;
+      url = `${Texts.API.offers}/${listItem._id}`;
 
     if(page === 'calendar')
-      url = Texts.API.events;
+      url = `${Texts.API.events}/${listItem._id}`;
 
     if(page === 'visits')
-      url = Texts.API.visitors;
+      url = `${Texts.API.visitors}/${listItem._id}`;
 
     if(url !== null)
-      sendRemove(`${url}/${item._id}`);
+      sendRemove(url);
   }
 
   const renderSave = () => {
@@ -252,7 +238,7 @@ export default function Class({
       return (
         <StudentListItem item={item}
           onRemove={() => handleRemove(item)}
-          onOfferPress={() => setOffering(item)}
+          onOfferPress={() => setOffering(item.name)}
         />
       )
     }
@@ -262,7 +248,8 @@ export default function Class({
         <ListItem title={item.name}
           onRemove={() => handleRemove(item)}
           leftComponent={
-            <Label value={item.role} style={styles.lbl}/>
+            <Label value={`${item.role} (${item.username})`} 
+              style={styles.lbl}/>
           }
         />
       )
@@ -290,7 +277,7 @@ export default function Class({
           leftComponent={
             <Label value={`${item.title}`} style={styles.lbl}/>
           }
-          midleComponent={
+          rightComponent={
             <Label value={`Data:\n${item.dt}`} style={styles.lbl}/>
           }
         />
@@ -404,9 +391,12 @@ export default function Class({
 
     if(offering && offering !== null){
       return (
-        <OfferModal offerer={offering} onClose={() => {
-          setOffering(null);
-        }}/>
+        <OfferModal offerer={offering} 
+          classs={item}
+          onClose={() => {
+            setOffering(null);
+          }}
+        />
       );
     }
 

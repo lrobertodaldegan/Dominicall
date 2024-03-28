@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -10,26 +10,26 @@ import {
 } from 'react-native';
 import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
-import NewListItem from '../components/NewListItem';
 import ListItem from '../components/ListItem';
 import Label from '../components/Label';
 import { Colors } from '../utils/Colors';
 import Logo from '../components/Logo';
-import GroupModal from '../components/GroupModal';
 import Link from '../components/Link';
-import { del, get } from '../service/Rest/RestService';
+import { get, post } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
 import Input from '../components/Input';
-import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Button from '../components/Button';
+import MemberModal from '../components/MemberModal';
 
 const InviteScreen = ({navigation, route}) => {
   const [filter, setFilter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const [modal, setModal] = useState(<></>);
 
-  const {role, classId} = route.params;
+  const {role, classs} = route.params;
 
   const search = () => {
     setLoading(true);
@@ -53,40 +53,42 @@ const InviteScreen = ({navigation, route}) => {
   }
 
   const sendInvite = (user) => {
-    if(!role){
-      //showMemberModal
+    if(!role || (role === 'Professor' && !classs)){
+      setModal(
+        <MemberModal member={user} 
+          showInputs={false}
+          showOptions={false}
+          onClose={() => sendInvite(user)}/>
+      );
     } else {
-      if(role && paper === 'Professor' && (!clas || clas === null)){
+      setLoading(true);
+
+      let body = {
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        role: role
+      };
+
+      if(role === 'Professor')
+        body.classId = classs._id;
+
+      post(Texts.API.member, body).then(response => {
         setLoading(false);
-        setErr('Por favor, selecione uma turma para o professor.');
-      } else {
-        setLoading(true);
-        setErr(null);
-
-        let body = {
-          classId: classs?._id,
-          username: username,
-          name: name,
-          email: email,
-          role: paper
-        };
-
-        post(Texts.API.member, body).then(response => {
-          setLoading(false);
-          
-          if(response.status === 201){
-            onClose();
-          } else {
-            if(response.data && response.data.message)
-              setErr(response.data.message);
-          }
-        });
-      }
+        
+        if(response.data && response.data.message)
+          ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+        
+        if(response.status === 201)
+          navigation.goBack();
+      });
     }
   }
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      {modal}
+
       <View style={styles.logoffwrap}>
         <Link label={'< voltar'}
           onPress={() => navigation.goBack()}/>
@@ -110,7 +112,7 @@ const InviteScreen = ({navigation, route}) => {
               value={filter}
               onChange={setFilter}
               onEnter={search}
-              placeholder='Informe um usuário desejado'
+              placeholder='Informe um nome ou usuário'
             />
 
             <Button label={'Pesquisar'}

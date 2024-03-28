@@ -6,6 +6,8 @@ const Clas = db.clas;
 const ClassTeacher = db.classteacher;
 const GroupMember = db.groupmember;
 
+const classController = require('./clas.controller');
+
 const errorHandler = (err, res) => {
   if (err) {
     console.log(err);
@@ -59,6 +61,8 @@ exports.update = (req, res) => {
 
 exports.remove = (req, res) => {
   if(req.params.id){
+    classController.handleGroupDeletion(req.params.id);
+
     GroupMember.deleteMany({
       group:req.params.id
     }).then(() => {
@@ -154,16 +158,29 @@ exports.removeMember = (req, res) => {
   if(req.params.id){
     GroupMember.findById(req.params.id)
     .populate('role')
+    .populate('user')
+    .populate({
+      path:'group',
+      populate:{
+        path:'owner'
+      }
+    })
     .then(gm => {
-      if(gm.role.name === 'Professor'){
-        ClassTeacher.deleteMany({
-          teacher:req.params.id
+      if(gm){
+        ClassTeacher.findOne({
+          teacher:req.params.id,
+          clas: req.query.classId
         })
-        .then(() => {
-          return deleteMember(req.params.id, res);
+        .then((ct) => {
+          if(ct)
+            ClassTeacher.deleteOne({_id:ct._id}).exec();
+          
+          if(`${gm.group.owner._id}` === `${gm.user._id}`)
+            res.status(200).send({message: 'Operação realizada com sucesso!'});
+          else
+            return deleteMember(req.params.id, res);
+
         }).catch(err => errorHandler(err, res));
-      } else {
-       return deleteMember(req.params.id, res);
       }
     }).catch(err => errorHandler(err, res));
   } else {
@@ -208,12 +225,26 @@ exports.groupMembers = (req, res) => {
   GroupMember.find({
     group:req.groupId
   })
+  .populate('user')
+  .populate('role')
   .exec()
   .then(memberGroups => {
-    if(memberGroups && memberGroups !== null && memberGroups.length > 0){
-      res.status(200).send({members:memberGroups});
-    } else {
-      res.status(204).send({members:[]});
+    let result = [];
+    let status = memberGroups && memberGroups.length > 0 ? 200 : 204;
+
+    if(status === 200){
+      for(let i=0; i< memberGroups.length; i++){
+        let m = memberGroups[i];
+
+        result.push({
+          _id: m._id,
+          name:m.user.name,
+          username:m.user.username,
+          role:m.role.name
+        });
+      }
     }
+
+    res.status(status).send({members:result});
   }).catch(err => errorHandler(err, res));
 }

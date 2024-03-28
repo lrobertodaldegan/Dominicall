@@ -9,10 +9,6 @@ const Code = mongoose.model(
       type: String,
       enum:['resetpass', 'invite']
     },
-    group: {
-      type: mongoose.Schema.Types.ObjectId, 
-      ref:'Dominicall_Group'
-    },
     role: {
       type: mongoose.Schema.Types.ObjectId, 
       ref:'Dominicall_Role'

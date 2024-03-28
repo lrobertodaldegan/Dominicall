@@ -72,7 +72,7 @@ app.use((_req, res, next) => {
 });
 
 app.use((_req, res, next) => {
- console.log(`Req: body: ${_req.body ? JSON.stringify(_req.body) : 'empty'}, query: ${_req.query ? JSON.stringify(_req.query) : 'empty'}, path:${_req.params ? JSON.stringify(_req.params) : 'empty'}, headers: ${JSON.stringify(_req.headers)}`);
+ console.log(`Req: url: ${_req.url}, method: ${_req.method}, body: ${_req.body ? JSON.stringify(_req.body) : 'empty'}, query: ${_req.query ? JSON.stringify(_req.query) : 'empty'}, path:${_req.params ? JSON.stringify(_req.params) : 'empty'}, headers: ${JSON.stringify(_req.headers)}`);
 
  next();
 });

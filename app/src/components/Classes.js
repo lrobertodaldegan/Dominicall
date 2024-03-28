@@ -102,11 +102,11 @@ export default function Classes({navigation}) {
                 onRemove={() => handleRemove(item)}
                 title={item.name}
                 leftComponent={
-                  <Label value={`${item.teachers} professores`}
+                  <Label value={`${item.teachers} professor(es)`}
                       style={styles.lbl}/>
                 }
-                midleComponent={
-                  <Label value={`${item.students} alunos`}
+                rightComponent={
+                  <Label value={`${item.students} aluno(s)`}
                       style={styles.lbl}/>
                 }
             />

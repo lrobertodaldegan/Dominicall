@@ -1,10 +1,12 @@
-import react, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
   Dimensions,
   ImageBackground,
   FlatList,
+  ToastAndroid,
+  RefreshControl,
 } from 'react-native';
 import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
@@ -14,24 +16,52 @@ import ListItem from '../components/ListItem';
 import Label from '../components/Label';
 import MemberModal from '../components/MemberModal';
 import { Colors } from '../utils/Colors';
-
-const MEMBERS = [
-  {id:0, name:'Lucas Roberto', level:'Professor'},
-  {id:1, name:'Ismael', level:'Coordenador'},
-  {id:2, name:'Lucas', level:'Secretário'},
-  {id:3, name:'Arlam', level:'Coordenador'},
-];
+import { get, del } from '../service/Rest/RestService';
+import { Texts } from '../utils/Texts';
+import CacheService from '../service/Cache/CacheService';
 
 const TeamScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [members, setMembers] = useState(false);
+
+  useEffect(() => {
+    search();
+  }, []);
+
+  const search = () => {
+    setLoading(true);
+
+    get(Texts.API.member).then(response => {
+      if(response.status === 200){
+        setMembers(response.data.members);
+      } else {
+        if(response.data && response.data.message)
+          ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+
+        if(response.status === 403){
+          CacheService.wipe(Texts.Cache.user);
+          
+          navigation.navigate('login');
+        } else {
+          if(response.status === 204)
+            setMembers([]);
+        }
+      }
+
+      setLoading(false);
+    });
+  }
 
   const handleRemove = (item) => {
-    //todo
+    del(`${Texts.API.member}/${item._id}`).then(response => {
+      search();
+    });
   }
 
   const renderModal = () => {
     if(showModal === true){
-      return <MemberModal onClose={() => setShowModal(false)}/>
+      return <MemberModal onClose={() => {search(); setShowModal(false);}}/>
     }
 
     return <></>
@@ -47,18 +77,27 @@ const TeamScreen = ({navigation}) => {
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps='always'
         contentContainerStyle={styles.list}
-        keyExtractor={(item) => item.id}
-        data={MEMBERS}
+        data={members}
+        refreshControl={
+          <RefreshControl refreshing={loading}
+            onRefresh={search}
+          />
+        }
         ListHeaderComponent={
           <NewListItem title="Novo membro"
             onPress={() => setShowModal(true)}/>
         }
+        keyExtractor={(item) => item._id}
         renderItem={({item}) => 
           <ListItem onRemove={() => handleRemove(item)}
             title={item.name}
             leftComponent={
-              <Label value={`${item.level}`}
+              <Label value={`${item.role}`}
                   style={styles.lbl}/>
+            }
+            rightComponent={
+              <Label value={`(${item.username})`}
+                  style={styles.lblUser}/>
             }
           />
         }
@@ -86,6 +125,10 @@ const styles= StyleSheet.create({
     marginVertical:20
   },
   lbl:{
+    color:Colors.gray
+  },
+  lblUser:{
+    fontSize: 14,
     color:Colors.gray
   },
   listFoot:{

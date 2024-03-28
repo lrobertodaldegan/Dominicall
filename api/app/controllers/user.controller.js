@@ -134,7 +134,7 @@ exports.searchUsers = (req, res) => {
         {username: { "$regex": `.*${req.query.filter}.*`, '$options': 'i' }}
       ]
     })
-    .select('name username -_id')
+    .select('name username email -_id')
     .limit(5)
     .exec()
     .then(users => {

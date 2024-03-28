@@ -22,7 +22,7 @@ verifyClassId = (req, res, next) => {
   if(req.query.classId || req.body.classId || req.params.classId)
     next();
   else
-    return res.status(400).send({ message: "Informe uma classe para realizar a operação!" });
+    return res.status(400).send({ message: "Informe uma turma para realizar a operação!" });
 }
 
 verifyDt = (req, res, next) => {
@@ -48,7 +48,7 @@ verifyEventDuplication = (req, res, next) => {
   .exec()
   .then(ev => {
     if(ev)
-      return res.status(404).send({ message: "Já existe um evento assim para esta classe!" });
+      return res.status(404).send({ message: "Já existe um evento assim para esta turma!" });
 
     next();
   }).catch(err => errorHandler(err, res));

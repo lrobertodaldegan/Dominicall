@@ -3,6 +3,7 @@ import {
   View,
   Dimensions,
   StyleSheet,
+  ToastAndroid,
 } from 'react-native';
 import { faCoins, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
@@ -21,30 +22,42 @@ export default function OfferModal({classs, offerer=null, onClose=()=>null}){
   const [err, setErr] = useState(null);
 
   useEffect(() => {
+    console.log(offerer);
     setOffererr(offerer);
   }, []);
 
   const handleSubmit = () => {
-    setLoading(true);
-    setErr(null);
+    let val = value && value !== null ? value : 0;
 
-    let body = {
-      value:value !== null ? value : 0,
-      classId: classs?._id,
-      offerer: offererr,
-      dt:Days.label()
-    };
+    let valueOk = isNaN(val) === false;
 
-    post(Texts.API.offers, body).then(response => {
+    if(valueOk === true){
+      setLoading(true);
+      setErr(null);
+
+      let body = {
+        value:val,
+        classId: classs?._id,
+        offerer: offererr,
+        dt:Days.label()
+      };
+
+      post(Texts.API.offers, body).then(response => {
+        setLoading(false);
+        
+        if(response.status === 201){
+          ToastAndroid.show('Oferta registrada com sucesso!', ToastAndroid.BOTTOM);
+
+          onClose();
+        } else {
+          if(response.data && response.data.message)
+            setErr(response.data.message);
+        }
+      });
+    } else {
       setLoading(false);
-      
-      if(response.status === 201){
-        onClose();
-      } else {
-        if(response.data && response.data.message)
-          setErr(response.data.message);
-      }
-    });
+      setErr('Por favor, corrija o valor informado.');
+    }
   }
 
   const renderError = () => {
@@ -72,7 +85,7 @@ export default function OfferModal({classs, offerer=null, onClose=()=>null}){
 
         <Input ico={faGraduationCap} 
             placeholder='Ofertante (opcional)'
-            value={offererr?.name}
+            value={offererr}
             iconSize={30}
             style={styles.input}
             onChange={setOffererr}

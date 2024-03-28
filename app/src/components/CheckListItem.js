@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   StyleSheet,
@@ -14,6 +14,7 @@ import Link from "./Link";
 
 export default function CheckListItem({
                                 title='',
+                                selected=false,
                                 checklistLbl='Selecionar',
                                 checklistSelectedLbl='Selecionado',
                                 leftComponent=<></>,
@@ -22,14 +23,7 @@ export default function CheckListItem({
                                 onSelect=()=>null,
                                 onRemove=()=>null,
                               }) {
-  const [selected, setSelected] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const handleSelection = () => {
-    setSelected(!selected);
-
-    onSelect(title);
-  }
 
   const renderConfirmation = () => {
     if(showConfirm === true){
@@ -60,7 +54,7 @@ export default function CheckListItem({
         <IconLabel label={selected === true ? checklistSelectedLbl : checklistLbl}
             iconStyle={selected === true ? styles.slctd : styles.nSlctd}
             icon={faCheckSquare}
-            onPress={handleSelection}/>
+            onPress={onSelect}/>
       </View>
 
       <View style={styles.componentsWrap}>
