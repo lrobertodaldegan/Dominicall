@@ -393,12 +393,36 @@ exports.createStudent = (req, res) => {
   const student = new Student({
     clas:req.body.classId,
     name:req.body.name,
+    number:req.body.number,
+    churchMember:req.body.churchMember,
     since:util.date.dateLabel()
   });
 
   student.save().then(o => {
     res.status(201).send({message:`Aluno ${o.name} matriculado com sucesso!`});
   }).catch(err => errorHandler(err, res));
+}
+
+exports.updateStudent = (req, res) => {
+  if(req.body.name){
+    Student.findById(req.params.id)
+    .exec()
+    .then(student => {
+      if(student) {
+        student.name = req.body.name;
+        student.number = req.body.number;
+        student.churchMember = req.body.churchMember === true;
+
+        student.save().then(o => {
+          res.status(200).send({message:`Aluno ${o.name} atualizado com sucesso!`});
+        }).catch(err => errorHandler(err, res));
+      } else {
+        res.status(400).send({message: 'O aluno informado não existe!'});
+      }
+    }).catch(err => errorHandler(err, res));
+  } else {
+    res.status(400).send({message: 'Informe os dados obrigatórios pararealizar a operação!'});
+  }
 }
 
 exports.removeStudent = (req, res) => {

@@ -22,10 +22,10 @@ exports.sendResetPassword = (req, res) => {
     })
     .then(user => {
       if(!user){
-        res.status(404).send({message:"Não encontramos o usuário!"});
+        res.status(404).send({message:"Não encontramos o usuário informado!"});
       } else {
         if(!user.email || user.email === null){
-          res.status(404).send({message:"Não é possível resetar a senha automaticamente. O usuário não possui e-mail cadastrado!"});
+          res.status(400).send({message:"Não é possível resetar a senha automaticamente. O usuário não possui e-mail cadastrado!"});
         } else {
           var transporter = nodemailer.createTransport({
             host: config.smtp.host,
@@ -67,7 +67,7 @@ exports.sendResetPassword = (req, res) => {
       }
     }).catch(err => errorHandler(err, res));
   } else {
-    res.status(400).send({message: "informe o usuário para realizar a operação!"});
+    res.status(400).send({message: "informe um usuário válido para realizar a operação!"});
   }
 }
 
@@ -100,7 +100,10 @@ exports.codeValidation = (req, res) => {
                                     });
           res.status(200).send({
             id: userId,
-            token: token
+            token: token,
+            username: user.username,
+            name: user.name,
+            email: user.email,
           });
         }
       }
@@ -145,4 +148,32 @@ exports.searchUsers = (req, res) => {
   } else {
     res.status(400).send({message:"Informe os dados necessários para realizar a operação!"});
   }
+}
+
+exports.update = (req, res) => {
+  User.findById(req.userId)
+  .exec()
+  .then(user=> {
+    if(!user)
+      return res.status(400).send({message: 'Informe dados adequados para realizar a operação!'});
+
+    user.name = req.body.name;
+    user.username = req.body.username;
+
+    if(req.body.email)
+      user.email = req.body.email;
+    
+    if(req.body.password)
+      user.password = bcrypt.hashSync(req.body.password, 8)
+    
+    user.save().then(user => {
+      res.status(200).send({ 
+        id: user._id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        token: req.userToken
+      });
+    }).catch(err => errorHandler(err, res));
+  }).catch(err => errorHandler(err, res));
 }

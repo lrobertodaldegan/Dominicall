@@ -8,7 +8,7 @@ import {
   Linking,
 } from "react-native";
 import Logo from "./Logo";
-import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen } from '@fortawesome/free-solid-svg-icons'
+import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser } from '@fortawesome/free-solid-svg-icons'
 import IconLabel from './IconLabel';
 import { Colors } from '../utils/Colors';
 import Label from './Label';
@@ -19,8 +19,9 @@ const OPTIONS = [
   {id:0, label:'Turmas', page:'home', icon:faChalkboard},
   {id:1, label:'Equipe', page:'team', icon:faPeopleGroup},
   {id:2, label:'Relatórios', page:'reports', icon:faNewspaper},
-  {id:3, label:'Avalie o app', link: Texts.Avalie, icon:faStar},
-  {id:4, label:'Outros apps', link: Texts.GooglePlay, icon:faBoxOpen},
+  {id:3, label:'Meu perfil', page:'profile', icon:faUser},
+  {id:4, label:'Avalie o app', link: Texts.Avalie, icon:faStar},
+  {id:5, label:'Outros apps', link: Texts.GooglePlay, icon:faBoxOpen},
 ];
 
 const Header = ({navigation, page='home'}) => {
@@ -66,7 +67,7 @@ const Header = ({navigation, page='home'}) => {
               selected={page === item.page}
               onPress={async () => {
                 if(item?.page && item?.page !== null)
-                  navigation.navigate(item?.page, {group:group});
+                  navigation.navigate(item?.page);
                 else
                   await Linking.openURL(item?.link);
               }}

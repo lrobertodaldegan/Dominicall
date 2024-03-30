@@ -89,7 +89,15 @@ const FirstAccessScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <ScrollView contentContainerStyle={styles.subwrap} keyboardDismissMode='on-drag' keyboardShouldPersistTaps='always'>
+      <ScrollView contentContainerStyle={styles.subwrap} 
+          keyboardDismissMode='on-drag' 
+          keyboardShouldPersistTaps='always'>
+        
+        <View style={styles.logoffwrap}>
+          <Link label={'< voltar'}
+            onPress={() => navigate.goBack()}/>
+        </View>
+
         <Logo style={styles.logo} />
 
         <View style={styles.formWrap}>
@@ -118,7 +126,7 @@ const FirstAccessScreen = ({navigation}) => {
               iconSize={24}/>
 
           <Label style={styles.legend}
-              value={'Seu e-mail é opcional, mas é a única forma automática de recuperar o seu acesso ao sistema.'}/>
+              value={'Seu e-mail é opcional, mas é a única forma automática de recuperar o seu acesso ao app.'}/>
 
           {renderError()}
 
@@ -146,6 +154,12 @@ const styles= StyleSheet.create({
     height:screen.height,
     width:screen.width - 20,
     alignItems:'center',
+  },
+  logoffwrap:{
+    marginTop:screen.height * 0.04,
+    width:screen.width - 20,
+    alignItems:'flex-start',
+    justifyContent:'flex-start'
   },
   logo:{
     width:screen.width * 0.4,

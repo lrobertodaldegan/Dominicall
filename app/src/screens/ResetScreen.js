@@ -16,29 +16,50 @@ import Input from '../components/Input';
 import { faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import By from '../components/By';
 import { Colors } from '../utils/Colors';
+import { Texts } from '../utils/Texts';
 
 const ResetScreen = ({navigation}) => {
   const [code, setCode] = useState(null);
   const [codeSent, setCodeSent] = useState(false);
-  const [email, setEmail] = useState(null);
+  const [username, setUsername] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [btnLbl, setBtnLbl] = useState('Enviar código');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
-    if(email && email != null){
+    if(username && username != null){
+      setLoading(true);
+
       if(codeSent === true){
         if(code && code != null){
-          //TODO validate code
+          post(Texts.API.requestResetCode, {code: code}).then(response => {
+            if(response.status === 200){
+              CacheService.register(Texts.Cache.user, response.data);
+
+              navigation.navigate('group');
+            } else {
+              setErrorMsg(response.data.message);
+            }
+  
+            setLoading(false);
+          });
         }else{
           setErrorMsg('Informe corretamente o código recebido para continuar!\nCaso não tenha recebido o código no e-mail, infelizmente não será possível continuar!\n Se precisar, contate nosso time de suporte.');
         }
       } else {
-        //TODO send code
+        post(Texts.API.requestResetCode, {username: username}).then(response => {
+          if(response.status === 200){
+            codeSent(true);
+            setBtnLbl('Confirmar código');
+          } else {
+            setErrorMsg(response.data.message);
+          }
 
-        codeSent(true);//if sent success
-        setBtnLbl('Confirmar código');
+          setLoading(false);
+        });
       }
     }else{
+      setLoading(false);
       setErrorMsg('Informe um e-mail válido para continuar!');
     }
   }
@@ -61,20 +82,25 @@ const ResetScreen = ({navigation}) => {
 
           {renderError()}
 
-          <Button label={btnLbl} onPress={() => handleSubmit()}/>
+          <Button label={btnLbl} 
+              loading={loading}
+              onPress={() => handleSubmit()}/>
         </View>
       );
     } else {
       return (
         <View style={styles.formWrap}>
-          <Input onChange={setEmail} placeholder='Confirme seu e-mail'
-              value={email}
+          <Input onChange={setUsername} 
+              placeholder='Confirme seu usuário'
+              value={username}
               ico={faUser}
               iconSize={24}/>
 
           {renderError()}
 
-          <Button label={btnLbl} onPress={() => handleSubmit()}/>
+          <Button label={btnLbl} 
+              onPress={() => handleSubmit()}
+              loading={loading}/>
         </View>
       );
     }
@@ -82,7 +108,15 @@ const ResetScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <ScrollView contentContainerStyle={styles.subwrap} keyboardDismissMode='on-drag' keyboardShouldPersistTaps='always'>
+      <ScrollView contentContainerStyle={styles.subwrap} 
+          keyboardDismissMode='on-drag' 
+          keyboardShouldPersistTaps='always'>
+
+        <View style={styles.logoffwrap}>
+          <Link label={'< voltar'}
+            onPress={() => navigation.goBack()}/>
+        </View>
+
         <Logo style={styles.logo} />
 
         {renderComp()}
@@ -107,6 +141,12 @@ const styles= StyleSheet.create({
     height:screen.height,
     width:screen.width - 20,
     alignItems:'center',
+  },
+  logoffwrap:{
+    marginTop:screen.height * 0.04,
+    width:screen.width - 20,
+    alignItems:'flex-start',
+    justifyContent:'flex-start'
   },
   logo:{
     width:screen.width * 0.4,

@@ -4,22 +4,27 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { faCheckSquare, faGraduationCap, faMobile } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import IconLabel from './IconLabel';
 import { Texts } from '../utils/Texts';
-import { post } from '../service/Rest/RestService';
+import { post, put } from '../service/Rest/RestService';
 
 export default function StudentModal({classs, student=null, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [number, setNumber] = useState(null);
+  const [churchMember, setChurchMember] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
     setName(student?.name);
+    setNumber(student?.number);
+    setChurchMember(student?.churchMember);
     setErr(null);
   }, []);
 
@@ -31,18 +36,33 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
       let body = {
         name:name,
         classId: classs?._id,
+        number:number,
+        churchMember: churchMember
       };
 
-      post(Texts.API.students, body).then(response => {
-        setLoading(false);
-        
-        if(response.status === 201){
-          onClose();
-        } else {
-          if(response.data && response.data.message)
-            setErr(response.data.message);
-        }
-      });
+      if(student && student !== null){
+        put(`${Texts.API.students}/${student._id}`, body).then(response => {
+          setLoading(false);
+          
+          if(response.status === 200){
+            onClose();
+          } else {
+            if(response.data && response.data.message)
+              setErr(response.data.message);
+          }
+        });
+      } else {
+        post(Texts.API.students, body).then(response => {
+          setLoading(false);
+          
+          if(response.status === 201){
+            onClose();
+          } else {
+            if(response.data && response.data.message)
+              setErr(response.data.message);
+          }
+        });
+      }
     } else {
       setLoading(false);
       setErr('Por favor, informe um nome válido para o aluno.');
@@ -59,7 +79,8 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
   return (
     <Modal onClose={onClose} content={
       <View>
-        <Label value={'Novo aluno'} style={styles.title}/>
+        <Label value={student && student !== null ? 'Aluno' : 'Novo aluno'} 
+            style={styles.title}/>
 
         <Input ico={faGraduationCap} 
             placeholder='Nome do aluno'
@@ -68,6 +89,24 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
             style={styles.input}
             onChange={setName}
             onEnter={handleSubmit}
+        />
+
+        <Input ico={faMobile} 
+            placeholder='Telefone'
+            value={number}
+            iconSize={30}
+            style={styles.input}
+            onChange={setNumber}
+            onEnter={handleSubmit}
+        />
+
+        <IconLabel
+            icon={faCheckSquare}
+            label={churchMember === true ? 'Já é membro da igreja' : 'Ainda não é membro da igreja'}
+            style={styles.botOpt}
+            lblStyle={churchMember === true ? styles.botLblS : styles.botLbl}
+            iconStyle={churchMember === true ? styles.botLblS : styles.botIco}
+            onPress={() => setChurchMember(!churchMember)}
         />
 
         {renderError()}
@@ -106,5 +145,17 @@ const styles = StyleSheet.create({
     fontSize:18,
     marginVertical:10,
     fontFamily:'MartelSans-Bold'
+  },
+  botOpt:{
+    marginVertical:20
+  },
+  botLbl:{
+    color:Colors.darkerGray
+  },
+  botLblS:{
+    color:Colors.black
+  },
+  botIco:{
+    color:Colors.gray
   },
 });

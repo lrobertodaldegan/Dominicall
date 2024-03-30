@@ -59,6 +59,7 @@ exports.signin = (req, res) => {
       id: user._id,
       username: user.username,
       name: user.name,
+      email: user.email,
       token: token
     });
   }).catch(err => errorHandler(err, res));
@@ -85,6 +86,7 @@ exports.refresh = async (req, res) => {
       id: user._id,
       username: user.username,
       name: user.name,
+      email: user.email,
       token: token
     });
   }).catch(err => errorHandler(err, res));

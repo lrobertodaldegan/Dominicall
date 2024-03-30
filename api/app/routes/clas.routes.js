@@ -216,6 +216,16 @@ module.exports = function(app) {
   );
 
   app.put(
+    "/dominicall/class/student/:id",
+    [
+      authJwt.verifyToken,
+      verifyGroup.verifyUserGroup,
+      verifyClas.verifyId,
+    ],
+    controller.updateStudent
+  );
+
+  app.put(
     "/dominicall/class/teacher/:id",
     [
       authJwt.verifyToken,

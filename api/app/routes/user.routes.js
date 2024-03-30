@@ -29,4 +29,12 @@ module.exports = function(app) {
     ],
     controller.searchUsers
   );
+
+  app.put(
+    '/dominicall/user',
+    [
+      authJwt.verifyToken
+    ],
+    controller.update
+  );
 };

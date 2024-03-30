@@ -5,7 +5,8 @@ import {
   faChild, 
   faCoins, 
   faGraduationCap, 
-  faPersonChalkboard 
+  faPersonChalkboard, 
+  faTasks
 } from '@fortawesome/free-solid-svg-icons';
 import {
   StyleSheet,
@@ -39,8 +40,8 @@ import CacheService from '../service/Cache/CacheService';
 const CLASS_OPTIONS = [
   {
     id:'opt1', 
-    icon:faGraduationCap,
-    title:'Alunos',
+    icon:faTasks,
+    title:'Chamada',
     page:'students'
   },
   {
@@ -54,6 +55,12 @@ const CLASS_OPTIONS = [
     icon:faCoins,
     title:'Ofertas',
     page:'offers'
+  },
+  {
+    id:'opt0',
+    icon:faGraduationCap,
+    title:'Alunos',
+    page:'studentsCad'
   },
   {
     id:'opt4', 
@@ -88,6 +95,7 @@ export default function Class({
   const [showSave, setShowSave] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [offering, setOffering] = useState(null);
+  const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [calendarList, setCalendarList] = useState([]);
   const [list, setList] = useState([]);
@@ -105,7 +113,7 @@ export default function Class({
   }, [page]);
 
   const loadPageList = () => {
-    if(page === 'students')
+    if(page === 'students' || page === 'studentsCad')
       loadStudentsList();
 
     if(page === 'teachers')
@@ -204,7 +212,7 @@ export default function Class({
   const handleRemove = (listItem) => {
     let url = null;
 
-    if(page === 'students')
+    if(page === 'students' || page === 'studentsCad')
       url = `${Texts.API.students}/${listItem._id}`;
 
     if(page === 'teachers')
@@ -241,6 +249,27 @@ export default function Class({
           onOfferPress={() => setOffering(item.name)}
         />
       )
+    }
+
+    if(page === 'studentsCad'){
+      let memberLbl = item.churchMember === true 
+                          ? 'É membro da igreja' 
+                          : 'Ainda não é membro da igreja';
+
+      return (
+        <ListItem title={item.name}
+          onPress={() => setStudent(item)}
+          onRemove={() => handleRemove(item)}
+          leftComponent={
+            <Label value={`${item.number}`} 
+              style={styles.lbl}/>
+          }
+          bottomComponent={
+            <Label value={`${memberLbl}`} 
+              style={styles.lbl}/>
+          }
+        />
+      );
     }
 
     if(page === 'teachers'){
@@ -290,7 +319,7 @@ export default function Class({
   const getFirstListItem = () => {
     let title = '';
 
-    if(page === 'students')
+    if(page === 'students' || page === 'studentsCad')
       title = 'Novo aluno';
 
     if(page === 'teachers')
@@ -395,6 +424,15 @@ export default function Class({
           classs={item}
           onClose={() => {
             setOffering(null);
+          }}
+        />
+      );
+    } else if(student && student != null) {
+      return (
+        <StudentModal student={student} 
+          classs={item}
+          onClose={() => {
+            setStudent(null);
           }}
         />
       );

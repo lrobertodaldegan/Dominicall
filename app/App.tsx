@@ -11,7 +11,7 @@ import GroupScreen from './src/screens/GroupScreen';
 import InviteScreen from './src/screens/InviteScreen';
 import FirstAccessScreen from './src/screens/FirstAccessScreen';
 import ResetScreen from './src/screens/ResetScreen';
-import ErrorScreen from './src/screens/ErrorScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const ScreensOptions = {
   headerShown: false,
@@ -37,9 +37,9 @@ function App(): JSX.Element {
           <Stack.Screen name="reports" component={ReportScreen} options={ScreensOptions} />
           <Stack.Screen name="group" component={GroupScreen} options={ScreensOptions} />
           <Stack.Screen name="invite" component={InviteScreen} options={ScreensOptions} />
+          <Stack.Screen name="profile" component={ProfileScreen} options={ScreensOptions} />
           <Stack.Screen name="firstAccess" component={FirstAccessScreen} options={ScreensOptions} />
           <Stack.Screen name="reset" component={ResetScreen} options={ScreensOptions} />
-          <Stack.Screen name="error" component={ErrorScreen} options={ScreensOptions} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
