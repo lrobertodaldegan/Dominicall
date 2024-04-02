@@ -27,42 +27,52 @@ exports.sendResetPassword = (req, res) => {
         if(!user.email || user.email === null){
           res.status(400).send({message:"Não é possível resetar a senha automaticamente. O usuário não possui e-mail cadastrado!"});
         } else {
-          var transporter = nodemailer.createTransport({
-            host: config.smtp.host,
-            port: config.smtp.port,
-            auth: {
-              user: config.smtp.email,
-              pass: config.smtp.pass,
-            },
-          });
-
-          transporter.verify().then(console.log).catch(console.error);
-
-          const rc = new Code({
-            code: Math.round(Math.random() * 100000),
-            used: false,
-            user: user,
-            usefor: 'resetpass'
-          });
-
-          rc.save().then(resetCode => {
-            var mailOptions = {
-              from: config.smtp.email,
-              to: user.email,
-              subject: 'Código de segurança',
-              text: `Informe este código diretamente no aplicativo para realizar a troca de senha: ${resetCode.code}!`
-            };
-            
-            transporter.sendMail(mailOptions, function(error, info){
-              if (error) {
-                console.log(error);
-              } else {
-                console.log('Email enviado: ' + info.response);
-              }
-
-              res.status(200).send({ message: "E-mail enviado!" });
+          try {
+            var transporter = nodemailer.createTransport({
+              // host: config.smtp.host,
+              // port: config.smtp.port,
+              // secureConnection: false,
+              // secure:false,
+              service:'gmail',
+              auth: {
+                user: config.smtp.email,
+                pass: config.smtp.pass,
+              },
+              // tls: {
+              //   ciphers:'SSLv3',
+              //   rejectUnauthorized: false
+              // }
             });
-          }).catch(err => errorHandler(err, res));
+
+            transporter.verify().then(console.log).catch(console.error);
+
+            const rc = new Code({
+              code: Math.round(Math.random() * 100000),
+              used: false,
+              user: user,
+              usefor: 'resetpass'
+            });
+
+            rc.save().then(resetCode => {
+              var mailOptions = {
+                from: config.smtp.from,
+                to: user.email,
+                subject: 'Código de segurança',
+                text: `Informe este código diretamente no aplicativo para realizar a troca de senha: ${resetCode.code}!`
+              };
+              
+              transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  errorHandler(error, res);
+                } else {
+                  console.log('Email enviado: ' + info.response);
+                  res.status(200).send({ message: "E-mail enviado!" });
+                }
+              });
+            }).catch(err => errorHandler(err, res));
+          } catch(errr){
+            errorHandler(errr, res);
+          }
         }
       }
     }).catch(err => errorHandler(err, res));
@@ -84,22 +94,22 @@ exports.codeValidation = (req, res) => {
         if(resetCode.used === true){
           res.status(400).send({message:'Este código já foi utilizado!'});
         } else {
-          let userId = resetCode.user._id;
+          let user = resetCode.user;
 
           Code.deleteOne({
             _id:resetCode._id
-          })
+          }).exec()
           .catch(err => console.log('Erro ao invalidar código!'));
 
-          const token = jwt.sign({ id: userId },
+          const token = jwt.sign({ id: user._id },
                                     config.secret,
                                     {
                                       algorithm: 'HS256',
                                       allowInsecureKeySizes: true,
-                                      expiresIn: 5184000,//60 days
+                                      expiresIn: '300d'
                                     });
           res.status(200).send({
-            id: userId,
+            id: user._id,
             token: token,
             username: user.username,
             name: user.name,

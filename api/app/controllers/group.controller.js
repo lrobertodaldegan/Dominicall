@@ -5,6 +5,7 @@ const Group = db.group;
 const Clas = db.clas;
 const ClassTeacher = db.classteacher;
 const GroupMember = db.groupmember;
+const Finance = db.finance;
 
 const classController = require('./clas.controller');
 
@@ -63,13 +64,15 @@ exports.remove = (req, res) => {
   if(req.params.id){
     classController.handleGroupDeletion(req.params.id);
 
-    GroupMember.deleteMany({
-      group:req.params.id
-    }).then(() => {
-      Group.deleteOne({_id:req.params.id})
+    Finance.deleteMany({group:req.params.id})
+    .then(() => {
+      GroupMember.deleteMany({group:req.params.id})
       .then(() => {
-        res.status(200).send({message: 'Operação realizada com sucesso!'});
-      
+        Group.deleteOne({_id:req.params.id})
+        .then(() => {
+          res.status(200).send({message: 'Operação realizada com sucesso!'});
+        
+        }).catch(err => errorHandler(err, res));
       }).catch(err => errorHandler(err, res));
     }).catch(err => errorHandler(err, res));
   } else {
@@ -103,6 +106,7 @@ exports.createMember = (req, res) => {
           username:req.body.username,
           name:req.body.name,
           email:req.body.email,
+          since: new Date().getTime(),
         });
 
         memberUser = await newUser.save();

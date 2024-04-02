@@ -27,6 +27,8 @@ const FirstAccessScreen = ({navigation}) => {
   const [pass, setPass]   = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showInputs, setShowInputs] = useState(false);
+  const [isNew, setIsNew] = useState(false);
 
   const handleSubmit = () => {
     if(user && user != null && pass && pass != null){
@@ -43,25 +45,40 @@ const FirstAccessScreen = ({navigation}) => {
         email:email
       };
 
-      post(Texts.API.signup, body).then((response) => {
-        if(response.status == 201){
-          post(Texts.API.signin, body).then((response) => {
-            if(response.status == 200){
-              CacheService.register(Texts.Cache.user, response.data);
-    
-              navigation.navigate('group');
-            } else {
-              setErrorMsg('Cadastro realizado! Vamos te redirecionar para o login...');
-              setTimeout(() => navigation.navigate('login'), 3000);
-            }
+      if(isNew === true){
+        post(Texts.API.signup, body).then((response) => {
+          if(response.status == 201){
+            post(Texts.API.signin, body).then((response) => {
+              if(response.status == 200){
+                CacheService.register(Texts.Cache.user, response.data);
+      
+                navigation.navigate('group');
+              } else {
+                setErrorMsg('Cadastro realizado! Vamos te redirecionar para o login...');
+                setTimeout(() => navigation.navigate('login'), 3000);
+              }
 
+              setLoading(false);
+            });
+          } else {
+            setErrorMsg(response.data.message);
             setLoading(false);
-          })
-        } else {
-          setErrorMsg(response.data.message);
+          }
+        });
+      } else {
+        post(Texts.API.firstAccess, body).then((response) => {
+          if(response.status == 200){
+            CacheService.register(Texts.Cache.user, response.data);
+  
+            navigation.navigate('group');
+          } else {
+            if(response.data && response.data.message)
+              setErrorMsg(response.data.message);
+          }
+
           setLoading(false);
-        }
-      });
+        });
+      }
     }else{
       setErrorMsg('Usuário e senha são obrigatórios para entrar!');
       setLoading(false);
@@ -87,52 +104,82 @@ const FirstAccessScreen = ({navigation}) => {
       return <></>
   }
 
-  return (
-    <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <ScrollView contentContainerStyle={styles.subwrap} 
-          keyboardDismissMode='on-drag' 
-          keyboardShouldPersistTaps='always'>
+  const renderForm = () => {
+    if(showInputs === true) {
+      let nameInput = (
+        <Input onChange={handleChangeName} placeholder='Seu nome'
+          value={name}
+          ico={faUser}
+          iconSize={24}/>
+      );
+
+      let mailInput = (
+        <Input onChange={setEmail} placeholder='Seu e-mail'
+          value={email}
+          ico={faUser}
+          iconSize={24}/>
+      );
+
+      if(isNew === false){
+        nameInput = <></>;
+        mailInput = <></>;
+      }
         
-        <View style={styles.logoffwrap}>
-          <Link label={'< voltar'}
-            onPress={() => navigate.goBack()}/>
-        </View>
-
-        <Logo style={styles.logo} />
-
+      return (
         <View style={styles.formWrap}>
+          <Label style={styles.title}
+            value={`Bem-vindo(a)${name && name !== null ? ', ' + name : ''}!`}/>
 
-        <Label style={styles.title}
-              value={`Bem-vindo(a)${name && name !== null ? ', ' + name : ''}!`}/>
+          {nameInput}
 
-          <Input onChange={handleChangeName} placeholder='Seu nome'
-              value={name}
-              ico={faUser}
-              iconSize={24}/>
+          {mailInput}
 
           <Input onChange={setUser} placeholder='Seu usuário'
-              value={user}
-              ico={faUser}
-              iconSize={24}/>
+            value={user}
+            ico={faUser}
+            iconSize={24}/>
 
-          <Input onChange={setPass} placeholder='Sua senha'
-              value={pass}
-              ico={faKey}
-              iconSize={24}/>
-
-          <Input onChange={setEmail} placeholder='Seu e-mail'
-              value={email}
-              ico={faUser}
-              iconSize={24}/>
+          <Input onChange={setPass} placeholder='Sua nova senha'
+            value={pass}
+            ico={faKey}
+            hideValue={true}
+            iconSize={24}/>
 
           <Label style={styles.legend}
-              value={'Seu e-mail é opcional, mas é a única forma automática de recuperar o seu acesso ao app.'}/>
+            value={'Seu e-mail é opcional, mas é a única forma automática de recuperar o seu acesso ao app.'}/>
 
           {renderError()}
 
           <Button label={'Entrar'} onPress={() => handleSubmit()}
               loading={loading}/>
         </View>
+      );
+    } else {
+      return (
+        <View style={styles.formWrap}>
+          <Button label={'Já recebi meu usuário'} 
+            onPress={() => {setIsNew(false); setShowInputs(true);}}/>
+
+          <Button label={'Não possuo usuário'} 
+            onPress={() => {setIsNew(true); setShowInputs(true);}}/>
+        </View>
+      );
+    }
+  }
+
+  return (
+    <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <ScrollView contentContainerStyle={styles.subwrap} 
+          keyboardShouldPersistTaps='always'>
+        
+        <View style={styles.logoffwrap}>
+          <Link label={'< voltar'}
+            onPress={() => navigation.goBack()}/>
+        </View>
+
+        <Logo style={styles.logo} />
+
+        {renderForm()}
 
         <By />
       </ScrollView>
@@ -151,7 +198,7 @@ const styles= StyleSheet.create({
     padding:10
   },
   subwrap:{
-    height:screen.height,
+    height:screen.height * 1.3,
     width:screen.width - 20,
     alignItems:'center',
   },

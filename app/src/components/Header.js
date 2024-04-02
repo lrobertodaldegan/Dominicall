@@ -8,7 +8,7 @@ import {
   Linking,
 } from "react-native";
 import Logo from "./Logo";
-import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser } from '@fortawesome/free-solid-svg-icons'
+import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser, faCoins } from '@fortawesome/free-solid-svg-icons'
 import IconLabel from './IconLabel';
 import { Colors } from '../utils/Colors';
 import Label from './Label';
@@ -16,12 +16,55 @@ import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
 
 const OPTIONS = [
-  {id:0, label:'Turmas', page:'home', icon:faChalkboard},
-  {id:1, label:'Equipe', page:'team', icon:faPeopleGroup},
-  {id:2, label:'Relatórios', page:'reports', icon:faNewspaper},
-  {id:3, label:'Meu perfil', page:'profile', icon:faUser},
-  {id:4, label:'Avalie o app', link: Texts.Avalie, icon:faStar},
-  {id:5, label:'Outros apps', link: Texts.GooglePlay, icon:faBoxOpen},
+  {
+    id:0, 
+    label:'Turmas', 
+    page:'home', 
+    icon:faChalkboard,
+    restrictions:[]
+  },
+  {
+    id:1, 
+    label:'Equipe', 
+    page:'team', 
+    icon:faPeopleGroup,
+    restrictions:['Professor']
+  },
+  {
+    id:2, 
+    label:'Relatórios', 
+    page:'reports', 
+    icon:faNewspaper,
+    restrictions:['Professor']
+  },
+  {
+    id:3, 
+    label:'Financeiro', 
+    page:'finance', 
+    icon:faCoins,
+    restrictions:['Professor']
+  },
+  {
+    id:4, 
+    label:'Meu perfil', 
+    page:'profile', 
+    icon:faUser,
+    restrictions:[]
+  },
+  {
+    id:5, 
+    label:'Avalie o app', 
+    link: Texts.Avalie, 
+    icon:faStar,
+    restrictions:[]
+  },
+  {
+    id:6, 
+    label:'Outros apps', 
+    link: Texts.GooglePlay, 
+    icon:faBoxOpen,
+    restrictions:[]
+  },
 ];
 
 const Header = ({navigation, page='home'}) => {
@@ -58,21 +101,27 @@ const Header = ({navigation, page='home'}) => {
           horizontal
           data={OPTIONS}
           keyExtractor={(item) => item.id}
-          renderItem={({item}) => 
-            <IconLabel icon={item.icon} 
-              iconSize={26}
-              label={item.label}
-              lblStyle={styles.menuOpts}
-              style={styles.menuOptsWrap}
-              selected={page === item.page}
-              onPress={async () => {
-                if(item?.page && item?.page !== null)
-                  navigation.navigate(item?.page);
-                else
-                  await Linking.openURL(item?.link);
-              }}
-            />
-          }
+          renderItem={({item}) => {
+            if(!item.restrictions.includes(group?.role)){
+              return (
+                <IconLabel icon={item.icon} 
+                  iconSize={26}
+                  label={item.label}
+                  lblStyle={styles.menuOpts}
+                  style={styles.menuOptsWrap}
+                  selected={page === item.page}
+                  onPress={async () => {
+                    if(item?.page && item?.page !== null)
+                      navigation.navigate(item?.page, {group:group});
+                    else
+                      await Linking.openURL(item?.link);
+                  }}
+                />
+              );
+            }
+
+            return <></>
+          }}
         />
       </View>
     </>

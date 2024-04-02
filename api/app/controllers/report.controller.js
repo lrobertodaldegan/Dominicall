@@ -9,10 +9,12 @@ const Visitor = db.visitor;
 const Offer = db.offer;
 const Event = db.event;
 const ClassTeacher = db.classteacher;
+const Finance = db.finance;
 
 const GENERAL_TEMPLATE_DIR = __dirname + "/../report/template/general.template.html";
-const OFFER_TEMPLATE_DIR = __dirname + "/../report/template/offer.template.html";
+const OFFER_TEMPLATE_DIR = __dirname + "/../report/template/finance.template.html";
 const CALENDAR_TEMPLATE_DIR = __dirname + "/../report/template/calendar.template.html";
+const STUDENTS_TEMPLATE_DIR = __dirname + "/../report/template/students.template.html";
 
 const errorHandler = (err, res) => {
   if (err) {
@@ -88,7 +90,7 @@ exports.report = (req, res) => {
       
       if(offers && offers.length > 0){
         for(let iii=0; iii < offers.length; iii++){
-          totalOffer += offers[iii];
+          totalOffer += offers[iii].value;
         }
       }
 
@@ -104,6 +106,22 @@ exports.report = (req, res) => {
         offers:totalOffer,
         percent:`${(presences * 100) / students}%`
       });
+
+      totalPresences += presencesQtd;
+
+      totalStudents += students;
+
+      totalVisitors += visitors;
+
+      totalBibles += biblesQtd;
+
+      totalBooks += booksQtd;
+
+      totalAudience += presencesQtd + visitors;
+
+      totalAusences += students - presencesQtd;
+
+      totalOffers += totalOffer;
     }
 
     // let lastWeekDt = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -129,7 +147,7 @@ exports.report = (req, res) => {
           bibles: totalBibles,
           books: totalBooks,
           offers: totalOffers,
-          percent:`${(totalPresences * 100) / totalStudents}%`
+          percent:totalStudents === 0 ? 0 : `${(totalPresences * 100) / totalStudents}%`
         },
         dt:dtRef,
         group:{name:classes[0].group.name}
@@ -150,7 +168,7 @@ exports.report = (req, res) => {
   }).catch(err => errorHandler(err, res));
 }
 
-exports.reportOffers = (req, res) => {
+exports.reportFinance = (req, res) => {
   let groupId = req.query.groupId;
 
   if(!groupId)
@@ -169,54 +187,148 @@ exports.reportOffers = (req, res) => {
   })
   .exec()
   .then((offers) => {
-    if(!offers)
-      return res.status(204).send('Não há dados para relatório!');
-
     let data = [];
 
-    let groupName = offers[0].class.group.name;
+    let groupName = groupId;
 
-    for(let i=0; i < offers.length; i++){
-      let o = offers[i];
+    let oTotal = 0;
+    
+    if(offers && offers.length > 0){
+      groupName = offers[0].clas.group.name;
 
-      if(o.clas.group._id === groupId){
-        let item = {
-          className: o.clas.name,
-          offers:[],
-          total:0,
-        };
+      for(let i=0; i < offers.length; i++){
+        let o = offers[i];
 
-        let filtered = data.filter(d => d.className === o.clas.name);
+        if(`${o.clas.group._id}` === `${groupId}`){
+          data.push({
+            className: o.clas.name,
+            oValue: o.value,
+            offerer: o.offerer,
+            oDt: o.dt,
+          });
 
-        if(filtered && filtered.length > 0)
-          item = filtered[0];
+          oTotal += o.value;
+        }
+      }
+    }
 
-        item.total += o.value;
+    Finance.find()
+    .exec()
+    .then(fns => {
+      let finances = [];
 
-        item.offers.push({
-          value: o.value,
-          offerer: o.offerrer,
+      if(fns){
+        fns.map(f => {
+          finances.push({
+            title: f.title,
+            type: f.type,
+            value: f.value,
+            dt: f.dt
+          });
         });
+      }
 
-        item.offers = item.offers.sort(a, b => a.value > b.value ? 1 : -1);
+      let reportName = utils.date.reportDateLabel();
 
-        if(!(filtered && filtered.length > 0))
-          data.push(item);
+      let destinationPath = __dirname + `/../report/output/finance_${reportName}.pdf`;
+
+      let html = fs.readFileSync(OFFER_TEMPLATE_DIR, "utf8");
+
+      var report = {
+        html: html,
+        data: {
+          groupName:groupName,
+          dtRef: dtRef,
+          itens: data,
+          offerTotal: oTotal,
+          finances: finances,
+        },
+        path: destinationPath,
+        type: "",
+      }
+
+      pdf.create(report, {
+        format: "A4",
+        orientation: "landscape",
+        border: "10mm",
+      })
+      .then((result) => {
+        //res.status(200).send({message: 'Report criado e disponível para download!'});
+        res.download(destinationPath);
+      }).catch(err => errorHandler(err, res));
+    }).catch(err => errorHandler(err, res));
+  }).catch(err => errorHandler(err, res));
+}
+
+exports.reportCalendars = async (req, res) => {
+  let groupId = req.query.groupId;
+
+  if(!groupId)
+    return res.status(400).send('Informe um grupo para realizar a operação!');
+
+  Clas.find({group: groupId})
+  .populate('group')
+  .exec()
+  .then(async (classes) => {
+    let groupName = groupId;
+
+    if(!classes)
+      return res.status(400).send('Não há dados para emitir o relatório.');
+
+    groupName = classes[0].group.name;
+
+    let dtRef = utils.date.dateLabel();
+
+    let evs = [];
+    let tcrs = [];
+
+    for(let j=0; j < classes.length; j++) {
+      let c = classes[j];
+
+      let events = await Event.find({clas:c._id}).exec();
+
+      let classTeachers = await ClassTeacher.find({clas:c._id})
+                                            .populate({
+                                              path:'teacher',
+                                              populate:{
+                                                path:'user'
+                                              },
+                                            }).exec();
+      if(events && events.length > 0){
+        events.map(ev => {
+          evs.push({
+            className: c.name,
+            name: ev.name,
+            dt: ev.dt,
+            teacher: ev.teacher,
+          });
+        });
+      }
+
+      if(classTeachers && classTeachers.length > 0){
+        classTeachers.map(t => {
+          tcrs.push({
+            className: c.name,
+            order: t.order,
+            name: t.teacher.user.name
+          });
+        });
       }
     }
 
     let reportName = utils.date.reportDateLabel();
 
-    let destinationPath = __dirname + `/../report/output/offers_${reportName}.pdf`;
+    let destinationPath = __dirname + `/../report/output/calendar_${reportName}.pdf`;
 
-    let html = fs.readFileSync(OFFER_TEMPLATE_DIR, "utf8");
+    let html = fs.readFileSync(CALENDAR_TEMPLATE_DIR, "utf8");
 
     var report = {
       html: html,
       data: {
-        groupName:groupName,
+        groupName: groupName,
         dt: dtRef,
-        itens: data 
+        events: evs,
+        teachers: tcrs,
       },
       path: destinationPath,
       type: "",
@@ -234,82 +346,83 @@ exports.reportOffers = (req, res) => {
   }).catch(err => errorHandler(err, res));
 }
 
-exports.reportCalendars = async (req, res) => {
-  let classId = req.query.classId;
+exports.reportStudents = (req, res) => {
+  let groupId = req.query.groupId;
 
-  if(!classId)
-    return res.status(400).send('Informe uma turma para realizar a operação!');
+  if(!groupId)
+    return res.status(400).send('Informe um grupo para realizar a operação!');
 
-  let events = await Event.find({clas:classId})
-                          .populate({
-                            path:'clas',
-                            populate:{
-                              path:'group'
-                            }
-                          })
-                          .exec();
+  Clas.find({group: groupId})
+  .populate('group')
+  .exec()
+  .then(async (classes) => {
+    let groupName = groupId;
 
-  let classTeachers = await ClassTeacher.find({clas:classId})
-                                        .populate({
-                                          path:'teacher',
-                                          populate:{
-                                            path:'user'
-                                          },
-                                        })
-                                        .populate({
-                                          path:'clas',
-                                          populate:{
-                                            path:'group'
-                                          }
-                                        }).exec();
+    if(!classes)
+      return res.status(400).send('Não há dados para emitir o relatório.');
 
-  if(!events && !classTeachers)
-    return res.status(204).send('Não há dados para emitir o relatório!');
+    let students = [];
+
+    groupName = classes[0].group.name;
+
+    for(let j=0; j < classes.length; j++) {
+      let c = classes[j];
+
+      let stds = await Student.find({clas:c._id}).exec();
+
+      if(stds){
+        for(let i=0; i < stds.length; i++){
+          let dtN = 'Não informado';
+          
+          if(stds[i].dn){
+            let dt = new Date(stds[i]?.dn);
+
+            let di = dt.getDate();
+            di = di < 10 ? `0${di}` : di;
+      
+            let m = dt.getMonth() + 1;
+            m = m < 10 ? `0${m}` : m;
+
+            dtN = `${di}/${m}/${dt.getFullYear()}`;
+          }
+
+          students.push({
+            name: stds[i].name,
+            number: stds[i].number,
+            since: stds[i].since,
+            className: c.name,
+            dn: dtN,
+            memberStatus: stds[i].churchMember === true ? 'SIM' : 'AINDA NÃO'
+          });
+        }
+      }
+    }
+
+    let reportName = utils.date.reportDateLabel();
+
+    let destinationPath = __dirname + `/../report/output/students_${reportName}.pdf`;
   
-  let dtRef = utils.date.dateLabel();
-
-  let className = null;
-  let groupName = null;
-
-  if(events && events.length > 0) {
-    className = events[0].clas.name;
-    groupName = events[0].clas.group.name;
-  }
-
-  if(classTeachers && classTeachers.length > 0) {
-    if(className === null)
-      className = classTeachers[0].clas.name;
-    
-    if(groupName === null)
-      groupName = classTeachers[0].clas.group.name;
-  }
-
-  let reportName = utils.date.reportDateLabel();
-
-  let destinationPath = __dirname + `/../report/output/calendar_${reportName}.pdf`;
-
-  let html = fs.readFileSync(CALENDAR_TEMPLATE_DIR, "utf8");
-
-  var report = {
-    html: html,
-    data: {
-      groupName:groupName,
-      className:className,
-      dt: dtRef,
-      events: events,
-      teachers: classTeachers, 
-    },
-    path: destinationPath,
-    type: "",
-  }
-
-  pdf.create(report, {
-    format: "A4",
-    orientation: "landscape",
-    border: "10mm",
-  })
-  .then((result) => {
-    //res.status(200).send({message: 'Report criado e disponível para download!'});
-    res.download(destinationPath);
+    let html = fs.readFileSync(STUDENTS_TEMPLATE_DIR, "utf8");
+  
+    var report = {
+      html: html,
+      data: {
+        groupName:groupName,
+        dt: utils.date.dateLabel(),
+        students: students
+      },
+      path: destinationPath,
+      type: "",
+    }
+  
+    pdf.create(report, {
+      format: "A4",
+      orientation: "landscape",
+      border: "10mm",
+    })
+    .then((result) => {
+      //res.status(200).send({message: 'Report criado e disponível para download!'});
+      res.download(destinationPath);
+    }).catch(err => errorHandler(err, res));
   }).catch(err => errorHandler(err, res));
 }

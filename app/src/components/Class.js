@@ -33,7 +33,7 @@ import PositionListItem from './PositionListItem';
 import EventModal from './EventModal';
 import VisitModal from './VisitModal';
 import StudentListItem from './StudentListItem';
-import { del, get } from '../service/Rest/RestService';
+import { del, get, put } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
 
@@ -74,13 +74,6 @@ const CLASS_OPTIONS = [
     title:'Escalas',
     page:'calendar'
   },
-];
-
-const CLASS_ORDER = [
-  {id:0, teacher:'Lucas Roberto',position:1},
-  {id:1, teacher:'Gessé',position:2},
-  {id:2, teacher:'Carlos',position:3},
-  {id:3, teacher:'Elecy',position:4},
 ];
 
 export default function Class({
@@ -184,7 +177,13 @@ export default function Class({
   }
 
   const loadCalendarList = () => {
-    setCalendarList(CLASS_ORDER);
+    loadPageListAux(Texts.API.teachers, (response) => {
+      setCalendarList(response.data.teachers);
+    });
+
+    loadPageListAux(Texts.API.events, (response) => {
+      setList(response.data.events);
+    });
   }
 
   const handleNameChanging = (v) => {
@@ -304,10 +303,10 @@ export default function Class({
         <ListItem title={item.teacher}
           onRemove={() => handleRemove(item)}
           leftComponent={
-            <Label value={`${item.title}`} style={styles.lbl}/>
+            <Label value={`Evento:\n${item.name}`} style={styles.lbl}/>
           }
           rightComponent={
-            <Label value={`Data:\n${item.dt}`} style={styles.lbl}/>
+            <Label value={`Data:\n${item.dt?.split(' ')[1]}`} style={styles.lbl}/>
           }
         />
       )
@@ -372,26 +371,47 @@ export default function Class({
   const handlePositionChange = (item, movement) => {
     let list = [...calendarList];
 
-    let newPos = new Number(item.position) + new Number(movement);
+    let newPos = new Number(item.order) + new Number(movement);
     
     if(newPos > 0 && newPos <= list.length){
       for(let i=0; i < list.length; i++){
         let ii = list[i];
 
-        if(ii.position === newPos){
+        if(ii.order === newPos){
           if(movement > 0)
-            ii.position = ii.position - 1;//down
+            ii.order = ii.order - 1;//down
       
           if(movement < 0)
-            ii.position = ii.position + 1;//up
+            ii.order = ii.order + 1;//up
+
+          let body = {
+            teacherId: ii._id,
+            order: ii.order
+          };
+
+          put(`${Texts.API.teachers}/${ii.id}`, body).then((response) => {
+            if(response.data && response.data.message)
+              ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+          });
         }
 
-        if(ii.id === item.id)
-          ii.position = newPos;
+        if(ii._id === item._id){
+          ii.order = newPos;
+
+          let body = {
+            teacherId: ii._id,
+            order: newPos
+          };
+
+          put(`${Texts.API.teachers}/${ii.id}`, body).then((response) => {
+            if(response.data && response.data.message)
+              ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+          });
+        }
       }
     }
     
-    setCalendarList(list.sort((a, b) => a.position < b.position ? -1 : 1));
+    setCalendarList(list.sort((a, b) => a.order < b.order ? -1 : 1));
   }
 
   const handleModalClose = () => {
@@ -424,6 +444,7 @@ export default function Class({
           classs={item}
           onClose={() => {
             setOffering(null);
+            handleModalClose();
           }}
         />
       );
@@ -433,6 +454,7 @@ export default function Class({
           classs={item}
           onClose={() => {
             setStudent(null);
+            handleModalClose();
           }}
         />
       );
@@ -507,10 +529,11 @@ export default function Class({
           />
         }
         data={getCalendarList()}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({item}) => 
-          <PositionListItem title={item.teacher}
-            subtitle={`Aula ${item.position}`}
+          <PositionListItem title={item.name}
+            subtitle={`Aula ${item.order}`}
+            removable={false}
             onDown={() => handlePositionChange(item, 1)}
             onUp={() => handlePositionChange(item, -1)}
           />

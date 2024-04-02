@@ -10,6 +10,7 @@ module.exports = function(app) {
     controller.signUp
   );
 
+  app.post("/dominicall/auth/fa", controller.firstSignin);
   app.post("/dominicall/auth/signin", controller.signin);
   app.post("/dominicall/auth/signout", controller.signout);
 };

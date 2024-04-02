@@ -16,6 +16,7 @@ import { post } from '../service/Rest/RestService';
 
 export default function VisitModal({classs, onClose=()=>null}){
   const [name, setName] = useState(null);
+  const [number, setNumber] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
@@ -30,6 +31,7 @@ export default function VisitModal({classs, onClose=()=>null}){
 
       let body = {
         name:name,
+        number:number,
         classId: classs?._id,
         dt:Days.label()
       };
@@ -68,6 +70,16 @@ export default function VisitModal({classs, onClose=()=>null}){
             iconSize={30}
             style={styles.input}
             onChange={setName}
+            onEnter={handleSubmit}
+        />
+
+        <Input ico={faChild} 
+            placeholder='Número (contato)'
+            value={number}
+            iconSize={30}
+            style={styles.input}
+            keyboardType='numeric'
+            onChange={setNumber}
             onEnter={handleSubmit}
         />
 

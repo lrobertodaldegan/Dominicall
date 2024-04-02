@@ -6,6 +6,7 @@ const Event = db.event;
 const Student = db.student;
 const Visitor = db.visitor;
 const Presence = db.presence;
+const GroupMember = db.groupmember;
 const ClassTeacher = db.classteacher;
 
 const errorHandler = (err, res) => {
@@ -228,6 +229,8 @@ exports.getClassTeachers = (req, res) => {
           order:classTeacher.order,
         });
       }
+
+      result = result.sort((a, b) => a.order < b.order ? -1 : 1);
     }
 
     res.status(status).send({teachers: result});
@@ -249,10 +252,41 @@ exports.changeTeacherOrder = (req, res) => {
   }
 }
 
+exports.getTeacherClasses = (req, res) => {
+  GroupMember.find({
+    user:req.params.id
+  })
+  .then(gms => {
+    let classes = [];
+    
+    if(gms) {
+      for(let i=0; i< gms.length; i++){
+        ClassTeacher.find({
+          teacher:gms[i]._id
+        })
+        .populate('clas')
+        .then(teachers => {
+          if(teachers) {
+            for(let ii=0; ii< gms.length; ii++){
+              classes.push({
+                _id: teachers[ii].clas._id,
+                name:teachers[ii].clas.name,
+              });
+            }
+          }
+
+          res.status(200).send({teacherClasses: classes});
+        }).catch(err => errorHandler(err, res));
+      }
+    } else {
+      res.status(200).send({teacherClasses: classes});
+    }
+  }).catch(err => errorHandler(err, res));
+}
+
 exports.getEvents = (req, res) => {
   Event.find({
     clas:req.query.classId,
-    dt:req.query.dt,
   })
   .then(events => {
     let status = events && events.length > 0 ? 200 : 204;
@@ -263,9 +297,9 @@ exports.getEvents = (req, res) => {
 
 exports.createEvent = (req, res) => {
   const event = new Event({
-    clas:req.query.classId,
-    dt:req.query.dt,
-    name:req.query.name,
+    clas:req.body.classId,
+    dt:req.body.dt,
+    name:req.body.name,
     teacher:req.body.teacher
   });
 
@@ -395,7 +429,8 @@ exports.createStudent = (req, res) => {
     name:req.body.name,
     number:req.body.number,
     churchMember:req.body.churchMember,
-    since:util.date.dateLabel()
+    since:util.date.dateLabel(),
+    dn:req.body.dn,
   });
 
   student.save().then(o => {
@@ -412,6 +447,9 @@ exports.updateStudent = (req, res) => {
         student.name = req.body.name;
         student.number = req.body.number;
         student.churchMember = req.body.churchMember === true;
+
+        if(req.body.dn)
+          student.dn = req.body.dn;
 
         student.save().then(o => {
           res.status(200).send({message:`Aluno ${o.name} atualizado com sucesso!`});

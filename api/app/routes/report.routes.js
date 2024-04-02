@@ -8,9 +8,15 @@ module.exports = function(app) {
   );
 
   app.get(
-    "/dominicall/report/offer",
+    "/dominicall/report/finance",
     [],
-    controller.reportOffers
+    controller.reportFinance
+  );
+
+  app.get(
+    "/dominicall/report/students",
+    [],
+    controller.reportStudents
   );
 
   app.get(

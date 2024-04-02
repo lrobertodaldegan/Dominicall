@@ -14,6 +14,7 @@ import Link from "./Link";
 export default function PositionListItem({
                                 title=' ',
                                 subtitle='',
+                                removable=true,
                                 onUp=()=>null,
                                 onDown=()=>null,
                                 onRemove=()=>null,
@@ -42,6 +43,20 @@ export default function PositionListItem({
     }
   }
 
+  const renderRemoveBtn = () => {
+    if(removable === true){
+      return (
+        <TouchableHighlight style={styles.rmBtn}
+            underlayColor={Colors.white}
+            onPress={() => setShowConfirm(true)}>
+          <Icon icon={faTrash} style={{color:Colors.black}}/>
+        </TouchableHighlight>
+      );
+    }
+
+    return <></>
+  }
+
   return (
     <View style={styles.wrap}>
 
@@ -54,11 +69,7 @@ export default function PositionListItem({
         <View style={styles.titleWrap}>
           <Label value={title} style={styles.title}/>
 
-          <TouchableHighlight style={styles.rmBtn}
-              underlayColor={Colors.white}
-              onPress={() => setShowConfirm(true)}>
-            <Icon icon={faTrash} style={{color:Colors.black}}/>
-          </TouchableHighlight>
+          {renderRemoveBtn()}
         </View>
 
         <View style={styles.components}>

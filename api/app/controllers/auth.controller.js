@@ -18,6 +18,7 @@ exports.signUp = (req, res) => {
     name: req.body.name,
     username: req.body.username,
     email: req.body.email,
+    since: new Date().getTime(),
     password: bcrypt.hashSync(req.body.password, 8),
   });
 
@@ -62,6 +63,42 @@ exports.signin = (req, res) => {
       email: user.email,
       token: token
     });
+  }).catch(err => errorHandler(err, res));
+};
+
+exports.firstSignin = (req, res) => {
+  User.findOne({
+    username: req.body.username
+  })
+  .exec()
+  .then(user => {
+    if (!user)
+      return res.status(404).send({ message: "Usuário não encontrado!" });
+
+    if(user.password && user.password !== null)
+      return res.status(400).send({ message: "Usuário já realizou o primeiro acesso anteriormente!" });
+
+    user.password = bcrypt.hashSync(req.body.password, 8);
+
+    user.save().then(uUser => {
+      const token = jwt.sign({ id: uUser._id },
+                                config.secret,
+                                {
+                                  algorithm: 'HS256',
+                                  allowInsecureKeySizes: true,
+                                  expiresIn: '300d',
+                                });
+
+      res.setHeader('Authorization', token);
+
+      res.status(200).send({
+        id: uUser._id,
+        username: uUser.username,
+        name: uUser.name,
+        email: uUser.email,
+        token: token
+      });
+    }).catch(err => errorHandler(err, res));
   }).catch(err => errorHandler(err, res));
 };
 

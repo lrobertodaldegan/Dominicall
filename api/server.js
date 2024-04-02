@@ -71,11 +71,11 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.use((_req, res, next) => {
- console.log(`Req: url: ${_req.url}, method: ${_req.method}, body: ${_req.body ? JSON.stringify(_req.body) : 'empty'}, query: ${_req.query ? JSON.stringify(_req.query) : 'empty'}, path:${_req.params ? JSON.stringify(_req.params) : 'empty'}, headers: ${JSON.stringify(_req.headers)}`);
+// app.use((_req, res, next) => {
+//  console.log(`Req: url: ${_req.url}, method: ${_req.method}, body: ${_req.body ? JSON.stringify(_req.body) : 'empty'}, query: ${_req.query ? JSON.stringify(_req.query) : 'empty'}, path:${_req.params ? JSON.stringify(_req.params) : 'empty'}, headers: ${JSON.stringify(_req.headers)}`);
 
- next();
-});
+//  next();
+// });
  
 // routes
 require('./app/routes/auth.routes')(app);
@@ -83,6 +83,8 @@ require('./app/routes/user.routes')(app);
 require('./app/routes/clas.routes')(app);
 require('./app/routes/group.routes')(app);
 require('./app/routes/report.routes')(app);
+require('./app/routes/finance.routes')(app);
+require('./app/routes/license.routes')(app);
 
 app.all('*', [], (req, res, next) => {
   return res.status(404).send({message: 'Ops! Não tem nada aqui!'});

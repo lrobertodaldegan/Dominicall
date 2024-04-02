@@ -15,16 +15,6 @@ import Button from './Button';
 import { get, post } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 
-const TURMAS = [
-  {id:0, name:'Adultos', students:'10',teachers:'2'},
-  {id:1, name:'Discipulado', students:'10',teachers:'2'},
-  {id:2, name:'Insfantil II', students:'10',teachers:'2'},
-  {id:3, name:'Jovens', students:'10',teachers:'2'},
-  {id:4, name:'Insfantil I', students:'10',teachers:'2'},
-  {id:5, name:'Insfantil III', students:'10',teachers:'2'},
-  {id:6, name:'Esdras e Noemi Noemi Noemi', students:'10',teachers:'2'},
-];
-
 export default function MemberModal({
                                 member=null,
                                 classs=null, 

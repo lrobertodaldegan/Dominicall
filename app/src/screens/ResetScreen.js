@@ -17,10 +17,13 @@ import { faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import By from '../components/By';
 import { Colors } from '../utils/Colors';
 import { Texts } from '../utils/Texts';
+import Link from '../components/Link';
 
 const ResetScreen = ({navigation}) => {
   const [code, setCode] = useState(null);
   const [codeSent, setCodeSent] = useState(false);
+  const [codeValidated, setCodeValidated] = useState(false);
+  const [pass, setPass] = useState(null);
   const [username, setUsername] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [btnLbl, setBtnLbl] = useState('Enviar código');
@@ -29,33 +32,58 @@ const ResetScreen = ({navigation}) => {
   const handleSubmit = () => {
     if(username && username != null){
       setLoading(true);
+      setErrorMsg(null);
 
       if(codeSent === true){
-        if(code && code != null){
-          post(Texts.API.requestResetCode, {code: code}).then(response => {
-            if(response.status === 200){
-              CacheService.register(Texts.Cache.user, response.data);
+        if(codeValidated === true){
+          if(pass && pass !== null){
+            post(Texts.API.user, {username: username, password: pass})
+            .then(response => {
+              setLoading(false);
 
-              navigation.navigate('group');
-            } else {
-              setErrorMsg(response.data.message);
-            }
-  
-            setLoading(false);
-          });
-        }else{
-          setErrorMsg('Informe corretamente o código recebido para continuar!\nCaso não tenha recebido o código no e-mail, infelizmente não será possível continuar!\n Se precisar, contate nosso time de suporte.');
+              if(response.status === 200){
+                navigation.navigate('group');
+              } else {
+                if(response.data && response.data.message)
+                  setErrorMsg(response.data.message);
+              }
+            });
+          } else {
+            setErrorMsg('Informe uma nova senha válida para continuar!');
+          }
+        } else {
+          if(code && code != null){
+            post(Texts.API.confirmResetCode, {username: username, code: code})
+            .then(response => {
+              setLoading(false);
+
+              if(response.status === 200){
+                CacheService.register(Texts.Cache.user, response.data)
+                .then(() => {
+                  setBtnLbl('Atualizar senha');
+                  setCodeValidated(true);
+                });
+              } else {
+                if(response.data && response.data.message)
+                  setErrorMsg(response.data.message);
+              }
+            });
+          }else{
+            setErrorMsg('Informe corretamente o código recebido para continuar!\nCaso não tenha recebido o código no e-mail, infelizmente não será possível continuar!\n Se precisar, contate nosso time de suporte.');
+          }
         }
       } else {
-        post(Texts.API.requestResetCode, {username: username}).then(response => {
+        post(Texts.API.requestResetCode, {username: username})
+        .then(response => {
+          setLoading(false);
+
           if(response.status === 200){
-            codeSent(true);
+            setCodeSent(true);
             setBtnLbl('Confirmar código');
           } else {
-            setErrorMsg(response.data.message);
+            if(response.data && response.data.message)
+              setErrorMsg(response.data.message);
           }
-
-          setLoading(false);
         });
       }
     }else{
@@ -73,35 +101,31 @@ const ResetScreen = ({navigation}) => {
 
   const renderComp = () => {
     if(codeSent === true) {
-      return (
-        <View style={styles.formWrap}>
+      if(codeValidated === true){
+        return (
+          <Input onChange={setPass} 
+            placeholder='Sua nova senha'
+            value={pass}
+            ico={faKey}
+            hideValue={true}
+            iconSize={24}/>
+        );
+      } else {
+        return (
           <Input onChange={setCode} placeholder='Insira o código recebido'
               value={code}
               ico={faKey}
+              keyboardType='numeric'
               iconSize={24}/>
-
-          {renderError()}
-
-          <Button label={btnLbl} 
-              loading={loading}
-              onPress={() => handleSubmit()}/>
-        </View>
-      );
+        );
+      }
     } else {
       return (
-        <View style={styles.formWrap}>
-          <Input onChange={setUsername} 
-              placeholder='Confirme seu usuário'
-              value={username}
-              ico={faUser}
-              iconSize={24}/>
-
-          {renderError()}
-
-          <Button label={btnLbl} 
-              onPress={() => handleSubmit()}
-              loading={loading}/>
-        </View>
+        <Input onChange={setUsername} 
+          placeholder='Confirme seu usuário'
+          value={username}
+          ico={faUser}
+          iconSize={24}/>
       );
     }
   }
@@ -119,7 +143,15 @@ const ResetScreen = ({navigation}) => {
 
         <Logo style={styles.logo} />
 
-        {renderComp()}
+        <View style={styles.formWrap}>
+          {renderComp()}
+
+          {renderError()}
+
+          <Button label={btnLbl} 
+            onPress={() => handleSubmit()}
+            loading={loading}/>
+        </View>
 
         <By />
       </ScrollView>

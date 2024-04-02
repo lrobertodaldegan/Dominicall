@@ -1,4 +1,4 @@
-const { authJwt } = require("../middlewares");
+const { authJwt, verifyUser } = require("../middlewares");
 const controller = require("../controllers/user.controller");
 
 module.exports = function(app) {
@@ -18,6 +18,7 @@ module.exports = function(app) {
     "/dominicall/user",
     [
       authJwt.verifyToken,
+      verifyUser.exists,
     ],
     controller.resetPass
   );
@@ -33,7 +34,8 @@ module.exports = function(app) {
   app.put(
     '/dominicall/user',
     [
-      authJwt.verifyToken
+      authJwt.verifyToken,
+      verifyUser.exists,
     ],
     controller.update
   );

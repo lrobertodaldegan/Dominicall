@@ -6,6 +6,7 @@ const Student = mongoose.model(
     name: String,
     since: String,
     number: String,
+    dn: Number,
     churchMember: Boolean,
     clas: {
       type: mongoose.Schema.Types.ObjectId, 

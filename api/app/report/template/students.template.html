@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Relatório de Ofertas - {{groupName}}</title>
+    <title>Relatório de Matriculados - {{groupName}}</title>
     <style>
         body{
             font-family: sans-serif
@@ -28,27 +28,31 @@
     </style>
   </head>
   <body>
-    <h1>Relatório de Ofertas<br/>{{groupName}} - {{dt}}</h1>
+    <h1>Relatório de Matriculados<br/>{{groupName}} - {{dt}}</h1>
+    
     <br/>
-    {{#each this.itens}}
-        <h3>{{this.className}}</h3>
-        <table>
+    
+    <table>
+        <tr>
+            <th>Turma</th>
+            <th>Aluno</th>
+            <th>Contato</th>
+            <th>Data de nascimento</th>
+            <th>Membro da igreja</th>
+            <th>Matriculado em</th>
+        </tr>
+        {{#each students}}
             <tr>
-                <th>Ofertante</th>
-                <th>Valor</th>
-            </tr>
-                {{#each this.offers}}
-                    <tr>
-                        <td>{{this.offerer}}</td>
-                        <td>{{this.value}}</td>
-                    </tr>  
-                {{/each}}
-            <tr>
-                <th>Total:</th>
-                <td>{{this.total}}</td>
-            </tr>
-        </table>
-    {{/each}}
+                <td>{{this.className}}</td>
+                <td>{{this.name}}</td>
+                <td>{{this.number}}</td>
+                <td>{{this.dn}}</td>
+                <td>{{this.memberStatus}}</td>
+                <td>{{this.since}}</td>
+            </tr>  
+        {{/each}}
+    </table>
+
     <small>Gerado por Dominicall em {{dt}}<br/>Por <a href='https://linktr.ee/lrobertodaldegan'>@lucasrobertodev</a></small>
   </body>
 </html>

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TextInput,
   StyleSheet,
   Dimensions,
   View,
+  TouchableHighlight,
 } from 'react-native';
 import { Colors } from '../utils/Colors';
 import Icon from './Icon';
@@ -22,9 +23,27 @@ export default function Input({
                         onChange=(v)=>null,
                         onEnter=(v)=>null
                       }) {
+  const [showValue, setShowValue] = useState(false);
+
+  useEffect(()=>{
+    setShowValue(!hideValue)
+  },[]);
+
   const renderIcon = () => {
-    if(ico !== null)
-      return <Icon icon={ico} size={iconSize} style={iconStyle}/>
+    if(ico !== null){
+      let iconComp = <Icon icon={ico} size={iconSize} style={iconStyle}/>;
+
+      if(hideValue === true){
+        return (
+          <TouchableHighlight underlayColor={Colors.white}
+              onPress={() => setShowValue(!showValue)}>
+            {iconComp}
+          </TouchableHighlight>
+        );
+      } else {
+        return iconComp;
+      }
+    }
 
     return <></>
   }
@@ -40,7 +59,7 @@ export default function Input({
           keyboardType={keyboardType}
           onSubmitEditing={onEnter}
           onChangeText={onChange}
-          secureTextEntry={hideValue}
+          secureTextEntry={!showValue}
       />
     </View>
   );

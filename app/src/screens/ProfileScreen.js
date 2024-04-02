@@ -6,12 +6,13 @@ import {
   ImageBackground,
   ScrollView,
   ToastAndroid,
+  RefreshControl,
 } from 'react-native';
 import fundo from '../assets/img/fundo.png';
 import Button from '../components/Button';
 import ErrorLabel from '../components/ErrorLabel';
 import Header from '../components/Header';
-import {put} from '../service/Rest/RestService';
+import {get, post, put} from '../service/Rest/RestService';
 import CacheService from '../service/Cache/CacheService';
 import Input from '../components/Input';
 import { faEnvelope, faKey, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -32,14 +33,34 @@ const ProfileScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(()=>{
+    search();
+  },[]);
+
+  useEffect(()=>{
+    if(showModal === false)
+      search();
+  },[showModal]);
+
+  const search = () => {
+    setLoading(true);
+
     CacheService.get(Texts.Cache.user).then(user => {
       setUser(user.username);
       setName(user.name);
       setEmail(user.email);
       setLicenseEmail(user.email);
-      setLicense(user.license);
+      
+      get(Texts.API.license).then(response => {
+        setLoading(false);
+
+        if(response.status === 200){
+          setLicense(response.data.status);
+        } else {
+          ToastAndroid.show('Houve um erro ao tentar consultar o status da licença de usuário!');
+        }
+      });
     });
-  },[]);
+  }
 
   const handleSubmit = () => {
     if(user && user != null && user && user != null){
@@ -75,24 +96,39 @@ const ProfileScreen = ({navigation}) => {
 
   const handleLicenseSubmit = () => {
     if(licenseEmail && licenseEmail !== null){
-      //TODO
+      setLoading(true);
 
-      //on success...
-      setShowModal(false);
-      ToastAndroid.show('Logo você receberá nossas instruções. Fique atento!', ToastAndroid.BOTTOM);
+      post(Texts.API.license, {email: licenseEmail})
+      .then((response) => {
+        setLoading(false);
+        if(response.status === 200){
+          setShowModal(false);
+          ToastAndroid.show('Logo você receberá nossas instruções. Fique atento!', ToastAndroid.BOTTOM);
+        } else {
+          if(response.data && response.data.message)
+            ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+        }
+      });
     } else {
+      setLoading(false);
+
       ToastAndroid.show('Informe seu melhor e-mail para continuar', ToastAndroid.BOTTOM);
     }
   }
 
+  const isLicenseActive = () => {
+    return license && license !== null && (license === 'active' || license === 'requested');
+  }
+
   const renderLicenseAction = () => {
-    if(license && license !== null)
+    if(isLicenseActive() === true)
       return <></>;
 
     return (
       <Button label={'Ativar licença'} 
         style={styles.btnLi}
         labelStyle={styles.btnLiLbl}
+        loading={loading}
         onPress={() => setShowModal(true)}
       />
     );
@@ -116,11 +152,13 @@ const ProfileScreen = ({navigation}) => {
 
                 <Input onChange={setLicenseEmail} 
                   placeholder='Seu melhor e-mail'
+                  style={styles.input}
                   value={licenseEmail}
                   ico={faEnvelope}
                   iconSize={24}/>
 
                 <Button label={'Quero ativar a licença'} 
+                    style={styles.input}
                     onPress={() => handleLicenseSubmit()}
                     loading={loading}/>
               </View>
@@ -140,7 +178,11 @@ const ProfileScreen = ({navigation}) => {
       {renderModal()}
 
       <ScrollView contentContainerStyle={styles.subwrap} 
-          keyboardDismissMode='on-drag' 
+          refreshControl={
+            <RefreshControl refreshing={loading} 
+              onRefresh={search}
+            />
+          }
           keyboardShouldPersistTaps='always'>
 
         <View style={styles.formWrap}>
@@ -174,7 +216,7 @@ const ProfileScreen = ({navigation}) => {
               loading={loading}/>
 
           <Label style={styles.legend}
-              value={`Status da licença de usuário: ${license && license !== null ? 'Ativo' : 'Inativo'}`}/>
+              value={`Status da licença de usuário: ${isLicenseActive() === true ? 'Ativo' : 'Inativo'}`}/>
 
           {renderLicenseAction()}
         </View>
@@ -227,8 +269,12 @@ const styles= StyleSheet.create({
     color:Colors.black,
     textAlign:'justify',
     marginHorizontal:10,
-    marginVertical:20
-  }
+    marginVertical:20,
+    width:screen.width - 70
+  },
+  input:{
+    width:screen.width - 60
+  },
 });
 
 export default ProfileScreen;

@@ -21,6 +21,7 @@ export default function Classes({navigation}) {
   const [classList, setClassList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [showNewOption, setShowNewOption] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -30,10 +31,67 @@ export default function Classes({navigation}) {
   const loadClassList = () => {
     setLoading(true);
 
+    CacheService.get(Texts.Cache.user).then(user => {
+      CacheService.get(Texts.Cache.group).then(group => {
+        if(group.role === 'Professor'){
+          setShowNewOption(false);
+
+          get(`${Texts.API.teachers}/${user.id}`).then(response => {
+            if(response.status === 200){
+              let tclasses = response.data.teacherClasses;
+
+              searchClasses((response) => {
+                let cs = response.data.classes;
+                
+                let classesAccessable = [];
+
+                for(let i=0; i < cs.length; i++){
+                  let filtered = tclasses.filter(tc => tc._id === cs[i]._id);
+
+                  if(filtered && filtered.length > 0)
+                    classesAccessable.push(cs[i]);
+                }
+
+                setClassList(classesAccessable);
+
+                setLoading(false);
+              });
+            } else {
+              if(response.status !== 204){
+                if(response.data && response.data.message)
+                  ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+      
+                if(response.status === 403){
+                  CacheService.wipe(Texts.Cache.user);
+                  
+                  navigation.navigate('login');
+                }
+              }
+            }
+      
+            setLoading(false);
+          });
+        } else {
+          searchClasses((response) => {
+            setClassList(response.data.classes);
+            setShowNewOption(true);
+            setLoading(false);
+          });
+        }
+      });
+    });
+  }
+
+  const searchClasses = (onSuccess=()=>null) => {
+    if(loading === false)
+      setLoading(true);
+
     get(Texts.API.class).then(response => {
       if(response.status === 200){
-        setClassList(response.data.classes);
+        onSuccess(response);
       } else {
+        setLoading(false);
+
         if(response.status !== 204){
           if(response.data && response.data.message)
             ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
@@ -45,8 +103,6 @@ export default function Classes({navigation}) {
           }
         }
       }
-
-      setLoading(false);
     });
   }
 
@@ -93,10 +149,16 @@ export default function Classes({navigation}) {
             <RefreshControl refreshing={loading} 
                 onRefresh={loadClassList}/>
           }
-          ListHeaderComponent={
-            <NewListItem title="Nova turma"
-              onPress={() => setShowModal(true)}/>
-          }
+          ListHeaderComponent={() => {
+            if(showNewOption === true){
+              return (
+                <NewListItem title="Nova turma"
+                  onPress={() => setShowModal(true)}/>
+              );
+            }
+
+            return <></>
+          }}
           renderItem={({item}) => 
             <ListItem onPress={() => handleListItem(item)}
                 onRemove={() => handleRemove(item)}

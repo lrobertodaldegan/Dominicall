@@ -28,7 +28,7 @@
     </style>
   </head>
   <body>
-    <h1>Escala - Turma {{className}}<br/>{{groupName}} - {{dt}}</h1>
+    <h1>Escala - Turmas<br/>{{groupName}}</h1>
     <br/>
     <h3>Eventos</h3>
     <table>
@@ -37,7 +37,7 @@
             <th>Data</th>
             <th>Professor/Palestrante</th>
         </tr>
-            {{#each events}}
+            {{#each this.events}}
                 <tr>
                     <td>{{this.name}}</td>
                     <td>{{this.dt}}</td>
@@ -49,15 +49,17 @@
     <h3>Escala</h3>
     <table>
         <tr>
-            <th>#</th>
-            <th>Professor/Palestrante</th>
+            <th>Turma</th>
+            <th>Aula</th>
+            <th>Professor</th>
         </tr>
-            {{#each teachers}}
-                <tr>
-                    <td>{{this.order}}ª aula</td>
-                    <td>{{this.teacher.user.name}}</td>
-                </tr>  
-            {{/each}}
+        {{#each teachers}}
+            <tr>
+                <td>{{this.className}}</td>
+                <td>{{this.order}}ª aula</td>
+                <td>{{this.name}}</td>
+            </tr>  
+        {{/each}}
     </table>
     <br/>
     <small>Gerado por Dominicall em {{dt}}<br/>Por <a href='https://linktr.ee/lrobertodaldegan'>@lucasrobertodev</a></small>

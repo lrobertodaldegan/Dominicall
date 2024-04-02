@@ -1,4 +1,4 @@
-const API_BASE_PATH = 'http://192.168.100.27:21017/dominicall/';
+const API_BASE_PATH = 'http://192.168.100.33:21017/dominicall/';
 
 export const Texts = {
   Insta:'https://www.instagram.com/lucasrobertodev/',
@@ -15,6 +15,7 @@ export const Texts = {
   API: {
     signup: `${API_BASE_PATH}auth/signup`,
     signin: `${API_BASE_PATH}auth/signin`,
+    firstAccess: `${API_BASE_PATH}auth/fa`,
     signout: `${API_BASE_PATH}auth/signout`,
     requestResetCode: `${API_BASE_PATH}user/forgot`,
     confirmResetCode: `${API_BASE_PATH}user/code`,
@@ -29,6 +30,14 @@ export const Texts = {
     events: `${API_BASE_PATH}class/event`,
     teachers: `${API_BASE_PATH}class/teacher`,
     report: `${API_BASE_PATH}report`,
-    users: `${API_BASE_PATH}users`
+    users: `${API_BASE_PATH}users`,
+    finance: `${API_BASE_PATH}finance`,
+    license: `${API_BASE_PATH}license`,
+    reports: {
+      general:`${API_BASE_PATH}report`,
+      finance:`${API_BASE_PATH}report/finance`,
+      calendar:`${API_BASE_PATH}report/calendar`,
+      students:`${API_BASE_PATH}report/students`,
+    },
   }
 }

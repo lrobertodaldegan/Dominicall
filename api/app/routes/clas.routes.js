@@ -230,10 +230,19 @@ module.exports = function(app) {
     [
       authJwt.verifyToken,
       verifyGroup.verifyUserGroup,
-      verifyClas.verifyClassId,
       verifyClas.verifyId,
     ],
     controller.changeTeacherOrder
+  );
+
+  app.get(
+    "/dominicall/class/teacher/:id",
+    [
+      authJwt.verifyToken,
+      verifyGroup.verifyUserGroup,
+      verifyClas.verifyId,
+    ],
+    controller.getTeacherClasses
   );
 
   app.put(

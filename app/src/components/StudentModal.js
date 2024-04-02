@@ -3,8 +3,10 @@ import {
   View,
   Dimensions,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
 import { faCheckSquare, faGraduationCap, faMobile } from '@fortawesome/free-solid-svg-icons';
+import DatePicker, {getFormatedDate} from 'react-native-modern-datepicker';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
@@ -13,18 +15,38 @@ import Button from './Button';
 import IconLabel from './IconLabel';
 import { Texts } from '../utils/Texts';
 import { post, put } from '../service/Rest/RestService';
+import Link from './Link';
 
 export default function StudentModal({classs, student=null, onClose=()=>null}){
   const [name, setName] = useState(null);
   const [number, setNumber] = useState(null);
   const [churchMember, setChurchMember] = useState(null);
+  const [date, setDate] = useState(null);
+  const [oldDn, setOldDn] = useState(null);
+  const [showDtPicker, setShowDtPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
+    setDate(null);
     setName(student?.name);
     setNumber(student?.number);
     setChurchMember(student?.churchMember);
+
+    if(student?.dn){
+      setOldDn(student?.dn);
+      
+      let dt = new Date(student?.dn);
+
+      let di = dt.getDate();
+      di = di < 10 ? `0${di}` : di;
+
+      let m = dt.getMonth() + 1;
+      m = m < 10 ? `0${m}` : m;
+
+      setDate(`${dt.getFullYear()}/${m}/${di}`);
+    }
+    
     setErr(null);
   }, []);
 
@@ -33,11 +55,20 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
       setLoading(true);
       setErr(null);
 
+      let dts = date.split('/');
+
+      let d = new Number(dts[2]);
+      let m = new Number(dts[1]);
+      let y = new Number(dts[0]);
+
+      let dtf = new Date(y, m-1, d);
+
       let body = {
         name:name,
         classId: classs?._id,
         number:number,
-        churchMember: churchMember
+        churchMember: churchMember,
+        dn: dtf.getTime()
       };
 
       if(student && student !== null){
@@ -76,47 +107,78 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
     return <></>
   }
 
+  const renderDtPicker = () => {
+    if(showDtPicker === true){
+      let d = oldDn ? oldDn : new Date();
+
+      return (
+        <DatePicker 
+          mode='calendar'
+          style={styles.dtPicker}
+          options={{
+            defaultFont:'MartelSans-Regular',
+            mainColor: Colors.black,
+          }}
+          selected={getFormatedDate(d, 'YYYY/MM/DD')}
+          current={getFormatedDate(d, 'YYYY/MM/DD')}
+          onSelectedChange={daate => setDate(daate)}
+        />
+      );
+    }
+
+    return <></>
+  }
+
   return (
     <Modal onClose={onClose} content={
-      <View>
+      <ScrollView contentContainerStyle={styles.wrap}
+        keyboardDismissMode='on-drag'
+        keyboardShouldPersistTaps='always'>
         <Label value={student && student !== null ? 'Aluno' : 'Novo aluno'} 
-            style={styles.title}/>
+          style={styles.title}/>
 
         <Input ico={faGraduationCap} 
-            placeholder='Nome do aluno'
-            value={name}
-            iconSize={30}
-            style={styles.input}
-            onChange={setName}
-            onEnter={handleSubmit}
+          placeholder='Nome do aluno'
+          value={name}
+          iconSize={30}
+          style={styles.input}
+          onChange={setName}
+          onEnter={handleSubmit}
         />
 
         <Input ico={faMobile} 
-            placeholder='Telefone'
-            value={number}
-            iconSize={30}
-            style={styles.input}
-            onChange={setNumber}
-            onEnter={handleSubmit}
+          placeholder='Telefone'
+          value={number}
+          iconSize={30}
+          style={styles.input}
+          onChange={setNumber}
+          onEnter={handleSubmit}
         />
 
+        <Link label={`Data de nascimento: ${oldDn ? getFormatedDate(oldDn, 'DD/MM/YYYY') : 'Não informado'}\nToque para alterar`}
+          style={styles.lblDn}
+          onPress={() => setShowDtPicker(true)}
+        />
+
+        {renderDtPicker()}
+
         <IconLabel
-            icon={faCheckSquare}
-            label={churchMember === true ? 'Já é membro da igreja' : 'Ainda não é membro da igreja'}
-            style={styles.botOpt}
-            lblStyle={churchMember === true ? styles.botLblS : styles.botLbl}
-            iconStyle={churchMember === true ? styles.botLblS : styles.botIco}
-            onPress={() => setChurchMember(!churchMember)}
+          icon={faCheckSquare}
+          label={churchMember === true ? 'Já é membro da igreja' : 'Ainda não é membro da igreja'}
+          style={styles.botOpt}
+          lblStyle={churchMember === true ? styles.botLblS : styles.botLbl}
+          iconStyle={churchMember === true ? styles.botLblS : styles.botIco}
+          onPress={() => setChurchMember(!churchMember)}
         />
 
         {renderError()}
 
         <Button label={'Salvar'} 
-            onPress={handleSubmit}
-            style={styles.input}
-            loading={loading}
+          onPress={handleSubmit}
+          style={styles.input}
+          loading={loading}
         />
-      </View>
+      </ScrollView>
     }/>
   );
 }
@@ -125,10 +187,11 @@ const screen = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   wrap:{
-    position:'absolute',
-    width:screen.width,
-    height:screen.height,
+    height:screen.height * 1.3,
     backgroundColor:Colors.white,
+  },
+  modalWrap:{
+
   },
   title:{
     color:Colors.black,
@@ -139,6 +202,11 @@ const styles = StyleSheet.create({
   },
   input:{
     width:screen.width * 0.8
+  },
+  dtPicker:{
+    width:screen.width * 0.8,
+    marginBottom:10,
+    borderRadius:10
   },
   error:{
     color:Colors.red,
@@ -157,5 +225,9 @@ const styles = StyleSheet.create({
   },
   botIco:{
     color:Colors.gray
+  },
+  lblDn:{
+    textAlign:'center',
+    marginVertical:10
   },
 });

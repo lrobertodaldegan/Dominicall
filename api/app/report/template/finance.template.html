@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Relatório Financeiro e Ofertas - {{groupName}}</title>
+    <style>
+        body{
+            font-family: sans-serif
+        }
+        table{
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table,tr,th,td{
+            border:1px solid #000;
+            border-collapse: collapse;
+            text-align:center;
+        }
+        h1{
+            text-align: center;
+            font-weight: bolder;
+        }
+        small{
+            text-align: center;
+            display:block;
+            margin-top:20px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Relatório Financeiro e Ofertas<br/>{{groupName}} - {{dtRef}}</h1>
+    
+    <br/>
+    
+    <h2>Financeiro (entradas e saídas)</h2>
+    
+    <table>
+        <tr>
+            <th>Título</th>
+            <th>Valor</th>
+            <th>Tipo</th>
+            <th>Data</th>
+        </tr>
+        {{#each finances}}
+            <tr>
+                <td>{{this.title}}</td>
+                <td>{{this.value}}</td>
+                <td>{{this.type}}</td>
+                <td>{{this.dt}}</td>
+            </tr>  
+        {{/each}}
+    </table>
+    
+    <br/>
+    
+    <h2>Ofertas</h2>
+
+    <table>
+        <tr>
+            <th>Turma</th>
+            <th>Ofertante</th>
+            <th>Valor</th>
+            <th>Data</th>
+        </tr>
+        {{#each itens}}        
+            <tr>
+                <td>{{this.className}}</td>
+                <td>{{this.offerer}}</td>
+                <td>{{this.oValue}}</td>
+                <td>{{this.oDt}}</td>
+            </tr>  
+        {{/each}}
+        <tr>
+            <th>Total:</th>
+            <td colspan="3">{{this.offerTotal}}</td>
+        </tr>
+    </table>
+
+    <small>Gerado por Dominicall em {{dtRef}}<br/>Por <a href='https://linktr.ee/lrobertodaldegan'>@lucasrobertodev</a></small>
+  </body>
+</html>

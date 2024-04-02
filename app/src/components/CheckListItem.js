@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import {
   View,
   StyleSheet,
@@ -20,6 +20,7 @@ export default function CheckListItem({
                                 leftComponent=<></>,
                                 rightComponent=<></>,
                                 bottomComponent=<></>,
+                                removable=true,
                                 onSelect=()=>null,
                                 onRemove=()=>null,
                               }) {
@@ -46,6 +47,20 @@ export default function CheckListItem({
     }
   }
 
+  const renderRmoveBtn = () => {
+    if(removable === true){
+      return (
+        <TouchableHighlight style={styles.rmBtn}
+            underlayColor={Colors.white}
+            onPress={() => setShowConfirm(true)}>
+          <Icon icon={faTrash} style={{color:Colors.black}}/>
+        </TouchableHighlight>
+      );
+    }
+
+    return <></>
+  }
+
   return (
     <View style={styles.wrap}>
       {renderConfirmation()}
@@ -61,11 +76,7 @@ export default function CheckListItem({
         <View style={styles.titleWrap}>
           <Label value={title} style={styles.title}/>
 
-          <TouchableHighlight style={styles.rmBtn}
-              underlayColor={Colors.white}
-              onPress={() => setShowConfirm(true)}>
-            <Icon icon={faTrash} style={{color:Colors.black}}/>
-          </TouchableHighlight>
+          {renderRmoveBtn()}
         </View>
 
         <View style={styles.components}>

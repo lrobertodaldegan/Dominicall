@@ -31,6 +31,8 @@ const LoginScreen = ({navigation}) => {
       if(user && user !== null)
         navigation.navigate('group');
     });
+
+    setLoading(false);
   }, []);
 
   const handleSubmit = () => {
@@ -41,17 +43,18 @@ const LoginScreen = ({navigation}) => {
 
       CacheService.wipe(Texts.Cache.user);
 
-      setBtnLbl('Entrando...');
-
       post(Texts.API.signin, {username: user, password: pass}).then((response) => {
+        setLoading(false);
+
         if(response.status == 200){
+          setUser(null);
+          setPass(null);
+          
           CacheService.register(Texts.Cache.user, response.data);
 
           navigation.navigate('group');
         } else {
-          setLoading(false);
           setErrorMsg(response.data?.message);
-          setBtnLbl('Tente novamente!');
         }
       });
     }else{

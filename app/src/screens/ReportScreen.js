@@ -1,4 +1,4 @@
-import react, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -11,21 +11,55 @@ import By from '../components/By';
 import Header from '../components/Header';
 import { Colors } from '../utils/Colors';
 import ReportListItem from '../components/ReportListItem';
+import { Texts } from '../utils/Texts';
+import ReportModal from '../components/ReportModal';
 
 const REPORTS = [
-  {id:0, title:'Presença', subtitle:'Presentes e ausentes por turma e total geral', action:()=>null},
-  {id:1, title:'Ofertas', subtitle:'Ofertas por turma e total geral', action:()=>null},
-  {id:3, title:'Geral', subtitle:'Relatório geral (presença e ofertas)', action:()=>null},
-  {id:2, title:'Cantina', subtitle:'Entradas e saídas da cantina', action:()=>null},
-  {id:4, title:'Escalas', subtitle:'Escalas de professores', action:()=>null},
+  {
+    id:0, 
+    title:'Geral', 
+    subtitle:'Relatório de total geral (presença e ofertas)', 
+    link: Texts.API.reports.general,
+  },
+  {
+    id:1, 
+    title:'Financeiro', 
+    subtitle:'Ofertas, entradas e saídas', 
+    link: Texts.API.reports.finance,
+  },
+  {
+    id:2, 
+    title:'Escalas', 
+    subtitle:'Escalas (ordem de aulas) e eventos', 
+    link: Texts.API.reports.calendar,
+  },
+  {
+    id:3, 
+    title:'Matrículas', 
+    subtitle:'Alunos matriculados por turma', 
+    link: Texts.API.reports.students,
+  },
 ];
 
-const ReportScreen = ({navigation}) => {
+const ReportScreen = ({navigation, route}) => {
+  const [report, setReport] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  const {group} = route.params;
+
+  useEffect(() => {
+    setShowModal(report && report !== null);
+  }, [report]);
 
   const renderModal = () => {
     if(showModal === true){
-      return <></>
+      return (
+        <ReportModal 
+          group={group}
+          report={report}
+          onClose={() => setReport(null)}
+        />
+      );
     }
 
     return <></>
@@ -45,6 +79,7 @@ const ReportScreen = ({navigation}) => {
         data={REPORTS}
         renderItem={({item}) => 
           <ReportListItem
+            onPress={() => setReport(item)}
             title={item.title}
             subtitle={item.subtitle}
           />

@@ -11,30 +11,57 @@ import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import { post } from '../service/Rest/RestService';
+import { Texts } from '../utils/Texts';
+import { Days } from '../utils/Days';
 
-export default function EventModal({onClose=()=>null}){
+export default function EventModal({
+                                classs,
+                                onClose=()=>null
+                              }){
+
   const [event, setEvent] = useState(null);
   const [teacher, setTeacher] = useState(null);
   const [dt, setDt] = useState(null);
   const [err, setErr] = useState(null);
+  const [loading, setLoading] = useState(null);
 
   const handleSubmit = () => {
-    console.log(event);
-    console.log(teacher);
-    console.log(dt);//yyyy/mm/dd
-
     if(!event || event === null){
       setErr('Por favor, informe o nome do evento.');
+      setLoading(false);
     } else {
       if(!teacher || teacher === null){
         setErr('Por favor, informe o nome do professor ou palestrante.');
+        setLoading(false);
       } else {
         if(!dt || dt === null){
           setErr('Por favor, informe a data do evento.');
+          setLoading(false);
         } else {
-          //todo success
+          let dts = dt.split('/');
+          let d = new Number(dts[2]);
+          let m = new Number(dts[1]);
+          let y = new Number(dts[0]);
+          let dtf = new Date(y, m-1, d);
 
-          onClose();
+          let body = {
+            classId:classs._id,
+            dt:Days.label(dtf),
+            name:event,
+            teacher:teacher
+          };
+
+          post(Texts.API.events, body).then((response) => {
+            setLoading(false);
+
+            if(response.status === 201){
+              onClose();
+            } else {
+              if(response.data && response.data.message)
+                setErr(response.data.message);
+            }
+          });
         }
       }
     }
@@ -83,8 +110,9 @@ export default function EventModal({onClose=()=>null}){
         {renderError()}
 
         <Button label={'Salvar'} 
-            onPress={handleSubmit}
-            style={styles.input}
+          onPress={handleSubmit}
+          style={styles.input}
+          loading={loading}
         />
       </View>
     }/>

@@ -16,7 +16,6 @@ import { post, put, del } from '../service/Rest/RestService';
 export default function StudentListItem({
                                     item, 
                                     onOfferPress=(item)=>null,
-                                    onRemove=()=>null
                                   }) {
 
   const [presenceId, setPresenceId] = useState(item.presence?._id);
@@ -92,7 +91,7 @@ export default function StudentListItem({
       checklistSelectedLbl='Presente'
       selected={selected}
       onSelect={() => setSelected(!selected)}
-      onRemove={onRemove}
+      removable={false}
       bottomComponent={
         <View style={styles.botWrap}>
           <IconLabel

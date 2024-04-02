@@ -6,6 +6,7 @@ import SplashScreen from 'react-native-splash-screen';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import TeamScreen from './src/screens/TeamScreen';
+import FinanceScreen from './src/screens/FinanceScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import GroupScreen from './src/screens/GroupScreen';
 import InviteScreen from './src/screens/InviteScreen';
@@ -34,6 +35,7 @@ function App(): JSX.Element {
           <Stack.Screen name="login" component={LoginScreen} options={ScreensOptions} />
           <Stack.Screen name="home" component={HomeScreen} options={ScreensOptions} />
           <Stack.Screen name="team" component={TeamScreen} options={ScreensOptions} />
+          <Stack.Screen name="finance" component={FinanceScreen} options={ScreensOptions} />
           <Stack.Screen name="reports" component={ReportScreen} options={ScreensOptions} />
           <Stack.Screen name="group" component={GroupScreen} options={ScreensOptions} />
           <Stack.Screen name="invite" component={InviteScreen} options={ScreensOptions} />
