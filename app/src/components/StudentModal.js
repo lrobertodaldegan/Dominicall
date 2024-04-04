@@ -55,21 +55,27 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
       setLoading(true);
       setErr(null);
 
-      let dts = date.split('/');
+      let dtf = null;
 
-      let d = new Number(dts[2]);
-      let m = new Number(dts[1]);
-      let y = new Number(dts[0]);
+      if(date && date !== null){
+        let dts = date.split('/');
 
-      let dtf = new Date(y, m-1, d);
+        let d = new Number(dts[2]);
+        let m = new Number(dts[1]);
+        let y = new Number(dts[0]);
+
+        dtf = new Date(y, m-1, d);
+      }
 
       let body = {
         name:name,
         classId: classs?._id,
         number:number,
         churchMember: churchMember,
-        dn: dtf.getTime()
       };
+
+      if(dtf && dtf !== null)
+        body.dn = dtf.getTime();
 
       if(student && student !== null){
         put(`${Texts.API.students}/${student._id}`, body).then(response => {

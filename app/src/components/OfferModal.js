@@ -22,7 +22,6 @@ export default function OfferModal({classs, offerer=null, onClose=()=>null}){
   const [err, setErr] = useState(null);
 
   useEffect(() => {
-    console.log(offerer);
     setOffererr(offerer);
   }, []);
 

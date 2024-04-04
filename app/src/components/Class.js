@@ -158,8 +158,6 @@ export default function Class({
 
   const loadStudentsList = () => {
     loadPageListAux(Texts.API.students, (response) => {
-      console.log(response.data);
-
       setList(response.data.students);
     });
   }
@@ -260,7 +258,7 @@ export default function Class({
           onPress={() => setStudent(item)}
           onRemove={() => handleRemove(item)}
           leftComponent={
-            <Label value={`${item.number}`} 
+            <Label value={`${item.number ? item.number : 'Número não informado'}`} 
               style={styles.lbl}/>
           }
           bottomComponent={
