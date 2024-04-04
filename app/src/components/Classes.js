@@ -15,6 +15,8 @@ import NewListItem from "./NewListItem";
 import { del, get } from "../service/Rest/RestService";
 import { Texts } from "../utils/Texts";
 import CacheService from "../service/Cache/CacheService";
+import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
 
 export default function Classes({navigation}) {
   const [comp, setComp] = useState('list');
@@ -174,7 +176,13 @@ export default function Classes({navigation}) {
             />
           }
           ListFooterComponent={
-            <View style={styles.listFoot}/>
+            <View style={styles.listFoot}>
+              <BannerAd
+                unitId={adUnitId}
+                size={BannerAdSize.MEDIUM_RECTANGLE}
+                requestOptions={{requestNonPersonalizedAdsOnly: false,}}
+              />
+            </View>
           }
         />
       </>
@@ -196,6 +204,7 @@ const styles = StyleSheet.create({
     color:Colors.gray
   },
   listFoot:{
-    height:200
+    alignItems:'center',
+    marginBottom: 200
   },
 });

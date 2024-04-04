@@ -12,13 +12,15 @@ import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
 import Header from '../components/Header';
 import NewListItem from '../components/NewListItem';
-import LicenseWarnModal from '../components/LicenseWarnModal';
+// import LicenseWarnModal from '../components/LicenseWarnModal';
 import { Colors } from '../utils/Colors';
 import { get, del } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
 import FinanceModal from '../components/FinanceModal';
 import NumberListItem from '../components/NumberListItem';
+import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
 
 const FinanceScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
@@ -68,7 +70,7 @@ const FinanceScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <LicenseWarnModal navigation={navigation}/>
+      {/* <LicenseWarnModal navigation={navigation}/> */}
 
       <Header page={'finance'} navigation={navigation}/>
 
@@ -97,7 +99,13 @@ const FinanceScreen = ({navigation}) => {
           />
         }
         ListFooterComponent={
-          <View style={styles.listFoot}/>
+          <View style={styles.listFoot}>
+            <BannerAd
+              unitId={adUnitId}
+              size={BannerAdSize.MEDIUM_RECTANGLE}
+              requestOptions={{requestNonPersonalizedAdsOnly: false,}}
+            />
+          </View>
         }
       />
 
@@ -127,7 +135,8 @@ const styles= StyleSheet.create({
     color:Colors.gray
   },
   listFoot:{
-    height:200
+    alignItems:'center',
+    marginBottom: 200
   },
 });
 

@@ -8,12 +8,14 @@ import {
   Linking,
 } from "react-native";
 import Logo from "./Logo";
-import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser, faCoins, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser, faCoins, faRightFromBracket, faDollar, faAd } from '@fortawesome/free-solid-svg-icons'
 import IconLabel from './IconLabel';
 import { Colors } from '../utils/Colors';
 import Label from './Label';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
+import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerTop;
 
 const OPTIONS = [
   {
@@ -53,20 +55,27 @@ const OPTIONS = [
   },
   {
     id:5, 
+    label:'Remover anúncios', 
+    link: Texts.GooglePlayPro, 
+    icon:faAd,
+    restrictions:[]
+  },
+  {
+    id:6, 
     label:'Avalie o app', 
     link: Texts.Avalie, 
     icon:faStar,
     restrictions:[]
   },
   {
-    id:6, 
+    id:7, 
     label:'Outros apps', 
     link: Texts.GooglePlay, 
     icon:faBoxOpen,
     restrictions:[]
   },
   {
-    id:7, 
+    id:8, 
     label:'Sair', 
     icon:faRightFromBracket,
     restrictions:[]
@@ -95,6 +104,13 @@ const Header = ({navigation, page='home'}) => {
           barStyle='dark-content'/>
 
       <View style={styles.wrap} elevation={2}>
+
+        <BannerAd
+          unitId={adUnitId}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{requestNonPersonalizedAdsOnly: false,}}
+        />
+
         <View style={styles.header}>
           <Logo />
 
@@ -155,14 +171,14 @@ const styles = StyleSheet.create({
     paddingHorizontal:10,
     borderBottomLeftRadius:20,
     borderBottomRightRadius:20,
-    height: screen.height * 0.25,
+    height: screen.height * 0.285,
   },
   header:{
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
     width:screen.width - 20,
-    
+    marginTop:10,
   },
   title:{
     color:Colors.black,

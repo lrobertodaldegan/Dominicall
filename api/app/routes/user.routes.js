@@ -35,7 +35,7 @@ module.exports = function(app) {
     '/dominicall/user',
     [
       authJwt.verifyToken,
-      verifyUser.exists,
+      verifyUser.checkDuplicateUsername,
     ],
     controller.update
   );

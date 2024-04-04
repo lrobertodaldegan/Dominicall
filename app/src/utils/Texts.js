@@ -3,6 +3,7 @@ const API_BASE_PATH = 'http://192.168.100.33:21017/dominicall/';
 export const Texts = {
   Insta:'https://www.instagram.com/lucasrobertodev/',
   GooglePlay: 'https://play.google.com/store/apps/developer?id=Lucas+Roberto+Daldegan',
+  GooglePlayPro: 'https://play.google.com/store/apps/details?id=com.dominicallpro',
   Avalie: 'https://play.google.com/store/apps/details?id=com.dominicall',
   Cache:{
     group:'@group',
@@ -40,5 +41,9 @@ export const Texts = {
       calendar:`${API_BASE_PATH}report/calendar`,
       students:`${API_BASE_PATH}report/students`,
     },
-  }
+  },
+  Ads:{
+    bannerTop: 'ca-app-pub-2420598559068720/8193516251',
+    bannerBot: 'ca-app-pub-2420598559068720/6096484888',
+  },
 }
