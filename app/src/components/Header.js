@@ -8,7 +8,7 @@ import {
   Linking,
 } from "react-native";
 import Logo from "./Logo";
-import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser, faCoins } from '@fortawesome/free-solid-svg-icons'
+import {  faUsers, faChalkboard, faPeopleGroup, faNewspaper, faStar, faBoxOpen, faUser, faCoins, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import IconLabel from './IconLabel';
 import { Colors } from '../utils/Colors';
 import Label from './Label';
@@ -65,6 +65,12 @@ const OPTIONS = [
     icon:faBoxOpen,
     restrictions:[]
   },
+  {
+    id:7, 
+    label:'Sair', 
+    icon:faRightFromBracket,
+    restrictions:[]
+  },
 ];
 
 const Header = ({navigation, page='home'}) => {
@@ -75,6 +81,13 @@ const Header = ({navigation, page='home'}) => {
     CacheService.get(Texts.Cache.user).then(u => setUser(u.name));
     CacheService.get(Texts.Cache.group).then(g => setGroup(g));
   }, []);
+
+  const handleLogOff = () => {
+    CacheService.wipe(Texts.Cache.group);
+    CacheService.wipe(Texts.Cache.user);
+    
+    navigation.navigate('login');
+  }
 
   return (
     <>
@@ -111,10 +124,14 @@ const Header = ({navigation, page='home'}) => {
                   style={styles.menuOptsWrap}
                   selected={page === item.page}
                   onPress={async () => {
-                    if(item?.page && item?.page !== null)
-                      navigation.navigate(item?.page, {group:group});
-                    else
-                      await Linking.openURL(item?.link);
+                    if(item.id === OPTIONS.length-1){
+                      handleLogOff();
+                    } else {
+                      if(item?.page && item?.page !== null)
+                        navigation.navigate(item?.page, {group:group});
+                      else
+                        await Linking.openURL(item?.link);
+                    }
                   }}
                 />
               );

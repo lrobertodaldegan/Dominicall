@@ -76,31 +76,33 @@ exports.licenseStatus = (req, res) => {
 
     let status = 'unlicensed';
 
-    let sinceDt = new Date(user.since);
-    let todayDt = new Date();
-
-    const diffTime = Math.abs(todayDt - sinceDt);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if(diffDays > 14){
-      status = 'expired';
-
-      user.license = status;
-
-      user.save().then(uUser => {
-        res.status(200).send({status: status});
-      }).catch(err => errorHandler(err, res));
-    } else {
-      if(user.license && user.license !== null){
-        if(user.license === 'requested' || user.license === 'revoked'
-                                        || user.license === 'expired'){
-          status = user.license;
-        } else {
-          status = 'active';
-        }
+    if(user.license && user.license !== null){
+      if(user.license === 'requested' || user.license === 'revoked'
+                                      || user.license === 'expired'){
+        status = user.license;
+      } else {
+        status = 'active';
       }
 
       res.status(200).send({status: status});
+    } else {
+      let sinceDt = new Date(user.since);
+      let todayDt = new Date();
+
+      const diffTime = Math.abs(todayDt - sinceDt);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if(diffDays > 14){
+        status = 'expired';
+
+        user.license = status;
+
+        user.save().then(uUser => {
+          res.status(200).send({status: status});
+        }).catch(err => errorHandler(err, res));
+      } else {
+        res.status(200).send({status: status});
+      }
     }
   }).catch(err => errorHandler(err, res));
 }
@@ -130,7 +132,7 @@ exports.grantLicense = (req, res) => {
           from: config.smtp.from,
           to: user.email,
           subject: 'Recibo da operação',
-          text: `A licença do usuário ${user.name} (${user.username}) foi ativada com sucesso! Seguem detalhes da transação:\n\n\nCódigo da licença: ${user.license}\nProcessado em: ${new Date()}\nStatus do pagamento: PAGO\nPendências: N/A\nDetalhes:A operação foi processada sob a conceção de licença vitalícia ao aplicativo Dominicall para o usuário ${user.username}. A mesma é intransferível e é válida enquanto o usuário permanecer cadastrado no aplicativo, independentemente do tempo de uso ou inatividade.\n\n\nPara maiores detalhes, procure a nossa equipe através dos meios de comunicação já veículados.\n\nAtenciosamente,\nEquipe Dominicall`
+          text: `A licença do usuário ${user.name} (${user.username}) foi ativada com sucesso! Seguem detalhes da transação:\n\n\nCódigo da licença: ${user.license}\nProcessado em: ${new Date()}\nStatus do pagamento: PAGO\nValor pago: R$ 10,00 (dez reais)\nPendências: N/A\nDetalhes:A operação foi processada sob a conceção de licença vitalícia ao aplicativo Dominicall para o usuário ${user.username}. A mesma é intransferível e é válida enquanto o usuário permanecer cadastrado no aplicativo, independentemente do tempo de uso ou inatividade.\n\n\nPara maiores detalhes, procure a nossa equipe através dos meios de comunicação já veículados.\n\nAtenciosamente,\nEquipe Dominicall`
         };
         
         transporter.sendMail(mailOptions, function(error, info){

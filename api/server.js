@@ -15,7 +15,7 @@ const Role = db.role;
 const dbConfig = require("./app/config/db.config");
  
 db.mongoose
-  .connect(`mongodb+srv://${dbConfig.USER}:${dbConfig.PASS}@${dbConfig.HOST}`, {
+  .connect(`mongodb://${dbConfig.USER}:${dbConfig.PASS}@${dbConfig.HOST}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })

@@ -20,6 +20,7 @@ import Link from '../components/Link';
 import { del, get } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
+import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const GroupScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
@@ -38,9 +39,6 @@ const GroupScreen = ({navigation}) => {
         let gps = response.data.groups;
 
         setGroups(gps);
-        
-        if(gps.length === 1)
-          handleGroupSelection(gps[0]);
       } else {
         if(response.data && response.data.message)
           ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
@@ -87,8 +85,10 @@ const GroupScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <LicenseWarnModal navigation={navigation}/>
+
       <View style={styles.logoffwrap}>
-        <Link label={'< Sair do app (logoff)'}
+        <Link label={'< Sair do app'}
           onPress={handleLogoff}/>
       </View>
       <Logo style={styles.logo}/>

@@ -12,8 +12,7 @@ import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
 import Header from '../components/Header';
 import NewListItem from '../components/NewListItem';
-import ListItem from '../components/ListItem';
-import Label from '../components/Label';
+import LicenseWarnModal from '../components/LicenseWarnModal';
 import { Colors } from '../utils/Colors';
 import { get, del } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
@@ -69,6 +68,8 @@ const FinanceScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <LicenseWarnModal navigation={navigation}/>
+
       <Header page={'finance'} navigation={navigation}/>
 
       {renderModal()}

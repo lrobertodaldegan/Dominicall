@@ -8,9 +8,10 @@ export const Texts = {
     group:'@group',
     jwt: '@jwt',
     user: '@user',
+    licenseModal: '@lm'
   },
   License:{
-    info:'Para continuar usando todas as funcionalidades do Dominicall você precisará ativar sua licença e isso é muito fácil:\n\nCada licença tem o valor de R$ 10,00. Para ativar a sua, informe seu melhor e-mail e toque no botão abaixo que te enviaremos os dados para pagamento. Assim que o pagamento for processado, sua licença será atualizada automaticamente!\n\nPara maiores esclarecimentos, entre em contato com a gente!\n\nAtenciosamente,\nLucas Roberto - Equipe Dominicall',
+    info:'Para continuar usando todas as funcionalidades do Dominicall você precisará ativar sua licença e isso é muito fácil:\n\nCada licença tem o valor de R$ 10,00. Para ativar a sua, informe seu melhor e-mail e toque no botão abaixo. Em seguida te enviaremos os dados para pagamento por e-mail. Assim que o pagamento for processado, sua licença será atualizada automaticamente!\n\nPara maiores esclarecimentos, entre em contato com a gente!\n\nAtenciosamente,\nLucas Roberto - Equipe Dominicall',
   },
   API: {
     signup: `${API_BASE_PATH}auth/signup`,

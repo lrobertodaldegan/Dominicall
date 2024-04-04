@@ -9,11 +9,14 @@ import By from '../components/By';
 import Header from '../components/Header';
 import Classes from '../components/Classes';
 import { Colors } from '../utils/Colors';
+import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const HomeScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <LicenseWarnModal navigation={navigation}/>
+
       <Header page={'home'} navigation={navigation}/>
 
       <Classes navigation={navigation}/>

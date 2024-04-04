@@ -13,6 +13,7 @@ import { Colors } from '../utils/Colors';
 import ReportListItem from '../components/ReportListItem';
 import { Texts } from '../utils/Texts';
 import ReportModal from '../components/ReportModal';
+import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const REPORTS = [
   {
@@ -67,6 +68,8 @@ const ReportScreen = ({navigation, route}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <LicenseWarnModal navigation={navigation}/>
+
       <Header page={'reports'} navigation={navigation}/>
 
       {renderModal()}

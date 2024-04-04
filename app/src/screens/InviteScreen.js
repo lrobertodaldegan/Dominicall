@@ -22,6 +22,7 @@ import Input from '../components/Input';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Button from '../components/Button';
 import MemberModal from '../components/MemberModal';
+import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const InviteScreen = ({navigation, route}) => {
   const [filter, setFilter] = useState(null);
@@ -87,6 +88,8 @@ const InviteScreen = ({navigation, route}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <LicenseWarnModal navigation={navigation}/>
+      
       {modal}
 
       <View style={styles.logoffwrap}>

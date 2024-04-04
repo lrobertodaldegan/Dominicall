@@ -19,6 +19,7 @@ import { Colors } from '../utils/Colors';
 import { get, del } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
+import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const TeamScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
@@ -69,6 +70,8 @@ const TeamScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <LicenseWarnModal navigation={navigation}/>
+
       <Header page={'team'} navigation={navigation}/>
 
       {renderModal()}

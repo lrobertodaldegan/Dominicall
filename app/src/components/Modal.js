@@ -9,15 +9,25 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Icon from './Icon';
 
-export default function Modal({onClose=()=>null, content=<></>}){
+export default function Modal({onClose=()=>null, closable=true, content=<></>}){
+  const renderClose = () => {
+    if(closable === true){
+      return (
+        <TouchableHighlight underlayColor={'transparent'}
+            onPress={() => onClose()}>
+          <Icon icon={faX} size={26}/>
+        </TouchableHighlight>
+      );
+    }
+
+    return <></>
+  }
+  
   return (
     <View style={styles.wrap}>
       <View style={styles.subWrap}>
         <View style={styles.header}>
-          <TouchableHighlight underlayColor={'transparent'}
-              onPress={() => onClose()}>
-            <Icon icon={faX} size={26}/>
-          </TouchableHighlight>
+          {renderClose()}
         </View>
 
         <View style={styles.content}>
