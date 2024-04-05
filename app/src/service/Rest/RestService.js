@@ -47,7 +47,14 @@ const get = async (urlPath, errorHandler=()=>null, headers=DEFAULT_HEADERS) => {
     let jwt = await getJwt();
     let gId = await getGroupId();
 
-    let response = await axios.get(urlPath, {
+    let url = urlPath;
+
+    if(url.includes('?'))
+      url += `&t=${new Date().getTime()}`
+    else
+      url += `?t=${new Date().getTime()}`
+
+    let response = await axios.get(url, {
       withCredentials:true,
       headers: {...headers, 'Authorization':jwt, 'Group':gId}
     });
