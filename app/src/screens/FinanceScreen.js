@@ -19,8 +19,6 @@ import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
 import FinanceModal from '../components/FinanceModal';
 import NumberListItem from '../components/NumberListItem';
-import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
 
 const FinanceScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
@@ -100,11 +98,7 @@ const FinanceScreen = ({navigation}) => {
         }
         ListFooterComponent={
           <View style={styles.listFoot}>
-            <BannerAd
-              unitId={adUnitId}
-              size={BannerAdSize.MEDIUM_RECTANGLE}
-              requestOptions={{requestNonPersonalizedAdsOnly: false,}}
-            />
+            
           </View>
         }
       />

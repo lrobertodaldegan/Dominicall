@@ -42,8 +42,4 @@ export const Texts = {
       students:`${API_BASE_PATH}report/students`,
     },
   },
-  Ads:{
-    bannerTop: 'ca-app-pub-2420598559068720/8193516251',
-    bannerBot: 'ca-app-pub-2420598559068720/6096484888',
-  },
 }

@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.dominicall"
+    namespace "com.dominicallpro"
     defaultConfig {
-        applicationId "com.dominicall"
+        applicationId "com.dominicallpro"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

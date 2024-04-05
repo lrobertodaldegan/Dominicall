@@ -20,8 +20,6 @@ import Link from '../components/Link';
 import { del, get } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
-import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
 // import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const GroupScreen = ({navigation}) => {
@@ -125,11 +123,7 @@ const GroupScreen = ({navigation}) => {
         }
         ListFooterComponent={
           <View style={styles.listFoot}>
-            <BannerAd
-              unitId={adUnitId}
-              size={BannerAdSize.MEDIUM_RECTANGLE}
-              requestOptions={{requestNonPersonalizedAdsOnly: false,}}
-            />
+            
           </View>
         }
       />

@@ -1,4 +1,4 @@
-package com.dominicall;
+package com.dominicallpro;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

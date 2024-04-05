@@ -14,8 +14,6 @@ import { Colors } from '../utils/Colors';
 import Label from './Label';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
-import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerTop;
 
 const OPTIONS = [
   {
@@ -55,27 +53,20 @@ const OPTIONS = [
   },
   {
     id:5, 
-    label:'Remover anúncios', 
-    link: Texts.GooglePlayPro, 
-    icon:faAd,
-    restrictions:[]
-  },
-  {
-    id:6, 
     label:'Avalie o app', 
     link: Texts.Avalie, 
     icon:faStar,
     restrictions:[]
   },
   {
-    id:7, 
+    id:6, 
     label:'Outros apps', 
     link: Texts.GooglePlay, 
     icon:faBoxOpen,
     restrictions:[]
   },
   {
-    id:8, 
+    id:7, 
     label:'Sair', 
     icon:faRightFromBracket,
     restrictions:[]
@@ -104,12 +95,6 @@ const Header = ({navigation, page='home'}) => {
           barStyle='dark-content'/>
 
       <View style={styles.wrap} elevation={2}>
-
-        <BannerAd
-          unitId={adUnitId}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{requestNonPersonalizedAdsOnly: false,}}
-        />
 
         <View style={styles.header}>
           <Logo />

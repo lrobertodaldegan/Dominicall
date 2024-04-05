@@ -36,8 +36,6 @@ import StudentListItem from './StudentListItem';
 import { del, get, put } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
-import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
 
 const CLASS_OPTIONS = [
   {
@@ -358,11 +356,7 @@ export default function Class({
 
     c.push(
       <View key={'foot'} style={styles.foot}>
-        <BannerAd
-          unitId={adUnitId}
-          size={BannerAdSize.MEDIUM_RECTANGLE}
-          requestOptions={{requestNonPersonalizedAdsOnly: false,}}
-        />
+        
       </View>
     );
 

@@ -13,8 +13,6 @@ import { Colors } from '../utils/Colors';
 import ReportListItem from '../components/ReportListItem';
 import { Texts } from '../utils/Texts';
 import ReportModal from '../components/ReportModal';
-import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
 // import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const REPORTS = [
@@ -91,11 +89,7 @@ const ReportScreen = ({navigation, route}) => {
         }
         ListFooterComponent={
           <View style={styles.listFoot}>
-            <BannerAd
-              unitId={adUnitId}
-              size={BannerAdSize.MEDIUM_RECTANGLE}
-              requestOptions={{requestNonPersonalizedAdsOnly: false,}}
-            />
+            
           </View>
         }
       />
