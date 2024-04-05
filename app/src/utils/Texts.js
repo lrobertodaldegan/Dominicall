@@ -1,4 +1,4 @@
-const API_BASE_PATH = 'http://192.168.100.33:21017/dominicall/';
+const API_BASE_PATH = 'https://lucasrobertodev.com.br/dominicall/';//'http://192.168.100.33:21017/dominicall/';
 
 export const Texts = {
   Insta:'https://www.instagram.com/lucasrobertodev/',
