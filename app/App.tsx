@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import mobileAds from 'react-native-google-mobile-ads';
 import SplashScreen from 'react-native-splash-screen';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
@@ -22,6 +23,8 @@ const ScreensOptions = {
 const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
+  mobileAds().initialize();
+
   useEffect(() => {
     SplashScreen.hide()
   });
