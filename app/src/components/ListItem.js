@@ -65,11 +65,13 @@ export default function ListItem({
         {renderConfirmation()}
         
         <View style={styles.left}>
-          <Label value={title[0]} style={styles.titleLeft}/>
+          <Label value={title && title !== null ? title[0] : ''} 
+            style={styles.titleLeft}/>
         </View>
         <View style={styles.componentsWrap}>
           <View style={styles.titleWrap}>
-            <Label value={title} style={styles.title}/>
+            <Label value={title && title !== null ? title : ''} 
+              style={styles.title}/>
 
             {renderTrash()}
           </View>

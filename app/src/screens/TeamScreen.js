@@ -62,7 +62,10 @@ const TeamScreen = ({navigation}) => {
 
   const renderModal = () => {
     if(showModal === true){
-      return <MemberModal onClose={() => {search(); setShowModal(false);}}/>
+      return (
+        <MemberModal navigation={navigation}
+          onClose={() => {search(); setShowModal(false);}}/>
+      );
     }
 
     return <></>
