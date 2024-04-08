@@ -56,7 +56,9 @@ const InviteScreen = ({navigation, route}) => {
   const sendInvite = (user) => {
     if(!role || (role === 'Professor' && !classs)){
       setModal(
-        <MemberModal member={user} 
+        <MemberModal 
+          navigation={navigation}
+          member={user} 
           showInputs={false}
           showOptions={false}
           onClose={() => sendInvite(user)}/>

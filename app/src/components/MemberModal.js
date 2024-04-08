@@ -16,6 +16,7 @@ import { get, post } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 
 export default function MemberModal({
+                                navigation,
                                 member=null,
                                 classs=null, 
                                 showInputs=true,
@@ -242,7 +243,7 @@ export default function MemberModal({
             style={styles.legend}/>
 
           <Button label={'Convidar alguém'} 
-            onPress={() => navigation.navigate('invite')}
+            onPress={() => navigation.navigate('invite', {})}
             style={styles.input}
             loading={loading}
           />
