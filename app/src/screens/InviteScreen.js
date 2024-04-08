@@ -61,7 +61,7 @@ const InviteScreen = ({navigation, route}) => {
           member={user} 
           showInputs={false}
           showOptions={false}
-          onClose={() => sendInvite(user)}/>
+          onClose={() => setModal(<></>)}/>
       );
     } else {
       setLoading(true);
