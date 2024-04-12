@@ -1,0 +1,43 @@
+@keyframes backgroundSlide {
+    0% {
+        background:white;
+    }
+    100% {
+        background:#181818;
+    }
+}
+body{
+    overflow-x: hidden;
+    font-family: 'Martel Sans', sans-serif;
+}
+p {
+    text-align: justify;
+}
+.bg-black{
+    background-color: #000000;
+}
+
+.carousel-two a{
+    width: 100%;
+}
+
+
+#rodape{
+    color:#fff;
+}
+
+#rodape p{
+    text-align: center;
+}
+
+@media only screen and (min-width: 768px){
+    .hideOnMobile {
+        display:inline;
+    }
+    .showOnMobile {
+        display:none;
+    }
+    .centerOnMobile {
+        text-align:left
+    }
+}
