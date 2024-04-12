@@ -16,6 +16,11 @@ h4{
 p {
     text-align: justify;
 }
+p a,
+p a:active{
+    color: #000000;
+    font-weight: bold;
+}
 .bg-black{
     background-color: #000000;
     color:#fff;
