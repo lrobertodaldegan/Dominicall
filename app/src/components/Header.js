@@ -105,12 +105,6 @@ const Header = ({navigation, page='home'}) => {
 
       <View style={styles.wrap} elevation={2}>
 
-        <BannerAd
-          unitId={adUnitId}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{requestNonPersonalizedAdsOnly: false,}}
-        />
-
         <View style={styles.header}>
           <Logo />
 
