@@ -109,11 +109,13 @@ const styles = StyleSheet.create({
     height:screen.height * 0.12,
     backgroundColor:Colors.white,
     borderRadius:10,
-    marginBottom:10
+    marginBottom:10,
+    borderBottomWidth:1,
+    borderBottomColor:Colors.aWhite
   },
   titleLeft:{
     color:Colors.white,
-    fontSize:26
+    fontSize:24
   },
   left:{
     borderRadius:(screen.height * 0.15) * 0.5,
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
   },
   title:{
     color:Colors.black,
-    fontSize:22,
+    fontSize:20,
     fontFamily:'MartelSans-Bold',
   },
   titleWrap:{
@@ -157,7 +159,7 @@ const styles = StyleSheet.create({
   },
   dltTitle:{
     color:Colors.white,
-    fontSize:22,
+    fontSize:20,
     fontFamily:'MartelSans-Bold',
     textAlign:'center'
   },
@@ -168,14 +170,14 @@ const styles = StyleSheet.create({
   },
   dltLink:{
     color:Colors.black,
-    fontSize:16,
+    fontSize:14,
     textAlign:'center',
     marginRight:20,
     fontFamily:'MartelSans-Bold',
   },
   cnclLink:{
     color:Colors.white,
-    fontSize:16,
+    fontSize:14,
     textAlign:'center'
   },
 });

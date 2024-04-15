@@ -22,7 +22,6 @@ import Input from '../components/Input';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Button from '../components/Button';
 import MemberModal from '../components/MemberModal';
-// import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const InviteScreen = ({navigation, route}) => {
   const [filter, setFilter] = useState(null);
@@ -90,7 +89,6 @@ const InviteScreen = ({navigation, route}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      {/* <LicenseWarnModal navigation={navigation}/> */}
       
       {modal}
 
@@ -115,6 +113,7 @@ const InviteScreen = ({navigation, route}) => {
           <View style={styles.form}>
             <Input ico={faSearch}
               value={filter}
+              iconSize={20}
               onChange={setFilter}
               onEnter={search}
               placeholder='Informe um nome ou usuário'
@@ -142,7 +141,9 @@ const InviteScreen = ({navigation, route}) => {
           />
         }
         ListFooterComponent={
-          <View style={styles.listFoot}/>
+          <View style={styles.listFoot}>
+
+          </View>
         }
       />
 
@@ -170,13 +171,12 @@ const styles= StyleSheet.create({
   logo:{
     height:screen.height * 0.1,
     width:screen.height * 0.1,
-    marginTop:screen.height * 0.08,
   },
   title:{
-    fontSize:26,
+    fontSize:24,
     fontFamily:'MartelSans-Bold',
     color:Colors.dark,
-    marginVertical:screen.height * 0.05
+    marginVertical:screen.height * 0.02
   },
   legend:{
     fontSize:14,
@@ -185,6 +185,9 @@ const styles= StyleSheet.create({
     marginVertical:10
   },
   list:{
+    alignItems:'center',
+    paddingVertical:10,
+    width:screen.width * 0.95,
     marginVertical:20,
     backgroundColor:Colors.white,
     borderTopLeftRadius:20,

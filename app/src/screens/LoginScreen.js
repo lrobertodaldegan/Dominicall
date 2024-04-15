@@ -71,7 +71,10 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      <ScrollView contentContainerStyle={styles.subwrap} keyboardDismissMode='on-drag' keyboardShouldPersistTaps='always'>
+      <ScrollView contentContainerStyle={styles.subwrap} 
+          keyboardDismissMode='on-drag' 
+          keyboardShouldPersistTaps='always'>
+            
         <Logo style={styles.logo} />
 
         <View style={styles.formWrap}>
@@ -84,7 +87,8 @@ const LoginScreen = ({navigation}) => {
               value={pass}
               ico={faKey}
               hideValue={true}
-              iconSize={24}/>
+              iconSize={24}
+              onEnter={handleSubmit}/>
 
           {renderError()}
 
@@ -115,6 +119,9 @@ const styles= StyleSheet.create({
     backgroundColor:Colors.white,
     alignItems:'center',
     padding:10
+  },
+  formWrap:{
+    alignItems:'center'
   },
   subwrap:{
     height:screen.height,

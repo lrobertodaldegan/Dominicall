@@ -12,12 +12,12 @@ import ClassModal from "./ClassModal";
 import Label from "./Label";
 import ListItem from "./ListItem";
 import NewListItem from "./NewListItem";
-import { del, get } from "../service/Rest/RestService";
+import { del, get, put } from "../service/Rest/RestService";
 import { Texts } from "../utils/Texts";
 import CacheService from "../service/Cache/CacheService";
 
 export default function Classes({navigation}) {
-  const [comp, setComp] = useState('list');
+  const [comp, setComp] = useState(null);
   const [classList, setClassList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -25,8 +25,13 @@ export default function Classes({navigation}) {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    loadClassList();
+    setComp('list');
   }, []);
+
+  useEffect(() => {
+    if(comp === 'list')
+      loadClassList();
+  },[comp])
 
   const loadClassList = () => {
     setLoading(true);
@@ -134,6 +139,22 @@ export default function Classes({navigation}) {
     return <></>
   }
 
+  const handleNameChange = (newName) => {
+    let body = {
+      id: selected?._id,
+      name: newName
+    };
+
+    put(Texts.API.class, body).then(response => {
+      if(response.status === 200) {
+        ToastAndroid.show('Turma atualizada com sucesso!', ToastAndroid.BOTTOM);
+      } else {
+        if(response.data && response.data.message)
+          ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+      }
+    });
+  }
+
   if(comp === 'list'){
     return (
       <>
@@ -184,7 +205,13 @@ export default function Classes({navigation}) {
   }
 
   if(comp === 'class' && selected !== null){
-    return <Class navigation={navigation} item={selected} onGoBack={handleGoBack}/>
+    return (
+      <Class navigation={navigation} 
+        item={selected} 
+        onNameChange={handleNameChange}
+        onGoBack={handleGoBack}
+      />
+    );
   }
 
   return <></>

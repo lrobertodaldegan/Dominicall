@@ -66,18 +66,19 @@ export default function FinanceModal({onClose=()=>null}){
         <Label value={'Novo lançamento'} style={styles.title}/>
 
         <Input ico={faTag} 
-            placeholder='Título'
-            value={title}
-            iconSize={30}
-            style={styles.input}
-            onChange={setTitle}
-            onEnter={handleSubmit}
+          iconSize={18}
+          placeholder='Título'
+          value={title}
+          style={styles.input}
+          onChange={setTitle}
+          onEnter={handleSubmit}
           />
 
         <Input ico={faCoins} 
+          iconSize={18}
           placeholder='Valor'
           value={value}
-          iconSize={30}
+          keyboardType='numeric'
           style={styles.input}
           onChange={setValue}
           onEnter={handleSubmit}
@@ -168,8 +169,7 @@ const styles = StyleSheet.create({
   },
   paperSlctd:{
     borderColor:Colors.black,
-    borderWidth:4,
-    backgroundColor:Colors.offWhite
+    borderWidth:2,
   },
   paperLblSlctd:{
     fontFamily:'MartelSans-Bold'

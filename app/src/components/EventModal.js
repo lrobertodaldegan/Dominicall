@@ -4,13 +4,14 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
+import DatePicker from 'react-native-date-picker';
 import { faCalendarDay, faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons';
-import DatePicker from 'react-native-modern-datepicker';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
 import Modal from './Modal';
 import Button from './Button';
+import Link from './Link';
 import { post } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import { Days } from '../utils/Days';
@@ -22,7 +23,8 @@ export default function EventModal({
 
   const [event, setEvent] = useState(null);
   const [teacher, setTeacher] = useState(null);
-  const [dt, setDt] = useState(null);
+  const [dt, setDt] = useState(new Date());
+  const [showDtPicker, setShowDtPicker] = useState(false);
   const [err, setErr] = useState(null);
   const [loading, setLoading] = useState(null);
 
@@ -39,15 +41,9 @@ export default function EventModal({
           setErr('Por favor, informe a data do evento.');
           setLoading(false);
         } else {
-          let dts = dt.split('/');
-          let d = new Number(dts[2]);
-          let m = new Number(dts[1]);
-          let y = new Number(dts[0]);
-          let dtf = new Date(y, m-1, d);
-
           let body = {
             classId:classs._id,
-            dt:Days.label(dtf),
+            dt:Days.label(dt),
             name:event,
             teacher:teacher
           };
@@ -79,32 +75,39 @@ export default function EventModal({
       <View>
         <Label value={'Novo Evento'} style={styles.title}/>
 
+        <Link label={`Data do evento: ${dt && dt !== null ? Days.simpleLabel(dt): 'Não informado'}\nToque para alterar`}
+          style={styles.lblDn}
+          onPress={() => setShowDtPicker(true)}
+        />
+
         <Input ico={faCalendarDay} 
-            placeholder='Nome do evento'
+            iconSize={18}
+            placeholder='Evento'
             value={event}
-            iconSize={30}
             style={styles.input}
             onChange={setEvent}
             onEnter={handleSubmit}
         />
 
         <Input ico={faChalkboardTeacher} 
-            placeholder='Nome do professor'
+            iconSize={18}
+            placeholder='Palestrante'
             value={teacher}
-            iconSize={30}
             style={styles.input}
             onChange={setTeacher}
             onEnter={handleSubmit}
         />
 
         <DatePicker 
-          mode='calendar'
-          style={styles.dtPicker}
-          options={{
-            defaultFont:'MartelSans-Regular',
-            mainColor: Colors.black,
-          }}
-          onSelectedChange={date => setDt(date)}
+          date={dt} 
+          mode='date'
+          theme='light'
+          modal={true}
+          title='Informe a data do evento:'
+          open={showDtPicker}
+          onClose={() => setShowDtPicker(false)}
+          onCancel={() => setShowDtPicker(false)}
+          onConfirm={(newDt) => {setShowDtPicker(false); setDt(newDt);}}
         />
 
         {renderError()}
@@ -138,10 +141,9 @@ const styles = StyleSheet.create({
   input:{
     width:screen.width * 0.8
   },
-  dtPicker:{
-    width:screen.width * 0.8,
-    marginBottom:10,
-    borderRadius:10
+  lblDn:{
+    textAlign:'center',
+    marginBottom: 10
   },
   error:{
     color:Colors.red,
