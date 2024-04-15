@@ -1,47 +1,43 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
-  Dimensions,
   StyleSheet,
-  ScrollView,
+  Dimensions,
+  ImageBackground,
   ToastAndroid,
+  RefreshControl,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons';
+import fundo from '../assets/img/fundo.png';
+import Button from '../components/Button';
+import Input from '../components/Input';
+import {get, post} from '../service/Rest/RestService';
+import Header from '../components/Header';
+import By from '../components/By';
 import { Colors } from '../utils/Colors';
-import Input from './Input';
-import Label from './Label';
-import Modal from './Modal';
-import Button from './Button';
-import { get, post } from '../service/Rest/RestService';
+import Label from '../components/Label';
 import { Texts } from '../utils/Texts';
+import Link from '../components/Link';
 
-export default function MemberModal({
-                                navigation,
-                                member=null,
-                                classs=null, 
-                                showInputs=true,
-                                showOptions=true,
-                                onClose=()=>null}){
+const NewMemberScreen = ({navigation, route}) => {
   const [name, setName] = useState(null);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [paper, setPaper] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [clas, setClas] = useState(classs);
   const [classes, setClasses] = useState([]);
+  const [clas, setClas] = useState(classs);
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
-  const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    setPaper('Professor');
-    setClas(classs && classs !== null ? classs : null);
-    setShowForm(!(showOptions === true));
+  const {classs} = route.params;
 
-    if(member && member !== null){
-      setName(member.name);
-      setUsername(member.username);
-      setEmail(member.email);
-    }
+  useEffect(()=>{
+    searchClasses();
+  },[]);
+
+  const searchClasses = () => {
+    setLoading(true);
 
     get(Texts.API.class).then(response => {
       if(response.status === 200){
@@ -50,11 +46,14 @@ export default function MemberModal({
         if(response.data && response.data.message)
           ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
       }
+
+      setLoading(false);
     });
-  }, []);
+  }
 
   const handleSubmit = () => {
-    if(name && name !== null && paper && paper !== null
+    if(name && name !== null 
+            && paper && paper !== null
             && username && username !== null){
 
       if(paper === 'Professor' && (!clas || clas === null)){
@@ -76,7 +75,9 @@ export default function MemberModal({
           setLoading(false);
           
           if(response.status === 201){
-            onClose();
+            ToastAndroid.show('Membro cadastrado com sucesso!', ToastAndroid.BOTTOM);
+            
+            navigation.goBack();
           } else {
             if(response.data && response.data.message)
               setErr(response.data.message);
@@ -85,7 +86,10 @@ export default function MemberModal({
       }
     } else {
       setLoading(false);
-      setErr('Por favor, informe todos os dados necessários.');
+      setErr('Por favor, preencha os campos necessários.');
+
+      ToastAndroid.show('Por favor, preencha os campos necessários.', 
+                        ToastAndroid.BOTTOM);
     }
   }
 
@@ -108,7 +112,7 @@ export default function MemberModal({
     if(paper === 'Professor' && classs === null){
       return (
         <>
-          <Label value={'Escolha uma classe para o professor:'}
+          <Label value={'Escolha uma turma para o professor:'}
               style={styles.lbl}/>
           
           <View style={styles.papers}>
@@ -143,12 +147,67 @@ export default function MemberModal({
     return <></>
   }
 
-  const renderInputs = () => {
-    if(showInputs === true){
-      return (
-        <>
+  return (
+    <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
+      <Header page={'profile'} navigation={navigation}/>
+
+      <KeyboardAwareScrollView contentContainerStyle={styles.subwrap} 
+          enableOnAndroid={true}
+          refreshControl={
+            <RefreshControl refreshing={loading} 
+              onRefresh={searchClasses}
+            />
+          }
+          keyboardShouldPersistTaps='always'>
+
+        <View style={styles.formWrap}>
+
+          <Link onPress={() => navigation.goBack()} label={'< Voltar'}/>
+
+          <Label value={'Novo membro'}
+            style={styles.title}/>
+
+          <Label value={'Escolha uma função para o membro:'}
+            style={styles.lbl}/>
+
+          <View style={styles.papers}>
+            <Button label={'Coordenador'} 
+              onPress={() => setPaper(paper === 'Coordenador' ? null : 'Coordenador')}
+              labelStyle={[
+                styles.paperBtnLbl,
+                paper === 'Coordenador' ? styles.paperLblSlctd : {}
+              ]}
+              style={[
+                styles.paperBtn,
+                paper === 'Coordenador' ? styles.paperSlctd : {}
+              ]}
+            />
+            <Button label={'Professor'} 
+              onPress={() => setPaper(paper === 'Professor' ? null : 'Professor')}
+              labelStyle={[
+                styles.paperBtnLbl,
+                paper === 'Professor' ? styles.paperLblSlctd : {}
+              ]}
+              style={[
+                styles.paperBtn,
+                paper === 'Professor' ? styles.paperSlctd : {}
+              ]}
+            />
+            <Button label={'Auxiliar'} 
+              onPress={() => setPaper(paper === 'Auxiliar' ? null : 'Auxiliar')}
+              labelStyle={[
+                styles.paperBtnLbl,
+                paper === 'Auxiliar' ? styles.paperLblSlctd : {}
+              ]}
+              style={[
+                styles.paperBtn,
+                paper === 'Auxiliar' ? styles.paperSlctd : {}
+              ]}
+            />
+          </View>
+
           <Input ico={faUser} 
-            placeholder='Nome do membro'
+            placeholder={`Nome do ${paper && paper !== null ? paper : 'membro'}`}
             value={name}
             style={styles.input}
             onChange={handleChangeName}
@@ -170,118 +229,45 @@ export default function MemberModal({
             onChange={setEmail}
             onEnter={handleSubmit}
           />
-        </>
-      );
-    } else {
-      return <></>
-    }
-  }
-
-  const renderComp = () => {
-    if(showForm === true) {
-      return (
-        <>
-          {renderInputs()}
-
-          <Label value={'Escolha uma função para o membro:'}
-              style={styles.lbl}/>
-
-          <View style={styles.papers}>
-            <Button label={'Coordenador'} 
-                onPress={() => setPaper('Coordenador')}
-                labelStyle={[
-                  styles.paperBtnLbl,
-                  paper === 'Coordenador' ? styles.paperLblSlctd : {}
-                ]}
-                style={[
-                  styles.paperBtn,
-                  paper === 'Coordenador' ? styles.paperSlctd : {}
-                ]}
-            />
-            <Button label={'Professor'} 
-                onPress={() => setPaper('Professor')}
-                labelStyle={[
-                  styles.paperBtnLbl,
-                  paper === 'Professor' ? styles.paperLblSlctd : {}
-                ]}
-                style={[
-                  styles.paperBtn,
-                  paper === 'Professor' ? styles.paperSlctd : {}
-                ]}
-            />
-            <Button label={'Auxiliar'} 
-                onPress={() => setPaper('Auxiliar')}
-                labelStyle={[
-                  styles.paperBtnLbl,
-                  paper === 'Auxiliar' ? styles.paperLblSlctd : {}
-                ]}
-                style={[
-                  styles.paperBtn,
-                  paper === 'Auxiliar' ? styles.paperSlctd : {}
-                ]}
-            />
-          </View>
 
           {renderClasses()}
 
           {renderError()}
 
           <Button label={'Salvar'} 
-              onPress={handleSubmit}
-              style={styles.input}
-              loading={loading}
-          />
-        </>
-      );
-    } else {
-      return (
-        <>
-          <Label value={'Você pode convidar alguém que já usa o APP ou criar um usuário novo para alguém.\nO que você quer fazer?'} 
-            style={styles.legend}/>
-
-          <Button label={'Convidar alguém'} 
-            onPress={() => navigation.navigate('invite', {})}
+            onPress={handleSubmit}
             style={styles.input}
             loading={loading}
           />
+        </View>
 
-          <Button label={'Criar usuário'} 
-            onPress={() => navigation.navigate('new-member', {classs: clas})}
-            style={styles.input}
-            loading={loading}
-          />
-        </>
-      );
-    }
-  }
-
-  return (
-    <Modal onClose={onClose} content={
-      <ScrollView contentContainerStyle={styles.input}
-          keyboardDismissMode='on-drag'
-          keyboardShouldPersistTaps='always'>
-
-        <Label value={'Novo membro'} style={styles.title}/>
-
-        {renderComp()}
-
-      </ScrollView>
-    }/>
+      </KeyboardAwareScrollView>
+      <By />
+    </ImageBackground>
   );
 }
 
 const screen = Dimensions.get('screen');
 
-const styles = StyleSheet.create({
+const styles= StyleSheet.create({
   wrap:{
-  
+    height:screen.height,
+    width:screen.width,
+    backgroundColor:Colors.white,
+    alignItems:'center',
+    padding:10
+  },
+  subwrap:{
+    height:screen.height * 2,
+    width:screen.width - 20,
+    alignItems:'center',
+    paddingVertical: screen.height * 0.05,
   },
   title:{
     color:Colors.black,
-    textAlign:'center',
-    fontSize:20,
-    marginBottom:20,
-    fontFamily:'MartelSans-Bold'
+    fontSize:22,
+    fontFamily: 'MartelSans-Bold',
+    textAlign:'center' 
   },
   legend:{
     color:Colors.black,
@@ -292,19 +278,18 @@ const styles = StyleSheet.create({
     color:Colors.black,
     fontSize:18,
     marginTop:20,
+    textAlign:'center'
   },
   input:{
     width:screen.width * 0.8
   },
   papers:{
-    flexDirection:'row',
-    width:screen.width * 0.8,
     flexWrap:'wrap',
     justifyContent:'space-between',
     marginBottom:10
   },
   paperBtn:{
-    width: (screen.width * 0.8) * 0.45,
+    width: screen.width * 0.8,
     backgroundColor:Colors.white
   },
   paperBtnLbl:{
@@ -314,8 +299,7 @@ const styles = StyleSheet.create({
   },
   paperSlctd:{
     borderColor:Colors.black,
-    borderWidth:4,
-    backgroundColor:Colors.offWhite
+    borderWidth:2,
   },
   paperLblSlctd:{
     fontFamily:'MartelSans-Bold'
@@ -327,3 +311,5 @@ const styles = StyleSheet.create({
     fontFamily:'MartelSans-Bold'
   },
 });
+
+export default NewMemberScreen;

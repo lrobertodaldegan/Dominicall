@@ -15,6 +15,7 @@ import {
   FlatList,
   RefreshControl,
   ToastAndroid,
+  Keyboard,
 } from 'react-native';
 import { Colors } from '../utils/Colors';
 import { Days } from '../utils/Days';
@@ -188,11 +189,21 @@ export default function Class({
 
   const handleNameChanging = (v) => {
     setName(v);
-    setShowSave(v !== item?.name);
+
+    if(v === item?.name){
+      setShowSave(false);
+      
+      if(Keyboard.isVisible())
+        Keyboard.dismiss();
+    } else {
+      setShowSave(true);
+    }
   }
 
   const handleSubmitNameChanging = () => {
     onNameChange(name);
+
+    setShowSave(false);
   }
 
   const sendRemove = (url) => {
@@ -233,7 +244,7 @@ export default function Class({
   const renderSave = () => {
     if(showSave === true){
       return (
-        <Button label={'Salvar'}/>
+        <Button label={'Salvar'} onPress={handleSubmitNameChanging}/>
       );
     }
 
@@ -429,7 +440,7 @@ export default function Class({
 
   const renderModal = () => {
     if(showModal === true){
-      if(page === 'students')
+      if(page === 'students' || page == 'studentsCad')
         return <StudentModal classs={item} onClose={handleModalClose}/>
 
       if(page === 'offers')
@@ -474,12 +485,15 @@ export default function Class({
   const renderClassHeader = () => {
     return (
       <>
-        <Link onPress={onGoBack} label={'< Voltar'}/>
+        <View style={styles.topLabels}>
+          <Link onPress={onGoBack} label={'< Voltar'}/>
+
+          <Label value={Days.label()} style={styles.dt}/>
+        </View>
 
         <View style={styles.header}>
-          <Label value={Days.label()} style={styles.dt}/>
-
           <Input placeholder={item.name} 
+              iconSize={18}
               value={name}
               onChange={handleNameChanging}
               onEnter={handleSubmitNameChanging}
@@ -488,9 +502,13 @@ export default function Class({
               inputStyle={styles.input}
           />
 
+          <Label value={'Toque acima para alterar o nome da turma'}
+            style={styles.lbl}/>
+
           {renderSave()}
 
           <FlatList 
+            contentContainerStyle={styles.headerOptionsList}
             keyboardDismissMode='on-drag'
             keyboardShouldPersistTaps='always'
             horizontal
@@ -498,6 +516,7 @@ export default function Class({
             keyExtractor={(item) => item.id}
             renderItem={({item}) => 
               <IconLabel icon={item.icon} 
+                iconSize={20}
                 label={item.title}
                 style={styles.opts}
                 lblStyle={styles.opt}
@@ -527,7 +546,6 @@ export default function Class({
         }
         ListHeaderComponent={
           <FlatList 
-            contentContainerStyle={styles.wrap}
             keyboardDismissMode='on-drag'
             keyboardShouldPersistTaps='always'
             ListHeaderComponent={renderClassHeader()}
@@ -558,31 +576,35 @@ const styles = StyleSheet.create({
   wrap:{
     backgroundColor:Colors.white,
     marginTop:20,
-    width:screen.width - 10,
     borderRadius:20,
     padding:5,
   },
   header:{
     alignItems:'center',
+    maxWidth:screen.width * 0.93
+  },
+  topLabels:{
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+    paddingHorizontal: 10
   },
   dt:{
     color:Colors.black,
     fontSize:12
   },
   inputWrap:{
-    minWidth:screen.width * 0.5,
-    maxWidth:screen.width - 40,
+    marginVertical: 10
   },
-  input:{
-    textAlign:'center',
-    minWidth:((screen.width - 40) * 0.5) * 0.9,
-    maxWidth:(screen.width - 40) * 0.8,
+  headerOptionsList:{
+    alignItems:'center',
+    marginTop:10,
   },
   opt:{
-    fontSize:14
+    fontSize:12
   },
   opts:{
-    marginHorizontal:25
+    marginRight:screen.width * 0.1
   },
   lbl:{
     color:Colors.black,

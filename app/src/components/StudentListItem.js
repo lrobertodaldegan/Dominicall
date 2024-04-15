@@ -17,50 +17,66 @@ export default function StudentListItem({
                                     item, 
                                     onOfferPress=(item)=>null,
                                   }) {
-
+  const [changed, setChanged] = useState(false);
   const [presenceId, setPresenceId] = useState(item.presence?._id);
   const [selected, setSelected] = useState(false);
   const [bible, setBible] = useState(false);
   const [book, setBook] = useState(false);
 
   useEffect(() => {
-    if(selected === false){
-      setPresenceId(null);
-      setBible(false);
-      setBook(false);
+    setChanged(false);
 
-      if(presenceId && presenceId !== null){
-        del(`${Texts.API.presences}/${presenceId}`).then(response => {
-          if(response.status !== 200 && response.data && response.data.message)
+    if(item && item !== null){
+      setSelected((item.presence && item.presence !== null) === true);
+      setBook(item.presence?.book === true);
+      setBible(item.presence?.bible === true);
+    } else {
+      setSelected(false);
+      setBook(false);
+      setBible(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if(changed === true){
+      if(selected === false){
+        setPresenceId(null);
+        setBible(false);
+        setBook(false);
+
+        if(presenceId && presenceId !== null){
+          del(`${Texts.API.presences}/${presenceId}`).then(response => {
+            if(response.status !== 200 && response.data && response.data.message)
+              ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+          });
+        }
+      } else if(selected === true) {
+        let body = {
+          classId: item.clas,
+          studentId: item._id,
+          bible: bible,
+          book: book
+        };
+
+        post(Texts.API.presences, body).then(response => {
+          if(response.status === 201 && response.data && response.data.message)
             ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
+
+          setPresenceId(response.data._id);
         });
       }
-    }
-    
-    if(selected === true) {
-      let body = {
-        classId: item.clas,
-        studentId: item._id,
-        bible: bible,
-        book: book
-      };
-
-      post(Texts.API.presences, body).then(response => {
-        if(response.status === 201 && response.data && response.data.message)
-          ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
-
-        setPresenceId(response.data._id);
-      });
     }
   }, [selected]);
 
   useEffect(() => {
+    setChanged(true);
+
     if(selected === true) {
       let body = {bible: bible,book: book};
-     
+    
       if(presenceId && presenceId !== null){
         put(`${Texts.API.presences}/${presenceId}`, body).then(response => { 
-          if(response.status !== 201 && response.data && response.data.message)
+          if(response.status !== 200 && response.data && response.data.message)
             ToastAndroid.show(response.data.message, ToastAndroid.BOTTOM);
         });
       }
@@ -68,7 +84,7 @@ export default function StudentListItem({
 
     if(selected === false && (bible === true || book == true))
       setSelected(true);
-  }, [bible, book]);
+  }, [book, bible]);
 
   const handleBibleOrBookPress = (pressOn) => { 
     let bi = bible === true;
@@ -90,7 +106,7 @@ export default function StudentListItem({
       checklistLbl='Ausente'
       checklistSelectedLbl='Presente'
       selected={selected}
-      onSelect={() => setSelected(!selected)}
+      onSelect={() => {setChanged(true); setSelected(!selected);}}
       removable={false}
       bottomComponent={
         <View style={styles.botWrap}>
@@ -137,7 +153,7 @@ const styles = StyleSheet.create({
     marginTop:10,
   },
   botOpt:{
-    marginRight:screen.width * 0.2
+    marginRight:screen.width * 0.1
   },
   botLbl:{
     color:Colors.darkerGray

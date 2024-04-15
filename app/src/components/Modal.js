@@ -15,7 +15,7 @@ export default function Modal({onClose=()=>null, closable=true, content=<></>}){
       return (
         <TouchableHighlight underlayColor={'transparent'}
             onPress={() => onClose()}>
-          <Icon icon={faX} size={26}/>
+          <Icon icon={faX} size={22}/>
         </TouchableHighlight>
       );
     }
@@ -24,7 +24,7 @@ export default function Modal({onClose=()=>null, closable=true, content=<></>}){
   }
   
   return (
-    <View style={styles.wrap}>
+    <View style={styles.wrap} elevation={5}>
       <View style={styles.subWrap}>
         <View style={styles.header}>
           {renderClose()}
@@ -50,16 +50,16 @@ const styles = StyleSheet.create({
     opacity:0.95,
     padding:10,
     alignItems:'center',
-    justifyContent:'center',
   },
   subWrap:{
-    borderWidth:2,
-    borderColor:Colors.darkerGray,
-    borderRadius:20,
+    borderWidth:1,
+    borderColor:Colors.offWhite,
+    borderRadius:10,
     width:screen.width - 20,
     padding:10,
     backgroundColor:Colors.white,
     zIndex:10,
+    marginTop:screen.height * 0.05
   },
   header:{
     justifyContent:'center',

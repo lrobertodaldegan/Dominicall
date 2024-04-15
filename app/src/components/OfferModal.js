@@ -73,9 +73,9 @@ export default function OfferModal({classs, offerer=null, onClose=()=>null}){
         <Label value={'Oferta'} style={styles.title}/>
 
         <Input ico={faCoins} 
+            iconSize={18}
             placeholder='Valor ofertado'
             value={value}
-            iconSize={30}
             keyboardType={'numeric'}
             style={styles.input}
             onChange={setValue}
@@ -83,9 +83,9 @@ export default function OfferModal({classs, offerer=null, onClose=()=>null}){
         />
 
         <Input ico={faGraduationCap} 
+            iconSize={18}
             placeholder='Ofertante (opcional)'
             value={offererr}
-            iconSize={30}
             style={styles.input}
             onChange={setOffererr}
             onEnter={handleSubmit}

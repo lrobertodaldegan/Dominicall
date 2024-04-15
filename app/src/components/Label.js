@@ -15,7 +15,7 @@ const Label = ({value, style={}}) => {
 const styles = StyleSheet.create({
   lbl:{
     color:Colors.white,
-    fontSize:16,
+    fontSize:14,
     fontFamily:'MartelSans-Regular'
   }
 });

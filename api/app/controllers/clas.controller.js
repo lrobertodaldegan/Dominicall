@@ -72,6 +72,8 @@ exports.update = (req, res) => {
   if(req.body.id && req.body.name) {
     Clas.findById(req.body.id).then(clas => {
       if(clas){
+        clas.name = req.body.name;
+        
         clas.save().then(clas => {
           res.status(200).send({message:`Turma ${clas.name} atualizada com sucesso!`});
         }).catch(err => errorHandler(err, res));

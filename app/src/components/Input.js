@@ -5,13 +5,14 @@ import {
   Dimensions,
   View,
   TouchableHighlight,
+  Keyboard,
 } from 'react-native';
 import { Colors } from '../utils/Colors';
 import Icon from './Icon';
 
 
 export default function Input({
-                        iconSize=18, 
+                        iconSize=26, 
                         iconStyle={},
                         ico=null,
                         style={},
@@ -47,6 +48,13 @@ export default function Input({
 
     return <></>
   }
+
+  const handleKeyboardSubmit = () => {
+    if(Keyboard.isVisible())
+      Keyboard.dismiss();
+
+    onEnter(value);
+  }
   
   return (
     <View style={[styles.wrap, style]}>
@@ -57,7 +65,7 @@ export default function Input({
           placeholder={placeholder}
           value={value} 
           keyboardType={keyboardType}
-          onSubmitEditing={onEnter}
+          onSubmitEditing={handleKeyboardSubmit}
           onChangeText={onChange}
           secureTextEntry={!showValue}
       />
@@ -71,16 +79,18 @@ const styles= StyleSheet.create({
   wrap:{
     flexDirection:'row',
     alignItems:'center',
-    width:screen.width - 20,
+    width:screen.width * 0.8,
     paddingHorizontal:10,
     backgroundColor:Colors.white,
     borderRadius:10,
-    marginBottom:10
+    marginBottom:10,
+    borderWidth:1,
+    borderColor:Colors.black
   },
   input:{
     borderRadius:10,
     marginVertical: 5,
-    height:screen.height * 0.06,
+    minHeight:screen.height * 0.05,
     paddingHorizontal:10,
     fontFamily:'MartelSans-Regular',
     color:Colors.black,

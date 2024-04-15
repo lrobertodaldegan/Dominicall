@@ -60,7 +60,6 @@ export default function GroupModal({group=null, onClose=()=>null}){
         <Input ico={faUsers} 
             placeholder='Nome do grupo'
             value={name}
-            iconSize={30}
             style={styles.input}
             onChange={setName}
             onEnter={handleSubmit}

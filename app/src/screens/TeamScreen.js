@@ -21,7 +21,6 @@ import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
 import { BannerAd,BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 const adUnitId = __DEV__ ? TestIds.BANNER : Texts.Ads.bannerBot;
-// import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const TeamScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
@@ -75,8 +74,6 @@ const TeamScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      {/* <LicenseWarnModal navigation={navigation}/> */}
-
       <Header page={'team'} navigation={navigation}/>
 
       {renderModal()}

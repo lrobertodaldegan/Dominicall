@@ -1,12 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {
-  View,
   Dimensions,
   StyleSheet,
   ScrollView,
 } from 'react-native';
 import { faCheckSquare, faGraduationCap, faMobile } from '@fortawesome/free-solid-svg-icons';
-import DatePicker, {getFormatedDate} from 'react-native-modern-datepicker';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
@@ -16,39 +14,36 @@ import IconLabel from './IconLabel';
 import { Texts } from '../utils/Texts';
 import { post, put } from '../service/Rest/RestService';
 import Link from './Link';
+import DatePicker from 'react-native-date-picker';
+import { Days } from '../utils/Days';
 
 export default function StudentModal({classs, student=null, onClose=()=>null}){
   const [name, setName] = useState(null);
   const [number, setNumber] = useState(null);
   const [churchMember, setChurchMember] = useState(null);
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(new Date());
   const [oldDn, setOldDn] = useState(null);
   const [showDtPicker, setShowDtPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
-    setDate(null);
+    setDate(new Date());
     setName(student?.name);
     setNumber(student?.number);
     setChurchMember(student?.churchMember);
 
     if(student?.dn){
-      setOldDn(student?.dn);
-      
-      let dt = new Date(student?.dn);
-
-      let di = dt.getDate();
-      di = di < 10 ? `0${di}` : di;
-
-      let m = dt.getMonth() + 1;
-      m = m < 10 ? `0${m}` : m;
-
-      setDate(`${dt.getFullYear()}/${m}/${di}`);
+      setOldDn(new Date(student?.dn));
+      setDate(new Date(student?.dn));
     }
     
     setErr(null);
   }, []);
+
+  useEffect(() => {
+    setOldDn(date)
+  }, [date]);
 
   const handleSubmit = () => {
     if(name && name !== null){
@@ -57,15 +52,8 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
 
       let dtf = null;
 
-      if(date && date !== null){
-        let dts = date.split('/');
-
-        let d = new Number(dts[2]);
-        let m = new Number(dts[1]);
-        let y = new Number(dts[0]);
-
-        dtf = new Date(y, m-1, d);
-      }
+      if(date && date !== null)
+        dtf = date.getTime();
 
       let body = {
         name:name,
@@ -75,7 +63,7 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
       };
 
       if(dtf && dtf !== null)
-        body.dn = dtf.getTime();
+        body.dn = dtf;
 
       if(student && student !== null){
         put(`${Texts.API.students}/${student._id}`, body).then(response => {
@@ -113,28 +101,6 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
     return <></>
   }
 
-  const renderDtPicker = () => {
-    if(showDtPicker === true){
-      let d = oldDn ? oldDn : new Date();
-
-      return (
-        <DatePicker 
-          mode='calendar'
-          style={styles.dtPicker}
-          options={{
-            defaultFont:'MartelSans-Regular',
-            mainColor: Colors.black,
-          }}
-          selected={getFormatedDate(d, 'YYYY/MM/DD')}
-          current={getFormatedDate(d, 'YYYY/MM/DD')}
-          onSelectedChange={daate => setDate(daate)}
-        />
-      );
-    }
-
-    return <></>
-  }
-
   return (
     <Modal onClose={onClose} content={
       <ScrollView contentContainerStyle={styles.wrap}
@@ -146,7 +112,6 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
         <Input ico={faGraduationCap} 
           placeholder='Nome do aluno'
           value={name}
-          iconSize={30}
           style={styles.input}
           onChange={setName}
           onEnter={handleSubmit}
@@ -155,18 +120,27 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
         <Input ico={faMobile} 
           placeholder='Telefone'
           value={number}
-          iconSize={30}
           style={styles.input}
           onChange={setNumber}
           onEnter={handleSubmit}
         />
 
-        <Link label={`Data de nascimento: ${oldDn ? getFormatedDate(oldDn, 'DD/MM/YYYY') : 'Não informado'}\nToque para alterar`}
+        <Link label={`Data de nascimento: ${oldDn ? Days.simpleLabel(oldDn) : 'Não informado'}\nToque para alterar`}
           style={styles.lblDn}
           onPress={() => setShowDtPicker(true)}
         />
 
-        {renderDtPicker()}
+        <DatePicker 
+          date={date} 
+          mode='date'
+          theme='light'
+          modal={true}
+          open={showDtPicker}
+          title='Informe a data de nascimento do aluno:'
+          onClose={() => setShowDtPicker(false)}
+          onCancel={() => setShowDtPicker(false)}
+          onConfirm={(newDt) => {setShowDtPicker(false); setDate(newDt);}}
+        />
 
         <IconLabel
           icon={faCheckSquare}

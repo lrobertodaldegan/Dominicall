@@ -12,7 +12,6 @@ import fundo from '../assets/img/fundo.png';
 import By from '../components/By';
 import Header from '../components/Header';
 import NewListItem from '../components/NewListItem';
-// import LicenseWarnModal from '../components/LicenseWarnModal';
 import { Colors } from '../utils/Colors';
 import { get, del } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
@@ -61,6 +60,21 @@ const FinanceScreen = ({navigation}) => {
     });
   }
 
+  const getTotal = () => {
+    let t = 0;
+
+    if(itens && itens !== null){
+      for(let i=0; i< itens.length; i++){
+        if(itens[i].type === 'Entrada')
+          t += itens[i].value;
+        else
+          t -= itens[i].value;
+      }
+    }
+
+    return t;
+  }
+
   const renderModal = () => {
     if(showModal === true)
       return <FinanceModal onClose={() => {search(); setShowModal(false);}}/>
@@ -70,7 +84,6 @@ const FinanceScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      {/* <LicenseWarnModal navigation={navigation}/> */}
 
       <Header page={'finance'} navigation={navigation}/>
 
@@ -94,12 +107,18 @@ const FinanceScreen = ({navigation}) => {
         renderItem={({item}) => 
           <NumberListItem
             onRemove={() => handleRemove(item)}
-            number={item.value}
-            subtitle={`${item.title} - ${item.dt}`}
+            number={item.type === 'Entrada' ? item.value : item.value * -1}
+            subtitle={`${item.title} \n${item.dt}`}
           />
         }
         ListFooterComponent={
           <View style={styles.listFoot}>
+            <NumberListItem
+              number={getTotal()}
+              subtitle='Total'
+              showRemove={false}
+            />
+
             <BannerAd
               unitId={adUnitId}
               size={BannerAdSize.MEDIUM_RECTANGLE}
@@ -131,7 +150,7 @@ const styles= StyleSheet.create({
     color:Colors.gray
   },
   lblUser:{
-    fontSize: 14,
+    fontSize: 12,
     color:Colors.gray
   },
   listFoot:{
