@@ -21,7 +21,8 @@ exports.getClasses = (req, res) => {
   Clas.find({
     group:req.groupId
   })
-  .exec()
+  .collation({locale:'pt', strength: 2})
+  .sort({name:1})
   .then(async (classes) => {
     let result = [];
     let status = 204;
@@ -388,6 +389,8 @@ exports.getStudents = (req, res) => {
   Student.find({
     clas:req.query.classId,
   })
+  .collation({locale:'pt', strength: 2})
+  .sort({name:1})
   .then(async (students) => {
     let status = students && students.length > 0 ? 200 : 204;
 
