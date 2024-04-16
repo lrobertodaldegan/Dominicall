@@ -388,6 +388,8 @@ exports.getStudents = (req, res) => {
   Student.find({
     clas:req.query.classId,
   })
+  .collation({locale:'pt', strength: 2})
+  .sort({name:1})
   .then(async (students) => {
     let status = students && students.length > 0 ? 200 : 204;
 
