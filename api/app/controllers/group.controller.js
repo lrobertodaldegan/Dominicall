@@ -256,6 +256,8 @@ exports.groupMembers = (req, res) => {
           role:m.role.name
         });
       }
+
+      result.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     res.status(status).send({members:result});

@@ -11,7 +11,6 @@ app.use(express.urlencoded({ extended: true, limit:'50mb' }));
 //start mongoose
 const db = require("./app/models");
 const Role = db.role;
- 
 const dbConfig = require("./app/config/db.config");
  
 db.mongoose
@@ -30,35 +29,35 @@ db.mongoose
  
 function initial() {
   Role.estimatedDocumentCount()
-    .then((count) => {
-      if (count === 0) {
-        new Role({name: "Coordenador"})
-        .save()
-        .then(() => console.log("Role 'Coordenador' adicionado"))
-        .catch(err => {
-          if (err)
-            console.log("Erro ao tentar adicionar Role 'Coordenador'", err);
-        });
- 
-        new Role({name: "Professor"}).save()
-        .then(() => console.log("Role 'Professor' adicionado"))
-        .catch(err => {
-          if (err)
-            console.log("Erro ao tentar adicionar Role 'Professor'", err);
-        });
+  .then((count) => {
+    if (count === 0) {
+      new Role({name: "Coordenador"})
+      .save()
+      .then(() => console.log("Role 'Coordenador' adicionado"))
+      .catch(err => {
+        if (err)
+          console.log("Erro ao tentar adicionar Role 'Coordenador'", err);
+      });
 
-        new Role({name: "Auxiliar"}).save()
-        .then(() => console.log("Role 'Auxiliar' adicionado"))
-        .catch(err => {
-          if (err)
-            console.log("Erro ao tentar adicionar Role 'Auxiliar'", err);
-        });
-      }
-    })
-    .catch(err => {
-      if (err)
-        console.log("error", err);
-    });
+      new Role({name: "Professor"}).save()
+      .then(() => console.log("Role 'Professor' adicionado"))
+      .catch(err => {
+        if (err)
+          console.log("Erro ao tentar adicionar Role 'Professor'", err);
+      });
+
+      new Role({name: "Auxiliar"}).save()
+      .then(() => console.log("Role 'Auxiliar' adicionado"))
+      .catch(err => {
+        if (err)
+          console.log("Erro ao tentar adicionar Role 'Auxiliar'", err);
+      });
+    }
+  })
+  .catch(err => {
+    if (err)
+      console.log("error", err);
+  });
 }
 //end mongoose
  

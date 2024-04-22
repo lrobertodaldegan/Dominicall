@@ -348,16 +348,26 @@ exports.getPresences = (req, res) => {
 }
 
 exports.createPresence = (req, res) => {
-  new Presence({
+  Presence.findOne({
     dt: req.body.dt ? req.body.dt : util.date.dateLabel(),
     clas: req.body.classId,
     student: req.body.studentId,
-    bible: req.body.bible === true,
-    book: req.body.book === true
-  })
-  .save()
-  .then(presence => {
-    res.status(201).send(presence);
+  }).then(presence => {
+    if(presence && presence !== null){
+      res.status(201).send(presence);
+    } else {
+      new Presence({
+        dt: req.body.dt ? req.body.dt : util.date.dateLabel(),
+        clas: req.body.classId,
+        student: req.body.studentId,
+        bible: req.body.bible === true,
+        book: req.body.book === true
+      })
+      .save()
+      .then(presence => {
+        res.status(201).send(presence);
+      }).catch(err => errorHandler(err, res));
+    }
   }).catch(err => errorHandler(err, res));
 }
 

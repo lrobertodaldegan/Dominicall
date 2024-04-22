@@ -32,6 +32,9 @@ exports.report = (req, res) => {
 
   let dtRef = utils.date.dateLabel();
 
+  if(req.query.d && req.query.d !== null)
+    dtRef = req.query.d;
+
   Clas.find({
     group:groupId
   })
@@ -54,6 +57,7 @@ exports.report = (req, res) => {
 
     for(let i=0; i < classes.length; i++){
       let c = classes[i];
+      console.log(`${c._id} - ${c.name}`);
 
       let students = await Student.where({clas: c._id})
                                   .countDocuments();
@@ -68,17 +72,17 @@ exports.report = (req, res) => {
                                           dt:dtRef,    
                                         });
 
-      let presencesQtd = presences ? presences.length : 0;
+      let presencesQtd = new Number(presences ? presences.length : 0);
 
-      let biblesQtd = 0;
-      let booksQtd  = 0;
+      let biblesQtd = new Number(0);
+      let booksQtd  = new Number(0);
 
       for(let ii=0; ii < presencesQtd; ii++){
         if(presences[ii].bible === true)
-          biblesQtd += 1;
+          biblesQtd = biblesQtd + 1;
         
         if(presences[ii].book === true)
-          booksQtd += 1;
+          booksQtd = booksQtd + 1;
       }
 
       let offers = await Offer.find({
@@ -86,11 +90,11 @@ exports.report = (req, res) => {
         dt:dtRef,    
       });
 
-      let totalOffer = 0;
+      let totalOffer = new Number(0);
       
       if(offers && offers.length > 0){
         for(let iii=0; iii < offers.length; iii++){
-          totalOffer += offers[iii].value;
+          totalOffer = new Number(offers[iii].value);
         }
       }
 
@@ -104,24 +108,24 @@ exports.report = (req, res) => {
         bibles:biblesQtd,
         books:booksQtd,
         offers:totalOffer,
-        percent:`${(presences * 100) / students}%`
+        percent:`${(presencesQtd * 100) / students}%`
       });
 
-      totalPresences += presencesQtd;
+      totalPresences = totalPresences + presencesQtd;
 
-      totalStudents += students;
+      totalStudents = totalStudents + students;
 
-      totalVisitors += visitors;
+      totalVisitors = totalVisitors + visitors;
 
-      totalBibles += biblesQtd;
+      totalBibles = totalBibles + biblesQtd;
 
-      totalBooks += booksQtd;
+      totalBooks = totalBooks + booksQtd;
 
-      totalAudience += presencesQtd + visitors;
+      totalAudience = totalAudience + (presencesQtd + visitors);
 
-      totalAusences += students - presencesQtd;
+      totalAusences = totalAusences + (students - presencesQtd);
 
-      totalOffers += totalOffer;
+      totalOffers = totalOffers + totalOffer;
     }
 
     // let lastWeekDt = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
