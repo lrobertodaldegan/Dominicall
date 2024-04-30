@@ -98,6 +98,8 @@ exports.report = (req, res) => {
         }
       }
 
+      let cdPercent = (presencesQtd * 100) / students
+
       classData.push({
         name:c.name,
         students:students,
@@ -108,7 +110,7 @@ exports.report = (req, res) => {
         bibles:biblesQtd,
         books:booksQtd,
         offers:totalOffer,
-        percent:`${(presencesQtd * 100) / students}%`
+        percent:`${cdPercent.toFixed(2)}%`
       });
 
       totalPresences = totalPresences + presencesQtd;
@@ -138,6 +140,8 @@ exports.report = (req, res) => {
 
     let html = fs.readFileSync(GENERAL_TEMPLATE_DIR, "utf8");
 
+    let totalPercent = totalStudents === 0 ? 0 : ((totalPresences * 100) / totalStudents);
+
     var report = {
       html: html,
       data: {
@@ -150,8 +154,8 @@ exports.report = (req, res) => {
           audience: totalAudience,
           bibles: totalBibles,
           books: totalBooks,
-          offers: totalOffers,
-          percent:totalStudents === 0 ? 0 : `${(totalPresences * 100) / totalStudents}%`
+          offers: totalOffers && totalOffers !== null ? totalOffers.toFixed(2) : 0,
+          percent:`${totalPercent.toFixed(2)}%`
         },
         dt:dtRef,
         group:{name:classes[0].group.name}
@@ -429,4 +433,4 @@ exports.reportStudents = (req, res) => {
       res.download(destinationPath);
     }).catch(err => errorHandler(err, res));
   }).catch(err => errorHandler(err, res));
-}
+}	
