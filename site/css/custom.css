@@ -46,6 +46,14 @@ p a:active{
     text-align: center;
 }
 
+#video-wrap{
+    margin: 0;
+    padding-top: 50px;
+}
+#video-wrap iframe{
+    height: 90%;
+}
+
 @media only screen and (min-width: 768px){
     .hideOnMobile {
         display:block;
