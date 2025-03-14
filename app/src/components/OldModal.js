@@ -9,7 +9,7 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Icon from './Icon';
 
-export default function Modal({onClose=()=>null, closable=true, content=<></>}){
+export default function OldModal({onClose=()=>null, closable=true, content=<></>}){
   const renderClose = () => {
     if(closable === true){
       return (

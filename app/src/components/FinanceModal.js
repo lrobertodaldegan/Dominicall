@@ -9,7 +9,7 @@ import { faCoins, faTag } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 import { post } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
@@ -58,7 +58,7 @@ export default function FinanceModal({onClose=()=>null}){
   }
 
   return (
-    <Modal onClose={onClose} content={
+    <OldModal onClose={onClose} content={
       <ScrollView contentContainerStyle={styles.input}
           keyboardDismissMode='on-drag'
           keyboardShouldPersistTaps='always'>

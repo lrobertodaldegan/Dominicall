@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Dimensions,
@@ -6,16 +6,82 @@ import {
   Linking,
   Share,
   ToastAndroid,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
+import { get } from '../service/Rest/RestService';
 import { Colors } from '../utils/Colors';
+import { Texts } from '../utils/Texts';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 
+const reportTypes = ['pdf', 'csv'];
+
 export default function ReportModal({group, report, onClose=()=>null}){
+  const [reportType, setReportType] = useState(null);
+  const [reportDates, setReportDates] = useState(null);
+  const [reportDate, setReportDate] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if(report?.link === null || report?.linkCsv === null){
+      if(report?.link !== null)
+        setReportType(reportTypes[0]);
+
+      if(report?.linkCsv !== null)
+        setReportType(reportTypes[1]);
+    }
+
+    if(report?.enableDateFilter === true){
+      setLoading(true);
+
+      get(`${Texts.API.reports.presencesDays}?groupId=${group?._id}`).then((response) => {
+        if(response.status === 200){
+          let dts = response.data.dates;
+          
+          setReportDates(dts.sort((a, b) => {
+            let dta = a.split(" ")[1];
+            let dtb = b.split(" ")[1];
+
+            const partesA = dta.split('/');
+            const partesB = dtb.split('/');
+
+            let dateA = new Date(parseInt(partesA[2], 10), 
+                                  parseInt(partesA[1], 10) - 1,
+                                  parseInt(partesA[0], 10));
+
+            let dateB = new Date(parseInt(partesB[2], 10), 
+                                  parseInt(partesB[1], 10) - 1,
+                                  parseInt(partesB[0], 10));
+
+            if(dateA > dateB)
+              return 1;
+            else
+              return 0;
+          }));
+
+          if(dts.length === 1)
+            setReportDate(dts[0]);
+        }
+
+        setLoading(false);
+      });
+    }
+  }, []);
 
   const getLink = () => {
-    return `${report?.link}?groupId=${group._id}`;
+    let link = null;
+
+    if(reportType === reportTypes[0])
+      link = `${report?.link}?groupId=${group._id}`;
+    else
+      link = `${report?.linkCsv}?groupId=${group._id}`;
+
+    if(report?.enableDateFilter === true && reportDate !== null)
+      link = `${link}&d=${reportDate}`;
+
+    return link;
   }
 
   const onShare = async () => {
@@ -31,26 +97,79 @@ export default function ReportModal({group, report, onClose=()=>null}){
   }
 
   return (
-    <Modal onClose={onClose} content={
-      <View>
-        <Label value={'Relatório'} style={styles.title}/>
+    <OldModal onClose={onClose} content={
+      <ScrollView contentContainerStyle={styles.modalScroll}>
+        <Label value={`Relatório ${report?.title}`} style={styles.title}/>
 
-        <Label value={report?.title} style={styles.subtitle}/>
+        {isLoading === true && (
+          <ActivityIndicator size={'large'} color={'#000'}/>
+        )}
 
-        <Label style={styles.legend}
-            value={'Você pode abrir o relatório no navegador\nou compartilhar um link de acesso:'}/>
+        {isLoading === false
+            && report?.enableDateFilter === true 
+            && reportDate === null
+            && reportDates !== null
+            && (
+          <>
+            <Label value={'Selecione uma data para o relatório:'}
+                style={styles.legend}/>
+          
+            {reportDates.map((rd) => 
+              <Button key={rd}
+                  label={rd} 
+                  onPress={() => setReportDate(rd)}
+                  style={styles.whiteBtn}
+                  labelStyle={styles.whiteBtnLbl}
+              />
+            )}
+          </>
+        )}
 
-        <Button label={'Abrir'} 
-            onPress={() => Linking.openURL(getLink())}
-            style={styles.btn}
-        />
+        {isLoading === false
+            && (report?.enableDateFilter === true ? reportDate !== null : true)
+            && reportDate != null && (
+        
+          <Label value={`Data do relatório: ${reportDate}`}
+              style={styles.subtitle}/>
+        )}
 
-        <Button label={'Compartilhar link'} 
-            onPress={onShare}
-            labelStyle={styles.whiteBtnLbl}
-            style={styles.whiteBtn}
-        />
-      </View>
+        {isLoading === false
+            && (report?.enableDateFilter === true ? reportDate !== null : true)
+            && reportType === null && (
+          <>
+            <Label value={'Selecione o tipo de arquivo desejado:'}
+                style={styles.legend}/>
+          
+            {reportTypes.map((rt) => 
+              <Button key={rt}
+                  label={rt} 
+                  onPress={() => setReportType(rt)}
+                  style={styles.btn}
+              />
+            )}
+          </>
+        )}
+
+        {isLoading === false 
+            && (report?.enableDateFilter === true ? reportDate !== null : true)
+            && reportType !== null && (
+          <>
+            <Label style={styles.legend}
+                value={`Você pode abrir o relatório (${reportType}) no navegador\nou compartilhar um link de acesso:`}/>
+
+            <Button label={'Abrir'} 
+                onPress={() => Linking.openURL(getLink())}
+                style={styles.btn}
+            />
+
+            <Button label={'Compartilhar link'} 
+                onPress={onShare}
+                labelStyle={styles.whiteBtnLbl}
+                style={styles.whiteBtn}
+            />
+          </>
+        )}
+      </ScrollView>
     }/>
   );
 }
@@ -58,6 +177,11 @@ export default function ReportModal({group, report, onClose=()=>null}){
 const screen = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
+  modalScroll:{
+    minHeight:screen.height * 0.75,
+    alignItems:'center',
+    justifyContent: 'center'
+  },
   title:{
     color:Colors.black,
     textAlign:'center',

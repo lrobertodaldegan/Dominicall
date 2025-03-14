@@ -8,7 +8,7 @@ import { faEnvelope, faPersonChalkboard, faUsd, faUser } from '@fortawesome/free
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 import { Texts } from '../utils/Texts';
 import { post } from '../service/Rest/RestService';
@@ -143,7 +143,7 @@ export default function TeacherModal({
   }
 
   return (
-    <Modal onClose={onClose} content={
+    <OldModal onClose={onClose} content={
       <View style={styles.input}>
         <Label value={'Novo Professor'} style={styles.title}/>
 

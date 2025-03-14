@@ -9,7 +9,7 @@ import { faCoins, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 import { Texts } from '../utils/Texts';
 import { Days } from '../utils/Days';
@@ -68,7 +68,7 @@ export default function OfferModal({classs, offerer=null, onClose=()=>null}){
 
 
   return (
-    <Modal onClose={onClose} content={
+    <OldModal onClose={onClose} content={
       <View>
         <Label value={'Oferta'} style={styles.title}/>
 

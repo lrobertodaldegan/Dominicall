@@ -9,7 +9,7 @@ import DatePicker from 'react-native-modern-datepicker';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 import { post } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
@@ -75,7 +75,7 @@ export default function EventModal({
   }
 
   return (
-    <Modal onClose={onClose} content={
+    <OldModal onClose={onClose} content={
       <View>
         <Label value={'Novo Evento'} style={styles.title}/>
 

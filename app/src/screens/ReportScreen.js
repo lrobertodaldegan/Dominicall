@@ -13,32 +13,47 @@ import { Colors } from '../utils/Colors';
 import ReportListItem from '../components/ReportListItem';
 import { Texts } from '../utils/Texts';
 import ReportModal from '../components/ReportModal';
-// import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const REPORTS = [
   {
     id:0, 
     title:'Geral', 
     subtitle:'Relatório de total geral (presença e ofertas)', 
+    enableDateFilter:true,
     link: Texts.API.reports.general,
+    linkCsv: Texts.API.reports.generalCsv
   },
   {
     id:1, 
-    title:'Financeiro', 
-    subtitle:'Ofertas, entradas e saídas', 
-    link: Texts.API.reports.finance,
+    title:'Matrículas', 
+    subtitle:'Alunos matriculados por turma', 
+    enableDateFilter:false,
+    link: Texts.API.reports.students,
+    linkCsv: Texts.API.reports.studentsCsv
   },
   {
     id:2, 
-    title:'Escalas', 
-    subtitle:'Escalas (ordem de aulas) e eventos', 
-    link: Texts.API.reports.calendar,
+    title:'Presenças', 
+    subtitle:'Presenças registradas por turma', 
+    enableDateFilter:false,
+    link: null,
+    linkCsv: Texts.API.reports.presencesCsv
   },
   {
     id:3, 
-    title:'Matrículas', 
-    subtitle:'Alunos matriculados por turma', 
-    link: Texts.API.reports.students,
+    title:'Escalas', 
+    subtitle:'Escalas (ordem de aulas) e eventos', 
+    enableDateFilter:false,
+    link: Texts.API.reports.calendar,
+    linkCsv: null,
+  },
+  {
+    id:4, 
+    title:'Financeiro', 
+    subtitle:'Ofertas, entradas e saídas', 
+    enableDateFilter:false,
+    link: Texts.API.reports.finance,
+    linkCsv: null,
   },
 ];
 
@@ -68,7 +83,6 @@ const ReportScreen = ({navigation, route}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      {/* <LicenseWarnModal navigation={navigation}/> */}
 
       <Header page={'reports'} navigation={navigation}/>
 

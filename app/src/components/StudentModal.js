@@ -10,7 +10,7 @@ import DatePicker, {getFormatedDate} from 'react-native-modern-datepicker';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 import IconLabel from './IconLabel';
 import { Texts } from '../utils/Texts';
@@ -136,7 +136,7 @@ export default function StudentModal({classs, student=null, onClose=()=>null}){
   }
 
   return (
-    <Modal onClose={onClose} content={
+    <OldModal onClose={onClose} content={
       <ScrollView contentContainerStyle={styles.wrap}
         keyboardDismissMode='on-drag'
         keyboardShouldPersistTaps='always'>

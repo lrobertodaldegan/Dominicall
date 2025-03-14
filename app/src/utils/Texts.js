@@ -37,9 +37,13 @@ export const Texts = {
     license: `${API_BASE_PATH}license`,
     reports: {
       general:`${API_BASE_PATH}report`,
+      generalCsv:`${API_BASE_PATH}report/csv`,
       finance:`${API_BASE_PATH}report/finance`,
       calendar:`${API_BASE_PATH}report/calendar`,
       students:`${API_BASE_PATH}report/students`,
+      studentsCsv:`${API_BASE_PATH}report/csv/students`,
+      presencesCsv:`${API_BASE_PATH}report/csv/presences`,
+      presencesDays:`${API_BASE_PATH}report/date`,
     },
   },
 }

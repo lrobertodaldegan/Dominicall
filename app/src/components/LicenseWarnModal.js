@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import Label from './Label';
-import Modal from './Modal';
+import OldModal from './OldModal';
 import Button from './Button';
 import { Colors } from '../utils/Colors';
 import { Texts } from '../utils/Texts';
@@ -103,7 +103,7 @@ export default function LicenseWarnModal({navigation}){
     return <></>
 
   return (
-    <Modal closable={closable} onClose={handleClose} content={
+    <OldModal closable={closable} onClose={handleClose} content={
       <ScrollView contentContainerStyle={styles.modalScroll} 
           refreshControl={
             <RefreshControl refreshing={loading}
