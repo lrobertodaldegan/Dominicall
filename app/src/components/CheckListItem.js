@@ -105,11 +105,13 @@ const styles = StyleSheet.create({
   wrap:{
     flexDirection:'row',
     alignItems:'center',
-    width:screen.width - 20,
+    width:screen.width * 0.99,
     minHeight:screen.height * 0.12,
     backgroundColor:Colors.white,
     marginBottom:20,
     paddingVertical:10,
+    borderBottomWidth:1,
+    borderBottomColor:Colors.aWhite
   },
   titleLeft:{
     color:Colors.white,
@@ -118,9 +120,8 @@ const styles = StyleSheet.create({
   left:{
     justifyContent:'center',
     alignItems:'center',
-    width:(screen.height * 0.12) * 0.5,
-    height:(screen.height * 0.12) * 0.5,
-    marginRight:20
+    width:screen.width * 0.20,
+    height:screen.width * 0.15,
   },
   title:{
     color:Colors.black,
@@ -140,10 +141,7 @@ const styles = StyleSheet.create({
     marginTop:5,
   },
   compsItem:{
-    width: ((screen.width - 20) - ((screen.height * 0.12) * 0.5)) * 0.5
-  },
-  bottomCompWrap:{
-    width: (screen.width - 20) - ((screen.height * 0.12) * 0.5)
+    width:screen.width * 0.20,
   },
   slctd:{
     color:Colors.black

@@ -150,7 +150,6 @@ export default function MemberModal({
           <Input ico={faUser} 
             placeholder='Nome do membro'
             value={name}
-            iconSize={30}
             style={styles.input}
             onChange={handleChangeName}
             onEnter={handleSubmit}
@@ -159,7 +158,6 @@ export default function MemberModal({
           <Input ico={faUser} 
             placeholder='Usuário para acesso'
             value={username}
-            iconSize={30}
             style={styles.input}
             onChange={setUsername}
             onEnter={handleSubmit}
@@ -168,7 +166,6 @@ export default function MemberModal({
           <Input ico={faEnvelope} 
             placeholder='E-mail para acesso'
             value={email}
-            iconSize={30}
             style={styles.input}
             onChange={setEmail}
             onEnter={handleSubmit}
@@ -249,7 +246,7 @@ export default function MemberModal({
           />
 
           <Button label={'Criar usuário'} 
-            onPress={() => setShowForm(true)}
+            onPress={() => navigation.navigate('new-member', {classs: clas})}
             style={styles.input}
             loading={loading}
           />

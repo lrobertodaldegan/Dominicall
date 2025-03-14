@@ -58,7 +58,6 @@ export default function ClassModal({onClose=()=>null}){
         <Input ico={faUsers} 
             placeholder='Nome da turma'
             value={name}
-            iconSize={30}
             style={styles.input}
             onChange={setName}
             onEnter={handleSubmit}

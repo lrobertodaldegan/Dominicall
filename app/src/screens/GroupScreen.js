@@ -20,7 +20,6 @@ import Link from '../components/Link';
 import { del, get } from '../service/Rest/RestService';
 import { Texts } from '../utils/Texts';
 import CacheService from '../service/Cache/CacheService';
-// import LicenseWarnModal from '../components/LicenseWarnModal';
 
 const GroupScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
@@ -85,7 +84,6 @@ const GroupScreen = ({navigation}) => {
 
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
-      {/* <LicenseWarnModal navigation={navigation}/> */}
 
       <View style={styles.logoffwrap}>
         <Link label={'< Sair do app'}
@@ -152,19 +150,19 @@ const styles= StyleSheet.create({
   logo:{
     height:screen.height * 0.1,
     width:screen.height * 0.1,
-    marginTop:screen.height * 0.08,
   },
   list:{
+    padding: 10,
     marginVertical:20,
     backgroundColor:Colors.white,
     borderTopLeftRadius:20,
     borderTopRightRadius:20,
   },
   title:{
-    fontSize:26,
+    fontSize:24,
     fontFamily:'MartelSans-Bold',
     color:Colors.dark,
-    marginVertical:screen.height * 0.05
+    marginVertical:screen.height * 0.02
   },
   lbl:{
     color:Colors.gray

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   wrap:{
     position:'absolute',
     bottom:70,
-    backgroundColor:Colors.offWhite,
+    backgroundColor:Colors.black,
     borderRadius:20,
     margin:10,
     paddingHorizontal:20,
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
   },
   link:{
     fontSize:12,
-    marginTop:0
+    marginTop:0,
+    color:Colors.white
   },
 });

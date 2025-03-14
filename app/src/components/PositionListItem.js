@@ -105,7 +105,9 @@ const styles = StyleSheet.create({
     height:screen.height * 0.12,
     backgroundColor:Colors.white,
     borderRadius:10,
-    marginBottom:10
+    marginBottom:10,
+    borderBottomWidth:1,
+    borderBottomColor:Colors.aWhite
   },
   titleLeft:{
     color:Colors.white,

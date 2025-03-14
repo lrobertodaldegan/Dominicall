@@ -162,12 +162,12 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
-    width:screen.width - 20,
+    width:screen.width * 0.95,
     marginTop:10,
   },
   title:{
     color:Colors.black,
-    fontSize:24,
+    fontSize:20,
     fontFamily:'MartelSans-Bold'
   },
   user:{
@@ -178,12 +178,11 @@ const styles = StyleSheet.create({
     alignItems:"center"
   },
   menuOpts:{
-    fontSize:18,
+    fontSize:14,
     textAlign:'center'
   },
   menuOptsWrap:{
-    minWidth:(screen.width * 0.33) * 0.5,
-    marginHorizontal:(screen.width * 0.33) * 0.25,
+    marginRight:screen.width * 0.12
   },
 });
 

@@ -171,13 +171,22 @@ exports.removeMember = (req, res) => {
     })
     .then(gm => {
       if(gm){
-        ClassTeacher.findOne({
-          teacher:req.params.id,
-          clas: req.query.classId
+        ClassTeacher.find({
+          teacher:gm._id,
         })
-        .then((ct) => {
-          if(ct)
-            ClassTeacher.deleteOne({_id:ct._id}).exec();
+        .then((cts) => {
+          if(cts){
+            for(let i=0; i < cts.length; i++){
+              let ct = cts[i];
+
+              if(req.query.classId && req.query.classId !== null){
+                if(`${ct.clas}` === `${req.query.classId}`)
+                  ClassTeacher.deleteOne({_id:ct._id}).exec();
+              } else {
+                ClassTeacher.deleteOne({_id:ct._id}).exec();
+              }
+            }
+          }
           
           if(`${gm.group.owner._id}` === `${gm.user._id}`)
             res.status(200).send({message: 'Operação realizada com sucesso!'});

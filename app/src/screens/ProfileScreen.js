@@ -4,14 +4,14 @@ import {
   StyleSheet,
   Dimensions,
   ImageBackground,
-  ScrollView,
   ToastAndroid,
   RefreshControl,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import fundo from '../assets/img/fundo.png';
 import Button from '../components/Button';
 import Header from '../components/Header';
-import {get, put} from '../service/Rest/RestService';
+import {put} from '../service/Rest/RestService';
 import CacheService from '../service/Cache/CacheService';
 import Input from '../components/Input';
 import { faKey, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -19,25 +19,17 @@ import By from '../components/By';
 import { Colors } from '../utils/Colors';
 import Label from '../components/Label';
 import { Texts } from '../utils/Texts';
-// import LicenseModal from '../components/LicenseModal';
 
 const ProfileScreen = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [pass, setPass] = useState(null);
   const [name, setName] = useState(null);
   const [email, setEmail] = useState(null);
-  // const [license, setLicense] = useState(null);
   const [loading, setLoading] = useState(false);
-  // const [showModal, setShowModal] = useState(false);
 
   useEffect(()=>{
     search();
   },[]);
-
-  // useEffect(()=>{
-  //   if(showModal === false)
-  //     search();
-  // },[showModal]);
 
   const search = () => {
     setLoading(true);
@@ -48,16 +40,6 @@ const ProfileScreen = ({navigation}) => {
       setEmail(user.email);
 
       setLoading(false);
-      
-      // get(Texts.API.license).then(response => {
-      //   setLoading(false);
-
-      //   if(response.status === 200){
-      //     setLicense(response.data.status);
-      //   } else {
-      //     ToastAndroid.show('Houve um erro ao tentar consultar o status da licença de usuário!');
-      //   }
-      // });
     });
   }
 
@@ -93,56 +75,12 @@ const ProfileScreen = ({navigation}) => {
     }
   }
 
-  // const isLicenseActive = () => {
-  //   return license && license !== null && (license === 'active');
-  // }
-
-  // const getLicenseStatusLabel = () => {
-  //   if(isLicenseActive() === true){
-  //     return 'Ativa';
-  //   } else {
-  //     if(license === 'expired'){
-  //       return 'Expirada';
-  //     } else if(license === 'requested'){
-  //       return 'Solicitada';
-  //     } else {
-  //       return 'Inativa';
-  //     }
-  //   }
-  // }
-
-  // const renderLicenseAction = () => {
-  //   if(isLicenseActive() === true || getLicenseStatusLabel() === 'Solicitada')
-  //     return <></>;
-
-  //   return (
-  //     <Button label={'Ativar licença'} 
-  //       style={styles.btnLi}
-  //       labelStyle={styles.btnLiLbl}
-  //       loading={loading}
-  //       onPress={() => setShowModal(true)}
-  //     />
-  //   );
-  // }
-
-  // const renderModal = () => {
-  //   if(showModal === true){
-  //     return (
-  //       <LicenseModal onClose={() => setShowModal(false)}
-  //         licenseMail={email}/>
-  //     );
-  //   }
-
-  //   return<></>
-  // }
-
   return (
     <ImageBackground source={fundo} resizeMode='repeat' style={styles.wrap}>
       <Header page={'profile'} navigation={navigation}/>
 
-      {/* {renderModal()} */}
-
-      <ScrollView contentContainerStyle={styles.subwrap} 
+      <KeyboardAwareScrollView contentContainerStyle={styles.subwrap} 
+          enableOnAndroid={true}
           refreshControl={
             <RefreshControl refreshing={loading} 
               onRefresh={search}
@@ -179,18 +117,10 @@ const ProfileScreen = ({navigation}) => {
           <Button label={'Salvar'} 
               onPress={() => handleSubmit()}
               loading={loading}/>
-
-          {/* <Label style={styles.legend}
-              value={`Status da licença de usuário: ${getLicenseStatusLabel()}`}/>
-
-          {renderLicenseAction()}
-
-          <Label style={styles.legend}
-              value={`\nNós liberamos o seu acesso ao app durante os primeiros 14 dias após o registro de usuário. Após isso será necessário ativar sua licença de usuário. A licença é vitalícia e intransferível. Se ainda não ativou, ative a sua e garanta todos os benefícios do app!`}/> */}
         </View>
 
         <By />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </ImageBackground>
   );
 }

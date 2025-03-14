@@ -1,0 +1,56 @@
+@keyframes backgroundSlide {
+    0% {
+        background:white;
+    }
+    100% {
+        background:#181818;
+    }
+}
+body{
+    overflow-x: hidden;
+    font-family: 'Martel Sans', sans-serif;
+}
+h4{
+    font-weight: bold;
+}
+p {
+    text-align: justify;
+}
+p a,
+p a:active{
+    color: #000000;
+    font-weight: bold;
+}
+.bg-black{
+    background-color: #000000;
+    color:#fff;
+}
+.hideOnMobile{
+    display: none;
+}
+
+.carousel-two{
+    margin-bottom: 10px;
+}
+
+#rodaperow{
+    margin-bottom:0;
+    padding-bottom:50px;
+    padding-top:50px;
+}
+#rodape{
+    color:#fff;
+}
+
+#rodape p{
+    text-align: center;
+}
+
+@media only screen and (min-width: 768px){
+    .hideOnMobile {
+        display:block;
+    }
+    .showOnMobile {
+        display:none;
+    }
+}

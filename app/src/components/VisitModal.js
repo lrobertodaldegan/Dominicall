@@ -4,7 +4,7 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { faChild } from '@fortawesome/free-solid-svg-icons';
+import { faChild, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { Colors } from '../utils/Colors';
 import Input from './Input';
 import Label from './Label';
@@ -65,18 +65,18 @@ export default function VisitModal({classs, onClose=()=>null}){
         <Label value={'Nova visita'} style={styles.title}/>
 
         <Input ico={faChild} 
+            iconSize={18}
             placeholder='Nome da visita'
             value={name}
-            iconSize={30}
             style={styles.input}
             onChange={setName}
             onEnter={handleSubmit}
         />
 
-        <Input ico={faChild} 
+        <Input ico={faPhone} 
+            iconSize={18}
             placeholder='Número (contato)'
             value={number}
-            iconSize={30}
             style={styles.input}
             keyboardType='numeric'
             onChange={setNumber}

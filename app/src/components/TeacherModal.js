@@ -85,27 +85,27 @@ export default function TeacherModal({
       return (
         <>
           <Input ico={faPersonChalkboard} 
+            iconSize={18}
             placeholder='Nome do professor'
             value={name}
-            iconSize={30}
             style={styles.input}
             onChange={handleChangeName}
             onEnter={handleSubmit}
           />
 
           <Input ico={faUser} 
+            iconSize={18}
             placeholder='Usuário para acesso'
             value={username}
-            iconSize={30}
             style={styles.input}
             onChange={setUsername}
             onEnter={handleSubmit}
           />
 
           <Input ico={faEnvelope} 
+            iconSize={18}
             placeholder='E-mail para acesso'
             value={email}
-            iconSize={30}
             style={styles.input}
             onChange={setEmail}
             onEnter={handleSubmit}

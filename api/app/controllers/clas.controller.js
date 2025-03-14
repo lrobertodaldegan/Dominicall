@@ -72,6 +72,8 @@ exports.update = (req, res) => {
   if(req.body.id && req.body.name) {
     Clas.findById(req.body.id).then(clas => {
       if(clas){
+        clas.name = req.body.name;
+        
         clas.save().then(clas => {
           res.status(200).send({message:`Turma ${clas.name} atualizada com sucesso!`});
         }).catch(err => errorHandler(err, res));
@@ -386,6 +388,8 @@ exports.getStudents = (req, res) => {
   Student.find({
     clas:req.query.classId,
   })
+  .collation({locale:'pt', strength: 2})
+  .sort({name:1})
   .then(async (students) => {
     let status = students && students.length > 0 ? 200 : 204;
 
